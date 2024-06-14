@@ -93,7 +93,7 @@
       ]
     },
     {
-      "group": "Endpoint Examples",
+      "group": "API Endpoints",
       "pages": [
         "api-reference/endpoint/get",
         "api-reference/endpoint/create",
@@ -103,7 +103,7 @@
   ],
   "footerSocials": {
     "x": "https://x.com/mavapay",
-    "github": "https://github.com/stealthmoney/mavapay",
+    "github": "https://github.com/stealthmoney/mavapay-docs",
     "linkedin": "https://www.linkedin.com/company/mavapay"
   }
 }
