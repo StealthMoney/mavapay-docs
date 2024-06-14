@@ -71,6 +71,230 @@
           }
         }
       }
+    },
+    "/bankaccount": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Bank Account"],
+        "operationId": "getBankAccount",
+        "summary": "Get bank account details",
+        "description": "Returns the bank account details for a given currency",
+        "parameters": [
+          {
+            "name": "walletId",
+            "in": "query",
+            "description": "The wallet ID to get the bank account for (optional)",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "The currency to get the bank account for (optional)",
+            "schema": {
+              "type": "string",
+              "enum": ["NGN", "KES", "BTC", "USD"]
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bank account response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BankAccount"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Bank Account"],
+        "operationId": "createBankAccount",
+        "summary": "Register a bank account",
+        "description": "Register a bank account that can be used for withdrawal for a given currency",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankAccount"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Bank account response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BankAccount"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bank/bankcode": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Bank Account"],
+        "operationId": "getBankCode",
+        "summary": "Get bank code",
+        "description": "Returns all bank codes for a given currency. This endpoint is currently limited to Nigeria(NGN) only",
+        "responses": {
+          "200": {
+            "description": "Bank code response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankCode"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bank/name-enquiry": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "tags": ["Bank Account"],
+        "operationId": "getBankNameEnquiry",
+        "summary": "Verify bank account details if it is correct",
+        "description": "Verify bank account details if it is correct. The response returned should match the account number and account name of the user. This endpoint is currently limited to Nigeria(NGN) only",
+        "parameters": [
+          {
+            "name": "accountNumber",
+            "in": "query",
+            "description": "The account number to verify",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "bankCode",
+            "in": "query",
+            "description": "The bank code to verify",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bank name enquiry response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankNameEnquiry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -132,13 +356,127 @@
           }
         }
       },
+      "BankAccount": {
+        "type": "object",
+        "properties": {
+          "bankName": {
+            "type": "string",
+            "format": "string",
+            "example": "KUDA MICROFINANCE BANK"
+          },
+          "bankCode": {
+            "type": "string",
+            "format": "string",
+            "example": "090267"
+          },
+          "bankAccountNumber": {
+            "type": "string",
+            "format": "string",
+            "example": "0123456789"
+          },
+          "bankAccountName": {
+            "type": "string",
+            "format": "string",
+            "example": "Satoshi Nakamoto"
+          },
+          "currency": {
+            "type": "string",
+            "format": "string",
+            "enum": ["NGN", "KES"]
+          },
+          "walletId": {
+            "type": "string",
+            "format": "string",
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b-123456789"
+          }
+        }
+      },
+      "BankCode": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "format": "string",
+            "example": "ok"
+          },
+          "message": {
+            "type": "string",
+            "format": "string",
+            "example": "all bank codes retrieved successfully"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "bankName": {
+                  "type": "string",
+                  "format": "string",
+                  "example": "KUDA MICROFINANCE BANK"
+                },
+                "nipBankCode": {
+                  "type": "string",
+                  "format": "string",
+                  "example": "090267"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BankNameEnquiry": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "format": "string",
+            "example": "ok"
+          },
+          "message": {
+            "type": "string",
+            "format": "string",
+            "example": "Bank account name verified successfully"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "accountName": {
+                "type": "string",
+                "format": "string",
+                "example": "Oladeji Olaolu"
+              },
+              "accountNumber": {
+                "type": "string",
+                "format": "string",
+                "example": "0123456789"
+              },
+              "kycLevel": {
+                "type": "string",
+                "format": "string",
+                "example": "3"
+              },
+              "nameInquiryReference": {
+                "type": "string",
+                "format": "string",
+                "example": "123456789"
+              },
+              "channelCode": {
+                "type": "string",
+                "format": "string",
+                "example": "123456789"
+              }
+            }
+          }
+        }
+      },
       "Error": {
         "required": ["error", "message"],
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "format": "string"
+            "format": "string",
+            "example": "error"
           },
           "message": {
             "type": "string"

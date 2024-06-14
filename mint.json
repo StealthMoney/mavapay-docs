@@ -93,8 +93,20 @@
       "pages": [
         {
           "group": "Price",
+          "pages": ["api-reference/endpoint/price/get-price"]
+        },
+        {
+          "group": "Bank Account",
           "pages": [
-            "api-reference/endpoint/price/get-price"
+            "api-reference/endpoint/bank-account/get-account",
+            "api-reference/endpoint/bank-account/register-account"
+          ]
+        },
+        {
+          "group": "Bank Info",
+          "pages": [
+            "api-reference/endpoint/bank-info/bank-code",
+            "api-reference/endpoint/bank-info/name-enquiry"
           ]
         }
       ]
