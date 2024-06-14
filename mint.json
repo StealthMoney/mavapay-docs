@@ -1,15 +1,14 @@
 {
-  "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "Mavapay",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg"
+    "dark": "/logo/mavapay.svg",
+    "light": "/logo/mavapay.svg"
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0D9373",
+    "primary": "#F2B246",
     "light": "#07C983",
-    "dark": "#0D9373",
+    "dark": "#F2B246",
     "anchors": {
       "from": "#0D9373",
       "to": "#07C983"
@@ -18,12 +17,12 @@
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:hi@mintlify.com"
+      "url": "mailto:info@mavapay.co"
     }
   ],
   "topbarCtaButton": {
-    "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
+    "name": "Sign up",
+    "url": "https://mavapay.co/sign-up"
   },
   "tabs": [
     {
@@ -33,19 +32,14 @@
   ],
   "anchors": [
     {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
-    },
-    {
-      "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
+      "name": "Products",
+      "icon": "product-hunt",
+      "url": "https://app.mavapay.money"
     },
     {
       "name": "Blog",
       "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
+      "url": "https://blog.mavapay.money"
     }
   ],
   "navigation": [
@@ -53,25 +47,49 @@
       "group": "Get Started",
       "pages": [
         "introduction",
-        "quickstart",
+        "account-setup",
         "development"
       ]
     },
     {
-      "group": "Essentials",
+      "group": "Collections",
       "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation",
-        "essentials/reusable-snippets"
+        "collections/markdown",
+        "collections/code",
+        "collections/images",
+        "collections/settings",
+        "collections/navigation",
+        "collections/reusable-snippets"
+      ]
+    },
+    {
+      "group": "Payouts",
+      "pages": [
+        "payouts/markdown",
+        "payouts/code",
+        "payouts/images",
+        "payouts/settings",
+        "payouts/navigation",
+        "payouts/reusable-snippets"
+      ]
+    },
+    {
+      "group": "Webhooks",
+      "pages": [
+        "webhooks/markdown",
+        "webhooks/code",
+        "webhooks/images",
+        "webhooks/settings",
+        "webhooks/navigation",
+        "webhooks/reusable-snippets"
       ]
     },
     {
       "group": "API Documentation",
       "pages": [
-        "api-reference/introduction"
+        "api-reference/introduction",
+        "api-reference/authentication",
+        "api-reference/errors"
       ]
     },
     {
@@ -84,8 +102,8 @@
     }
   ],
   "footerSocials": {
-    "x": "https://x.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
+    "x": "https://x.com/mavapay",
+    "github": "https://github.com/stealthmoney/mavapay",
+    "linkedin": "https://www.linkedin.com/company/mavapay"
   }
 }

@@ -1,0 +1,35 @@
+---
+title: 'Account Setup'
+description: 'Set up your account and start building with the Mavapay API.'
+---
+### Step 1: Create an account
+Create a [free Mavapay account](https://mavapay.co/signup). By default, you will be in the test environment. You can switch to the live environment after completing the KYC verification process.
+
+### Step 2: Get your API keys
+After creating an account, you will be able to generate your test API keys from the [dashboard](https://dashboard.mavapay.co). You will need these keys to authenticate your requests to the Mavapay API.
+Here's a sample of what your API keys will look like:
+
+```json
+{
+  "public_key": "pk_test_sddkdkd",
+  "secret_key": "sk_test_sddkdkd"
+}
+```
+
+### Step 3: Start building
+You can now start building with the Mavapay API.
+In the test environment, you would be able to:
+
+1. Collect payments using mocked card data
+2. Make transfers to dummy accounts (bank accounts and mobile money wallets).
+3. Build with our wallets and virtual cards (using mock data).
+4. Configure your integration to handle different scenarios like failed payments, successful payments, etc.
+5. Complete KYC verification and go live with your integration.
+
+<Card
+  title="Mavapay API Endpoints Schema"
+  icon="leaf"
+  href="https://github.com/stealthmoney/mavapay-docs/blob/main/api-reference/openapi.json"
+>
+  View our OpenAPI specification file
+</Card>
