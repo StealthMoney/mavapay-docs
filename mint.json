@@ -45,11 +45,7 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": [
-        "introduction",
-        "account-setup",
-        "development"
-      ]
+      "pages": ["introduction", "account-setup", "development"]
     },
     {
       "group": "Collections",
@@ -95,9 +91,12 @@
     {
       "group": "API Endpoints",
       "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        {
+          "group": "Price",
+          "pages": [
+            "api-reference/endpoint/price/get-price"
+          ]
+        }
       ]
     }
   ],
@@ -105,5 +104,6 @@
     "x": "https://x.com/mavapay",
     "github": "https://github.com/stealthmoney/mavapay-docs",
     "linkedin": "https://www.linkedin.com/company/mavapay"
-  }
+  },
+  "openapi": "/api-reference/openapi.json"
 }
