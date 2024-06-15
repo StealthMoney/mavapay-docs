@@ -108,6 +108,13 @@
             "api-reference/endpoint/bank-info/bank-code",
             "api-reference/endpoint/bank-info/name-enquiry"
           ]
+        },
+        {
+          "group": "Order",
+          "pages": [
+            "api-reference/endpoint/order/get-order-by-id",
+            "api-reference/endpoint/order/get-all-orders"
+          ]
         }
       ]
     }

@@ -295,6 +295,117 @@
           }
         }
       }
+    },
+    "/order": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Order"],
+        "operationId": "getOrder",
+        "summary": "Get order details",
+        "description": "Returns the order details for a given order ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The order ID to get the details for",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Order"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/all": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Order"],
+        "operationId": "getAllOrders",
+        "summary": "Get all orders",
+        "description": "Returns all orders",
+        "responses": {
+          "200": {
+            "description": "Order response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AllOrders"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -466,6 +577,187 @@
                 "example": "123456789"
               }
             }
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "string",
+            "example": "99854-2345"
+          },
+          "quoteId": {
+            "type": "string",
+            "format": "string",
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+          },
+          "status": {
+            "type": "string",
+            "format": "string",
+            "enum": ["PAID", "PENDING", "EXPIRED", "FAILED"]
+          },
+          "currency": {
+            "type": "string",
+            "format": "string",
+            "enum": ["NGN", "KES"]
+          },
+          "paymentCollectionMethod": {
+            "type": "string",
+            "format": "string",
+            "enum": ["LIGHTNING", "ONCHAIN", "USDT"]
+          },
+          "isValid": {
+            "type": "boolean",
+            "format": "boolean",
+            "example": true
+          },
+          "displayAmount": {
+            "type": "string",
+            "format": "string",
+            "example": "1000.00 NGN"
+          },
+          "paymentBtcDetail": {
+            "type": "string",
+            "format": "string",
+            "example": "lntbs14912790n1pjnruqtpp5xmrq39nwyhgde4a94wsnuacj4stacls05g4x5du2req9pvjpqz6sdz9296k7ar98gsxgdm9vvmx2v3s95ckyceh956xvd3595uxyetr95cnydrxxv6nvwrxv5mngcqzpuxqzfvsp578t78k4628snkkhc43eqrpn6sem28w4cwgzn7ceyyr320kwm4uss9qyyssqcwxw8wy2qenwgm7gagx9lwvcs9w9tw47ntuc823yclasjqczvvj545hr4d9nmg996l0cswudgeawclwytafmh66a2fafk4heksyae5sq3vzd28"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-07-01T12:00:00Z"
+          },
+          "quote": {
+            "$ref": "#/components/schemas/Quote"
+          }
+        }
+      },
+      "AllOrders": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "string",
+            "example": "99854-2345"
+          },
+          "quoteId": {
+            "type": "string",
+            "format": "string",
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+          },
+          "status": {
+            "type": "string",
+            "format": "string",
+            "enum": ["PAID", "PENDING", "EXPIRED", "FAILED"]
+          },
+          "currency": {
+            "type": "string",
+            "format": "string",
+            "enum": ["NGN", "KES"]
+          },
+          "paymentMethod": {
+            "type": "string",
+            "format": "string",
+            "enum": ["LIGHTNING", "ONCHAIN", "USDT"]
+          },
+          "isValid": {
+            "type": "boolean",
+            "format": "boolean",
+            "example": true
+          },
+          "amount": {
+            "type": "string",
+            "format": "string",
+            "example": "1000.00"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-07-01T12:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-07-01T12:00:00Z"
+          },
+          "quote": {
+            "$ref": "#/components/schemas/Quote"
+          }
+        }
+      },
+      "Quote": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+          },
+          "exchangeRate": {
+            "type": "number",
+            "format": "number",
+            "example": 5000000.23
+          },
+          "usdToTargetCurrencyRate": {
+            "type": "number",
+            "format": "number",
+            "example": 1500.65
+          },
+          "sourceCurrency": {
+            "type": "string",
+            "format": "string",
+            "enum": ["BTCSAT", "NGNKOBO", "KESCENT"]
+          },
+          "targetCurrency": {
+            "type": "string",
+            "format": "string",
+            "enum": ["NGNKOBO", "KESCENT"]
+          },
+          "transactionFeesInSourceCurrency": {
+            "type": "number",
+            "format": "number",
+            "example": 11163
+          },
+          "transactionFeesInTargetCurrency": {
+            "type": "string",
+            "format": "string",
+            "example": "3750.00"
+          },
+          "amountInSourceCurrency": {
+            "type": "number",
+            "format": "number",
+            "example": 1499589
+          },
+          "amountInTargetCurrency": {
+            "type": "string",
+            "format": "string",
+            "example": "50000.00"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "format": "string",
+            "enum": ["LIGHTNING", "ONCHAIN", "USDT"]
+          },
+          "expiry": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-07-01T12:00:00Z"
+          },
+          "isValid": {
+            "type": "boolean",
+            "format": "boolean",
+            "example": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-07-01T12:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-07-01T12:00:00Z"
           }
         }
       },
