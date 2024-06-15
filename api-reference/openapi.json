@@ -406,6 +406,194 @@
           }
         }
       }
+    },
+    "/quote": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Quote"],
+        "operationId": "createQuote",
+        "summary": "Create a quote",
+        "description": "Create a quote for a given currency",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuote"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Quote response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Quote"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quote/accept": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Quote"],
+        "operationId": "acceptQuote",
+        "summary": "Accept a quote",
+        "description": "Accept a quote by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The quote ID to accept",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "autopayout",
+            "in": "query",
+            "description": "Whether to automatically pay out the customer's bank account once the quote has been paid",
+            "schema": {
+              "type": "boolean",
+              "format": "boolean"
+            },
+            "required": false
+          },
+          {
+            "name": "bankAccountNumber",
+            "in": "query",
+            "description": "If autopayout is true, the customer bank account number to pay out to",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "bankCode",
+            "in": "query",
+            "description": "If autopayout is true, the customer bank code to pay out to",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "bankAccountName",
+            "in": "query",
+            "description": "If autopayout is true, the customer bank account name to pay out to",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "memo",
+            "in": "query",
+            "description": "A memo or short note to attach to the quote and invoice",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "descriptionHash",
+            "in": "query",
+            "description": "A description hash to attach to the quote and invoice if using lnurl",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "customerInternalFee",
+            "in": "query",
+            "description": "An extra fee to charge the customer that is meant for the entity/business. This must be in SATS and not FIAT",
+            "schema": {
+              "type": "number",
+              "format": "number"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quote response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "ok"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AcceptQuoteResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -758,6 +946,141 @@
             "type": "string",
             "format": "date-time",
             "example": "2021-07-01T12:00:00Z"
+          }
+        }
+      },
+      "CreateQuote": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "format": "number",
+            "example": 1000
+          },
+          "sourceCurrency": {
+            "type": "string",
+            "format": "string",
+            "enum": ["BTC", "NGN", "KES"]
+          },
+          "targetCurrency": {
+            "type": "string",
+            "format": "string",
+            "enum": ["NGN", "BTC", "KES"]
+          },
+          "paymentMethod": {
+            "type": "string",
+            "format": "string",
+            "enum": ["LIGHTNING", "ONCHAIN", "USDT"]
+          },
+          "paymentCurrency": {
+            "type": "string",
+            "format": "string",
+            "enum": ["BTC", "NGN", "KES"]
+          },
+          "implicitFees": {
+            "type": "boolean",
+            "format": "boolean",
+            "example": false
+          }
+        }
+      },
+      "AcceptQuoteResponse": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "string",
+            "example": "99854-2345"
+          },
+          "currency": {
+            "type": "string",
+            "format": "string",
+            "enum": ["NGN", "KES"]
+          },
+          "paymentCollectionMethod": {
+            "type": "string",
+            "format": "string",
+            "enum": ["LIGHTNING", "ONCHAIN", "USDT"]
+          },
+          "isValid": {
+            "type": "boolean",
+            "format": "boolean",
+            "example": true
+          },
+          "displayAmount": {
+            "type": "string",
+            "format": "string",
+            "example": "1000.00 NGN"
+          },
+          "paymentBtcDetail": {
+            "type": "string",
+            "format": "string",
+            "example": "lntbs14912790n1pjnruqtpp5xmrq39nwyhgde4a94wsnuacj4stacls05g4x5du2req9pvjpqz6sdz9296k7ar98gsxgdm9vvmx2v3s95ckyceh956xvd3595uxyetr95cnydrxxv6nvwrxv5mngcqzpuxqzfvsp578t78k4628snkkhc43eqrpn6sem28w4cwgzn7ceyyr320kwm4uss9qyyssqcwxw8wy2qenwgm7gagx9lwvcs9w9tw47ntuc823yclasjqczvvj545hr4d9nmg996l0cswudgeawclwytafmh66a2fafk4heksyae5sq3vzd28"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-07-01T12:00:00Z"
+          },
+          "quote": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+              },
+              "btcToTargetCurrencyRate": {
+                "type": "number",
+                "format": "number",
+                "example": 5000000.23
+              },
+              "usdToTargetCurrencyRate": {
+                "type": "number",
+                "format": "number",
+                "example": 1500.65
+              },
+              "totalSatAmount": {
+                "type": "number",
+                "format": "number",
+                "example": 1499589
+              },
+              "finalPayableAmountInTargetCurrency": {
+                "type": "string",
+                "format": "string",
+                "example": "50000.00"
+              },
+              "transactionFeesInSourceCurrency": {
+                "type": "number",
+                "format": "number",
+                "example": 11163
+              },
+              "transactionFeesInTargetCurrency": {
+                "type": "string",
+                "format": "string",
+                "example": "3750.00"
+              },
+              "customerInternalFee": {
+                "type": "number",
+                "format": "number",
+                "example": 1000
+              },
+              "sourceCurrency": {
+                "type": "string",
+                "format": "string",
+                "enum": ["BTCSAT", "NGNKOBO", "KESCENT"]
+              },
+              "targetCurrency": {
+                "type": "string",
+                "format": "string",
+                "enum": ["NGNKOBO", "KESCENT"]
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2021-07-01T12:00:00Z"
+              }
+            }
           }
         }
       },

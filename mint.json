@@ -115,6 +115,13 @@
             "api-reference/endpoint/order/get-order-by-id",
             "api-reference/endpoint/order/get-all-orders"
           ]
+        },
+        {
+          "group": "Quote",
+          "pages": [
+            "api-reference/endpoint/quote/get-quote",
+            "api-reference/endpoint/quote/accept-quote"
+          ]
         }
       ]
     }
