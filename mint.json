@@ -122,6 +122,12 @@
             "api-reference/endpoint/quote/get-quote",
             "api-reference/endpoint/quote/accept-quote"
           ]
+        },
+        {
+          "group": "Wallet",
+          "pages": [
+            "api-reference/endpoint/wallet/get-wallets"
+          ]
         }
       ]
     }
