@@ -819,6 +819,148 @@
           }
         }
       }
+    },
+    "/webhook/register": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Webhook"],
+        "operationId": "registerWebhook",
+        "summary": "Register a webhook",
+        "description": "Register a webhook to receive notifications for transaction events",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://webhook.site/12345678-1234-1234-1234-123456789012"
+                  },
+                  "secret": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "secret"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/Webhook"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhook": {
+      "put": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Webhook"],
+        "operationId": "updateWebhook",
+        "summary": "Update a webhook",
+        "description": "Update a webhook to receive notifications for transaction events",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://webhook.site/12345678-1234-1234-1234-123456789012"
+                  },
+                  "secret": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "secret"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/Webhook"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1449,6 +1591,46 @@
             "type": "string",
             "format": "date-time",
             "example": "2021-07-01T12:00:00Z"
+          }
+        }
+      },
+      "Webhook": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "string",
+            "example": "https://webhook.site/12345678-1234-1234-1234-123456789012"
+          },
+          "secret": {
+            "type": "string",
+            "format": "string",
+            "example": "secret"
+          },
+          "event": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "type": "string",
+                "format": "string",
+                "example": "ping"
+              },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "This is a test webhook event"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2021-07-01T12:00:00Z"
+                  }
+                }
+              }
+            }
           }
         }
       },

@@ -125,15 +125,20 @@
         },
         {
           "group": "Wallet",
-          "pages": [
-            "api-reference/endpoint/wallet/get-wallets"
-          ]
+          "pages": ["api-reference/endpoint/wallet/get-wallets"]
         },
         {
           "group": "Withdraw",
           "pages": [
             "api-reference/endpoint/withdraw/withdraw-fiat",
             "api-reference/endpoint/withdraw/withdraw-btc"
+          ]
+        },
+        {
+          "group": "Webhook",
+          "pages": [
+            "api-reference/endpoint/webhook/register-webhook",
+            "api-reference/endpoint/webhook/update-webhook"
           ]
         }
       ]
