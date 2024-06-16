@@ -961,6 +961,127 @@
           }
         }
       }
+    },
+    "/transaction": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Transaction"],
+        "operationId": "getTransaction",
+        "summary": "Get transaction details",
+        "description": "Returns the transaction details for a given transaction ID or transactions associated with an order",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The transaction ID to get the details for",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "orderId",
+            "in": "query",
+            "description": "The order ID to get the transactions for",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Transaction"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transactions": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Transaction"],
+        "operationId": "getTransactions",
+        "summary": "Get all transactions",
+        "description": "Returns all transactions",
+        "responses": {
+          "200": {
+            "description": "Transaction response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transaction"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

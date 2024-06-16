@@ -135,6 +135,13 @@
           ]
         },
         {
+          "group": "Transaction",
+          "pages": [
+            "api-reference/endpoint/transaction/get-transaction",
+            "api-reference/endpoint/transaction/get-all-transactions"
+          ]
+        },
+        {
           "group": "Webhook",
           "pages": [
             "api-reference/endpoint/webhook/register-webhook",
