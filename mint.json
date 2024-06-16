@@ -128,6 +128,13 @@
           "pages": [
             "api-reference/endpoint/wallet/get-wallets"
           ]
+        },
+        {
+          "group": "Withdraw",
+          "pages": [
+            "api-reference/endpoint/withdraw/withdraw-fiat",
+            "api-reference/endpoint/withdraw/withdraw-btc"
+          ]
         }
       ]
     }

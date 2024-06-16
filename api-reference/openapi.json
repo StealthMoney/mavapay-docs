@@ -667,6 +667,158 @@
           }
         }
       }
+    },
+    "/withdraw": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Withdraw"],
+        "operationId": "withdraw",
+        "summary": "Withdraw fiat",
+        "description": "Withdraw funds to a bank account",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "format": "number",
+                    "example": 1000
+                  },
+                  "currency": {
+                    "type": "string",
+                    "format": "string",
+                    "enum": ["NGN", "KES", "BTC", "USD"]
+                  },
+                  "bankAccountNumber": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0123456789"
+                  },
+                  "walletId": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Withdraw response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/Transaction"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/withdraw/btc": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Withdraw"],
+        "operationId": "withdrawBtc",
+        "summary": "Withdraw BTC",
+        "description": "Withdraw BTC to a wallet",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invoice": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "lntbs1234567890n1pjnruqtpp5xmrq39nwyhgde4a94wsnuacj4stacls05g4x5du2req9pvjpqz6sdz9296k7ar98gsxgdm9vvmx2v3s95ckyceh956xvd3595uxyetr95cnydrxxv6nvwrxv5mngcqzpuxqzfvsp578t78k4628snkkhc43eqrpn6sem28w4cwgzn7ceyyr320kwm4uss9qyyssqcwxw8wy2qenwgm7gagx9lwvcs9w9tw47ntuc823yclasjqczvvj545hr4d9nmg996l0cswudgeawclwytafmh66a2fafk4heksyae5sq3vzd28"
+                  },
+                  "memo": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Withdrawal to wallet"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Withdraw response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/Transaction"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1179,6 +1331,124 @@
             "type": "number",
             "format": "number",
             "example": 1000
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+          },
+          "walletId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+          },
+          "ref": {
+            "type": "string",
+            "format": "string",
+            "example": "99eeff854ffd345fffs67890"
+          },
+          "hash": {
+            "type": "string",
+            "format": "string",
+            "example": "99eeff854ffd345fffs67890"
+          },
+          "amount": {
+            "type": "number",
+            "format": "number",
+            "example": 1000
+          },
+          "fees": {
+            "type": "number",
+            "format": "number",
+            "example": 0
+          },
+          "currency": {
+            "type": "string",
+            "format": "string",
+            "enum": ["NGN", "KES", "BTC", "USD"]
+          },
+          "type": {
+            "type": "string",
+            "format": "string",
+            "enum": ["WITHDRAWAL", "DEPOSIT", "TRANSFER"]
+          },
+          "status": {
+            "type": "string",
+            "format": "string",
+            "enum": ["SUCCESS", "PENDING", "FAILED"]
+          },
+          "autopayout": {
+            "type": "boolean",
+            "format": "boolean",
+            "example": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-07-01T12:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-07-01T12:00:00Z"
+          },
+          "transactionMetadata": {
+            "$ref": "#/components/schemas/TransactionMetadata"
+          }
+        }
+      },
+      "TransactionMetadata": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+          },
+          "orderId": {
+            "type": "string",
+            "format": "string",
+            "example": "99854-2345"
+          },
+          "eProviderRef": {
+            "type": "string",
+            "format": "string",
+            "example": "9985434567890"
+          },
+          "bankCode": {
+            "type": "string",
+            "format": "string",
+            "example": "090267"
+          },
+          "bankAccountName": {
+            "type": "string",
+            "format": "string",
+            "example": "Satoshi Nakamoto"
+          },
+          "bankAccountNumber": {
+            "type": "string",
+            "format": "string",
+            "example": "0123456789"
+          },
+          "customerInternalFee": {
+            "type": "number",
+            "format": "number",
+            "example": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-07-01T12:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-07-01T12:00:00Z"
           }
         }
       },
