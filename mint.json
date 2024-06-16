@@ -142,6 +142,10 @@
           ]
         },
         {
+          "group": "User",
+          "pages": ["api-reference/endpoint/user/get-user-profile"]
+        },
+        {
           "group": "Webhook",
           "pages": [
             "api-reference/endpoint/webhook/register-webhook",

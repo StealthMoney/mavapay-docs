@@ -1082,6 +1082,54 @@
           }
         }
       }
+    },
+    "/user": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["User"],
+        "operationId": "getUser",
+        "summary": "Get user profile",
+        "description": "Returns an exhaustive user profile detail",
+        "responses": {
+          "200": {
+            "description": "User response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1748,6 +1796,195 @@
                     "type": "string",
                     "format": "date-time",
                     "example": "2021-07-01T12:00:00Z"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+          },
+          "name": {
+            "type": "string",
+            "format": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "johndoe@email.com"
+          },
+          "phone": {
+            "type": "string",
+            "format": "string",
+            "example": "+2348123456789"
+          },
+          "businessName": {
+            "type": "string",
+            "format": "string",
+            "example": "John Doe Enterprises"
+          },
+          "emailVerified": {
+            "type": "boolean",
+            "format": "boolean",
+            "example": true
+          },
+          "kycInfo": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string",
+                "format": "string",
+                "example": "3 Opebi Road, Ikeja, Lagos"
+              },
+              "phone": {
+                "type": "string",
+                "format": "string",
+                "example": "+2348123456789"
+              },
+              "nationality": {
+                "type": "string",
+                "format": "string",
+                "example": "Nigeria"
+              },
+              "businessName": {
+                "type": "string",
+                "format": "string",
+                "example": "John Doe Enterprises"
+              },
+              "status": {
+                "type": "string",
+                "format": "string",
+                "enum": ["PENDING", "APPROVED", "REJECTED"]
+              }
+            }
+          },
+          "account": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+              },
+              "type": {
+                "type": "string",
+                "format": "string",
+                "enum": ["INDIVIDUAL", "BUSINESS", "ADMIN"]
+              },
+              "status": {
+                "type": "string",
+                "format": "string",
+                "enum": ["ACTIVE", "INACTIVE"]
+              },
+              "walletDetails": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "format": "string",
+                    "enum": ["NGN", "KES", "BTC", "USD"]
+                  },
+                  "balance": {
+                    "type": "number",
+                    "format": "number",
+                    "example": "10000000"
+                  },
+                  "bankAccount": {
+                    "$ref": "#/components/schemas/BankAccount"
+                  },
+                  "transactions": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Transaction"
+                    }
+                  }
+                }
+              },
+              "ownerId": {
+                "type": "string",
+                "format": "string",
+                "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+              },
+              "apiKey": {
+                "type": "string",
+                "format": "string",
+                "example": "d1614a76411198a743199f307e5b"
+              },
+              "totalSatsExchanged": {
+                "type": "number",
+                "format": "number",
+                "example": 1000
+              },
+              "webhook": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://webhook.site/12345678-1234-1234-1234-123456789012"
+                  },
+                  "secret": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "secret"
+                  },
+                  "isActive": {
+                    "type": "boolean",
+                    "format": "boolean",
+                    "example": true
+                  }
+                }
+              },
+              "settings": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+                  },
+                  "autopayout": {
+                    "type": "boolean",
+                    "format": "boolean",
+                    "example": true
+                  },
+                  "language": {
+                    "type": "string",
+                    "format": "string",
+                    "enum": ["EN", "FR", "ES"]
+                  },
+                  "notification": {
+                    "type": "object",
+                    "properties": {
+                      "email": {
+                        "type": "boolean",
+                        "format": "boolean",
+                        "example": true
+                      },
+                      "sms": {
+                        "type": "boolean",
+                        "format": "boolean",
+                        "example": true
+                      }
+                    }
                   }
                 }
               }
