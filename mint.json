@@ -22,7 +22,7 @@
   ],
   "topbarCtaButton": {
     "name": "Sign up",
-    "url": "https://app.mavapay.co/register"
+    "url": "/api-reference/signup"
   },
   "tabs": [
     {
@@ -119,8 +119,7 @@
         {
           "group": "Quote",
           "pages": [
-            "api-reference/endpoint/quote/get-quote",
-            "api-reference/endpoint/quote/accept-quote"
+            "api-reference/endpoint/quote/get-quote"
           ]
         },
         {
@@ -151,13 +150,20 @@
             "api-reference/endpoint/webhook/register-webhook",
             "api-reference/endpoint/webhook/update-webhook"
           ]
+        },
+        {
+          "group": "Authentication",
+          "pages": [
+            "api-reference/endpoint/auth/signup",
+            "api-reference/endpoint/auth/signin"
+          ]
         }
       ]
     }
   ],
   "footerSocials": {
     "x": "https://x.com/mavapay",
-    "github": "https://github.com/stealthmoney/mavapay-docs",
+    "github": "https://github.com/mavapay",
     "linkedin": "https://www.linkedin.com/company/mavapay"
   },
   "openapi": "/api-reference/openapi.json"

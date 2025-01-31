@@ -15,11 +15,11 @@
   },
   "servers": [
     {
-      "url": "https://staging.mavapay.co/api",
+      "url": "https://staging.api.mavapay.co/api/v1",
       "description": "Staging server"
     },
     {
-      "url": "https://api.mavapay.co/api",
+      "url": "https://api.mavapay.co/api/v1",
       "description": "Live server"
     }
   ],
@@ -1130,6 +1130,189 @@
           }
         }
       }
+    },
+    "/signup/business": {
+      "post": {
+        "security": [],
+        "tags": ["Signup"],
+        "operationId": "signupBusiness",
+        "summary": "Create a business account",
+        "description": "Create a new Mavapay business account",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Signup"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "User response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "business account created successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "business account already exists"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/signin": {
+      "post": {
+        "security": [],
+        "tags": ["Signin"],
+        "operationId": "signin",
+        "summary": "Sign in to your account",
+        "description": "Sign in to your Mavapay account",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "johndoe@email.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "password"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "ok"
+                    },
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "Login successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "Invalid username or password"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2003,6 +2186,36 @@
           },
           "message": {
             "type": "string"
+          }
+        }
+      },
+      "Signup": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "johndoe@email.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "string",
+            "example": "password"
+          },
+          "name": {
+            "type": "string",
+            "format": "string",
+            "example": "John Doe"
+          },
+          "businessName": {
+            "type": "string",
+            "format": "string",
+            "example": "John Doe Enterprises"
+          },
+          "phone": {
+            "type": "string",
+            "format": "string",
+            "example": "+2348123456789"
           }
         }
       }
