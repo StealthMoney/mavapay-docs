@@ -85,7 +85,7 @@
         "tags": ["Bank Account"],
         "operationId": "getBankAccount",
         "summary": "Get bank account details",
-        "description": "Returns the bank account details for a given currency",
+        "description": "Returns all your saved bank accounts for a given currency. The bank account details used to make payouts to your customers.",
         "parameters": [
           {
             "name": "walletId",
@@ -100,10 +100,10 @@
           {
             "name": "currency",
             "in": "query",
-            "description": "The currency to get the bank account for (optional)",
+            "description": "The currency to get the bank account for (optional). Only NGN is supported at the moment.",
             "schema": {
               "type": "string",
-              "enum": ["NGN", "KES", "BTC", "USD"]
+              "enum": ["NGN"]
             },
             "required": false
           }
@@ -156,7 +156,7 @@
         "tags": ["Bank Account"],
         "operationId": "createBankAccount",
         "summary": "Register a bank account",
-        "description": "Register a bank account that can be used for withdrawal for a given currency",
+        "description": "Register a bank account that can be used for withdrawal for a given currency. Only NGN is supported at the moment.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -203,18 +203,23 @@
     },
     "/bank/bankcode": {
       "get": {
-        "security": [
-          {
-            "ApiKeyAuth": []
-          },
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": ["Bank Account"],
+        "security": [],
+        "tags": ["Bank Code"],
         "operationId": "getBankCode",
         "summary": "Get bank code",
-        "description": "Returns all bank codes for a given currency. This endpoint is currently limited to Nigeria(NGN) only",
+        "description": "Returns all bank codes for a given country. This endpoint is currently limited to Nigeria(NGN) and South Africa(ZAR) only.",
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "description": "The country to get the bank codes for. Use 'NG' for Nigeria and 'ZA' for South Africa.",
+            "schema": {
+              "type": "string",
+              "enum": ["NG", "ZA"]
+            },
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "Bank code response",
@@ -1400,7 +1405,7 @@
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "KES"]
+            "enum": ["NGN"]
           },
           "walletId": {
             "type": "string",
