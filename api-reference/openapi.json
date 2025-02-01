@@ -470,136 +470,6 @@
         }
       }
     },
-    "/quote/accept": {
-      "get": {
-        "security": [
-          {
-            "ApiKeyAuth": []
-          },
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": ["Quote"],
-        "operationId": "acceptQuote",
-        "summary": "Accept a quote",
-        "description": "Accept a quote by id",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "description": "The quote ID to accept",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "required": true
-          },
-          {
-            "name": "autopayout",
-            "in": "query",
-            "description": "Whether to automatically pay out the customer's bank account once the quote has been paid",
-            "schema": {
-              "type": "boolean",
-              "format": "boolean"
-            },
-            "required": false
-          },
-          {
-            "name": "bankAccountNumber",
-            "in": "query",
-            "description": "If autopayout is true, the customer bank account number to pay out to",
-            "schema": {
-              "type": "string",
-              "format": "string"
-            },
-            "required": false
-          },
-          {
-            "name": "bankCode",
-            "in": "query",
-            "description": "If autopayout is true, the customer bank code to pay out to",
-            "schema": {
-              "type": "string",
-              "format": "string"
-            },
-            "required": false
-          },
-          {
-            "name": "bankAccountName",
-            "in": "query",
-            "description": "If autopayout is true, the customer bank account name to pay out to",
-            "schema": {
-              "type": "string",
-              "format": "string"
-            },
-            "required": false
-          },
-          {
-            "name": "memo",
-            "in": "query",
-            "description": "A memo or short note to attach to the quote and invoice",
-            "schema": {
-              "type": "string",
-              "format": "string"
-            },
-            "required": false
-          },
-          {
-            "name": "descriptionHash",
-            "in": "query",
-            "description": "A description hash to attach to the quote and invoice if using lnurl",
-            "schema": {
-              "type": "string",
-              "format": "string"
-            },
-            "required": false
-          },
-          {
-            "name": "customerInternalFee",
-            "in": "query",
-            "description": "An extra fee to charge the customer that is meant for the entity/business. This must be in SATS and not FIAT",
-            "schema": {
-              "type": "number",
-              "format": "number"
-            },
-            "required": false
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Quote response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "format": "string",
-                      "example": "ok"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/AcceptQuoteResponse"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/wallet": {
       "get": {
         "security": [
@@ -990,12 +860,22 @@
               "type": "string",
               "format": "string"
             },
-            "required": true
+            "required": false
           },
           {
             "name": "orderId",
             "in": "query",
             "description": "The order ID to get the transactions for",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "hash",
+            "in": "query",
+            "description": "The payment hash of the transaction to get the details for",
             "schema": {
               "type": "string",
               "format": "string"
@@ -1017,7 +897,7 @@
                       "example": "success"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/Transaction"
+                      "$ref": "#/components/schemas/TransactionResponse"
                     }
                   }
                 }
@@ -1067,7 +947,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/Transaction"
+                        "$ref": "#/components/schemas/TransactionResponse"
                       }
                     }
                   }
@@ -1312,6 +1192,47 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/apikey": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["User"],
+        "operationId": "getUserApiKey",
+        "summary": "Get user API key",
+        "description": "Returns the user's API key. This generates a new API key even if the user already has one",
+        "responses": {
+          "200": {
+            "description": "API key response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "apiKey": {
+                          "type": "string",
+                          "example": "addedednefendfdcd"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -1794,7 +1715,12 @@
                     "description": "The name of the bank of the beneficiary"
                   }
                 },
-                "required": ["bankAccountNumber", "bankAccountName", "bankCode", "bankName"]
+                "required": [
+                  "bankAccountNumber",
+                  "bankAccountName",
+                  "bankCode",
+                  "bankName"
+                ]
               },
               {
                 "title": "KES Beneficiary",
@@ -1854,7 +1780,13 @@
             ]
           }
         },
-        "required": ["amount", "sourceCurrency", "targetCurrency", "paymentMethod", "paymentCurrency"]
+        "required": [
+          "amount",
+          "sourceCurrency",
+          "targetCurrency",
+          "paymentMethod",
+          "paymentCurrency"
+        ]
       },
       "Wallet": {
         "type": "object",
@@ -1959,7 +1891,7 @@
             "example": "2021-07-01T12:00:00Z",
             "description": "The date and time the transaction was last updated"
           },
-          "transactionMetadata": {
+          "metadata": {
             "$ref": "#/components/schemas/TransactionMetadata"
           }
         }
@@ -2279,6 +2211,175 @@
             "type": "string",
             "format": "string",
             "example": "+2348123456789"
+          }
+        }
+      },
+      "TransactionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "10cda92f-db32-4f69-ae30-af32a0055caf"
+          },
+          "ref": {
+            "type": "string",
+            "example": "142a39e0bb85c45b06a9657f56156"
+          },
+          "hash": {
+            "type": "string",
+            "example": "89d7fd6571c8bdf4242091953553c26228dd5b7679729d20aaf2cc84f000d1bc"
+          },
+          "amount": {
+            "type": "number",
+            "example": 10000
+          },
+          "fees": {
+            "type": "number",
+            "example": 0
+          },
+          "currency": {
+            "type": "string",
+            "enum": ["NGN", "KES", "BTC", "ZAR"]
+          },
+          "type": {
+            "type": "string",
+            "enum": ["WITHDRAWAL", "DEPOSIT", "TRANSFER"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["SUCCESS", "PENDING", "FAILED"]
+          },
+          "autopayout": {
+            "type": "boolean",
+            "example": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-23T10:46:01.050Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-23T10:46:04.590Z"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "f2bf7bf8-9fe9-4afd-9ebb-cf3abae8cb19"
+              },
+              "merchantId": {
+                "type": "string",
+                "format": "uuid",
+                "example": "f77986d6-75df-4979-85a9-8acedcfca392"
+              },
+              "merchantName": {
+                "type": "string",
+                "example": "Ricki Allardice"
+              },
+              "bankName": {
+                "type": "string",
+                "example": "CAPITEC BANK"
+              },
+              "bankAccountNumber": {
+                "type": "string",
+                "example": "1352906218"
+              },
+              "reference": {
+                "type": "string",
+                "example": "2bNkqVDLER7n65O7RrcV"
+              },
+              "customerInternalFee": {
+                "type": "number",
+                "example": 0
+              },
+              "order": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "22723-5636"
+                  },
+                  "settledQuoteId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "e3d3cb1c-3206-40bb-81a9-8dfd9d69a853"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 10000
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": ["NGN", "KES", "ZAR"]
+                  },
+                  "paymentMethod": {
+                    "type": "string",
+                    "enum": ["LIGHTNING"]
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["PAID", "PENDING", "EXPIRED", "FAILED"]
+                  },
+                  "quote": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "exchangeRate": {
+                        "type": "number",
+                        "example": 1874805.7499999998
+                      },
+                      "usdToTargetCurrencyRate": {
+                        "type": "number",
+                        "example": 18.4977
+                      },
+                      "paymentBtcDetail": {
+                        "type": "string"
+                      },
+                      "paymentMethod": {
+                        "type": "string",
+                        "enum": ["LIGHTNING"]
+                      },
+                      "totalAmount": {
+                        "type": "number",
+                        "example": 6474
+                      },
+                      "equivalentAmount": {
+                        "type": "number",
+                        "example": 10000
+                      },
+                      "expiry": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "sourceCurrency": {
+                        "type": "string",
+                        "enum": ["BTCSAT"]
+                      },
+                      "targetCurrency": {
+                        "type": "string",
+                        "enum": ["NGNKOBO", "KESCENT", "ZARCENT"]
+                      },
+                      "paymentCurrency": {
+                        "type": "string",
+                        "enum": ["NGNKOBO", "KESCENT", "ZARCENT"]
+                      },
+                      "customerInternalFee": {
+                        "type": "number",
+                        "example": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

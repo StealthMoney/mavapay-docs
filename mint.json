@@ -155,7 +155,8 @@
           "group": "Authentication",
           "pages": [
             "api-reference/endpoint/auth/signup",
-            "api-reference/endpoint/auth/signin"
+            "api-reference/endpoint/auth/signin",
+            "api-reference/endpoint/auth/apikey"
           ]
         }
       ]
