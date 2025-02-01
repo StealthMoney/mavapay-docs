@@ -1731,34 +1731,130 @@
           "amount": {
             "type": "number",
             "format": "number",
-            "example": 1000
+            "example": 1000,
+            "description": "The amount in the target currency in its lowest denomination. e.g '500000' for 5000.00 NGN"
           },
           "sourceCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTC", "NGN", "KES"]
+            "enum": ["BTCSAT"],
+            "default": "BTCSAT",
+            "description": "The source currency for the quote"
           },
           "targetCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "BTC", "KES"]
+            "enum": ["NGNKOBO", "KESCENT", "ZARCENT"],
+            "default": "NGNKOBO",
+            "description": "The local currency to convert the source currency to"
           },
           "paymentMethod": {
             "type": "string",
             "format": "string",
-            "enum": ["LIGHTNING", "ONCHAIN", "USDT"]
+            "enum": ["LIGHTNING"],
+            "default": "LIGHTNING",
+            "description": "The payment method for the quote"
           },
           "paymentCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTC", "NGN", "KES"]
+            "enum": ["NGNKOBO", "KESCENT", "ZARCENT"]
           },
-          "implicitFees": {
+          "autopayout": {
             "type": "boolean",
             "format": "boolean",
-            "example": false
+            "example": true,
+            "default": true
+          },
+          "beneficiary": {
+            "type": "object",
+            "oneOf": [
+              {
+                "title": "NGN Beneficiary",
+                "type": "object",
+                "properties": {
+                  "bankAccountNumber": {
+                    "type": "string",
+                    "example": "0149203789",
+                    "description": "The bank account number of the beneficiary"
+                  },
+                  "bankAccountName": {
+                    "type": "string",
+                    "example": "olaolu olajide",
+                    "description": "The name of the beneficiary"
+                  },
+                  "bankCode": {
+                    "type": "string",
+                    "example": "000013",
+                    "description": "The bank code of the beneficiary"
+                  },
+                  "bankName": {
+                    "type": "string",
+                    "example": "GTBANK PLC",
+                    "description": "The name of the bank of the beneficiary"
+                  }
+                },
+                "required": ["bankAccountNumber", "bankAccountName", "bankCode", "bankName"]
+              },
+              {
+                "title": "KES Beneficiary",
+                "type": "object",
+                "properties": {
+                  "identifierType": {
+                    "type": "string",
+                    "enum": ["paytophone", "paytobill"],
+                    "example": "paytophone",
+                    "description": "The type of identifier to use for the beneficiary"
+                  },
+                  "identifiers": {
+                    "type": "object",
+                    "properties": {
+                      "phoneNumber": {
+                        "type": "string",
+                        "example": "+254796980788",
+                        "description": "The phone number of the beneficiary if the identifierType is paytophone"
+                      },
+                      "paybillNumber": {
+                        "type": "string",
+                        "example": "4141031",
+                        "description": "The paybill number of the beneficiary if the identifierType is paytobill"
+                      },
+                      "accountNumber": {
+                        "type": "string",
+                        "example": "vlad",
+                        "description": "The account number of the beneficiary if the identifierType is paytobill"
+                      }
+                    }
+                  }
+                },
+                "required": ["identifierType", "identifiers"]
+              },
+              {
+                "title": "ZAR Beneficiary",
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Ricki Allardice",
+                    "description": "The name of the beneficiary"
+                  },
+                  "bankName": {
+                    "type": "string",
+                    "example": "CAPITEC BANK",
+                    "description": "The name of the bank of the beneficiary"
+                  },
+                  "bankAccountNumber": {
+                    "type": "string",
+                    "example": "1352906218",
+                    "description": "The bank account number of the beneficiary"
+                  }
+                },
+                "required": ["name", "bankName", "bankAccountNumber"]
+              }
+            ]
           }
-        }
+        },
+        "required": ["amount", "sourceCurrency", "targetCurrency", "paymentMethod", "paymentCurrency"]
       },
       "Wallet": {
         "type": "object",
@@ -1766,22 +1862,25 @@
           "id": {
             "type": "string",
             "format": "string",
-            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b",
+            "description": "The unique identifier for the wallet"
           },
           "accountId": {
             "type": "string",
             "format": "uuid",
-            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b",
+            "description": "The unique identifier for the account related to the wallet"
           },
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "KES", "BTC", "USD"]
+            "enum": ["NGN", "KES", "BTC", "ZAR"]
           },
           "balance": {
             "type": "number",
             "format": "number",
-            "example": 1000
+            "example": 1000,
+            "description": "The balance of the wallet in its lowest denomination"
           }
         }
       },
