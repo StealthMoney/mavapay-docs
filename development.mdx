@@ -1,98 +1,105 @@
 ---
 title: 'Development'
-description: 'Learn how to preview changes locally'
+description: 'Learn how to integrate with Mavapay API in a test environment'
 ---
 
-<Info>
-  **Prerequisite** You should have installed Node.js (version 18.10.0 or
-  higher).
-</Info>
+## Environment Overview
 
-Step 1. Install Mintlify on your OS:
+Mavapay provides two distinct environments for your integration:
 
-<CodeGroup>
+### Staging Environment
+The staging environment is designed for development and testing. Key characteristics:
 
-```bash npm
-npm i -g mintlify
+- Base URL: `https://staging.api.mavapay.co/api/v1`
+- Uses Bitcoin's Signet network for Lightning Network transactions
+- All Lightning invoices are test invoices (prefixed with `lntbs`)
+- Generated coins are not spendable or transferable
+- Simulated bank transfers and mobile money transactions
+- No real funds involved
+- Test API keys required
+- Webhook notifications work identically to production
+
+### Production Environment
+The production environment is for live transactions:
+
+- Base URL: `https://api.mavapay.co/api/v1`
+- Uses the main Bitcoin Lightning Network
+- Real funds are involved
+- Requires completed KYC verification
+- Live bank transfers and mobile money transactions
+- Production API keys required
+
+<Warning>
+  Never use production API keys in staging or staging API keys in production. Always test thoroughly in staging before moving to production.
+</Warning>
+
+## Getting Started with Staging
+
+### Prerequisites
+1. Create a [Mavapay account](/api-reference/endpoint/auth/signup)
+2. Get your [test API keys](/api-reference/endpoint/auth/apikey)
+3. Complete basic account setup
+
+### Testing Features
+
+#### Lightning Network Payments
+- All invoices are generated on Bitcoin's Signet network
+- Test invoices are prefixed with `lntbs`
+- Example test invoice:
+```text
+lntbs64740n1pney8wspp538tl6et3ez7lgfpqjx2n257zvg5d6kmk09ef6g927txgfuqq6x7q
 ```
 
-```bash yarn
-yarn global add mintlify
-```
+#### Bank Transfers
+Test different scenarios with:
+- Mock bank account numbers
+- Various response states (success/failure)
+- Different currencies (NGN, KES, ZAR)
 
-</CodeGroup>
+#### Mobile Money
+Test mobile money features using:
+- Test phone numbers
+- Simulated provider responses
+- All supported providers (M-PESA, etc.)
 
-Step 2. Go to the docs are located (where you can find `mint.json`) and run the following command:
+### Error Scenarios
+The staging environment allows testing various error cases:
+- Insufficient funds
+- Network timeouts
+- Rate limit exceeded
+- Invalid API key
+- Invalid request
 
-```bash
-mintlify dev
-```
+## Webhooks in Staging
 
-The documentation website is now available at `http://localhost:3000`.
+Webhook notifications work identically to production:
 
-### Custom Ports
-
-Mintlify uses port 3000 by default. You can use the `--port` flag to customize the port Mintlify runs on. For example, use this command to run in port 3333:
-
-```bash
-mintlify dev --port 3333
-```
-
-You will see an error like this if you try to run Mintlify in a port that's already taken:
-
-```md
-Error: listen EADDRINUSE: address already in use :::3000
-```
-
-## Mintlify Versions
-
-Each CLI is linked to a specific version of Mintlify. Please update the CLI if your local website looks different than production.
-
-<CodeGroup>
-
-```bash npm
-npm i -g mintlify@latest
-```
-
-```bash yarn
-yarn global upgrade mintlify
-```
-
-</CodeGroup>
-
-## Deployment
+1. Configure your webhook URL in the [API reference](/api-reference/endpoint/webhook/register-webhook)
+2. Receive notifications for all test transactions
+3. Test your webhook handling code
 
 <Tip>
-  Unlimited editors available under the [Startup
-  Plan](https://mintlify.com/pricing)
+  Use tools like [webhook.site](https://webhook.site) or [ngrok](https://ngrok.com) for local webhook testing.
 </Tip>
 
-You should see the following if the deploy successfully went through:
+## Moving to Production
 
-<Frame>
-  <img src="/images/checks-passed.png" style={{ borderRadius: '0.5rem' }} />
-</Frame>
+Before going live:
 
-## Troubleshooting
+1. Complete all integration testing in staging
+2. Verify webhook handling
+3. Complete KYC verification
+4. Request production API keys
+5. Update API endpoints to production URLs
+6. Test with small amounts initially
 
-Here's how to solve some common problems when working with the CLI.
+## Support
 
-<AccordionGroup>
-  <Accordion title="Mintlify is not loading">
-    Update to Node v18. Run `mintlify install` and try again.
-  </Accordion>
-  <Accordion title="No such file or directory on Windows">
-Go to the `C:/Users/Username/.mintlify/` directory and remove the `mint`
-folder. Then Open the Git Bash in this location and run `git clone
-https://github.com/mintlify/mint.git`.
+Need help during development?
+- Check our [API Reference](/api-reference)
+- Join our [Discord community](https://discord.gg/w82z7DdTM9)
+- Email support at info@mavapay.co
 
-Repeat step 3.
-
-  </Accordion>
-  <Accordion title="Getting an unknown error">
-    Try navigating to the root of your device and delete the ~/.mintlify folder.
-    Then run `mintlify dev` again.
-  </Accordion>
-</AccordionGroup>
-
-Curious about what changed in a CLI version? [Check out the CLI changelog.](/changelog/command-line)
+<Note>
+  The staging environment is reset periodically. Don't rely on staging data persistence for long-term testing.
+</Note>

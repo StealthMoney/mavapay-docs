@@ -4,16 +4,16 @@ description: 'Learn how to integrate our APIs into your application.'
 ---
 
 <Note>
-  Before you start, you need to create a [free Mavapay account](https://app.mavapay.co/register) and get your test API keys to start building with the Mavapay API.
+  Before you start, you need to create a [free Mavapay account](/api-reference/endpoint/auth/signup) and get your test API keys to start building with the Mavapay API.
   All monies transacted in the sandbox environment are not real and are for testing purposes only.
 </Note>
 
 ## About the API
 The Mavapay API is a set of RESTful APIs that allow you to interact with our platform. We provide APIs for payments, transfers, and more. You can use our APIs to build amazing payment experiences for your customers.
-We follow the [OpenAPI](https://swagger.io/specification/) specification for our API documentation. You can view our OpenAPI specification file [here](https://github.com/stealthmoney/mavapay-docs/blob/main/api-reference/openapi.json).
+We follow the [OpenAPI](https://swagger.io/specification/) specification for our API documentation.
 
 <Note>
-  Our base URL for the sandbox/staging API is `https://staging.mavapay.co/api/` while the base URL for the live API is `https://api.mavapay.co/api/`.
+  Our base URL for the sandbox/staging API is `https://staging.api.mavapay.co/api/v1` while the base URL for the live API is `https://api.mavapay.co/api/v1`.
 </Note>
 
 ### HTTP Methods
@@ -36,7 +36,6 @@ Our API uses standard HTTP status codes to indicate the success or failure of an
 
 ### Sample requests
 We provide sample requests for each API endpoint in our documentation. You can use these samples to understand how to interact with our APIs.
-You can also use our [API Swagger Playground](https://staging.mavapay.co/api/docs) to test our APIs without writing any code.
 
 ### Requests and Responses
 All requests to our API must include a valid API key in the `Authorization` header. Responses from our API are in JSON format. Content-Type should be set to `application/json`.
@@ -74,10 +73,16 @@ Here are the list of currencies our API supports (we're constantly adding more c
     "symbol": "₦",
     "base unit": "kobo",
     ```
-    ```json KES (in progress)
+    ```json KES
     "currency code": "KES",
     "currency name": "Kenyan Shilling",
     "symbol": "KSh",
+    "base unit": "cent",
+    ```
+    ```json ZAR
+    "currency code": "ZAR",
+    "currency name": "South African Rand",
+    "symbol": "R",
     "base unit": "cent",
     ```
   </CodeGroup>
@@ -93,17 +98,6 @@ Here are the list of currencies our API supports (we're constantly adding more c
     "symbol": "B",
     "base unit": "satoshis"
     ```
-    ```json USDT TRC20 (in progress)
-    "currency": "USDT",
-    "currency name": "Tether",
-    "symbol": "USDT",
-    "base unit": "USDT"
-    ```
   </CodeGroup>
 
 </ResponseField>
-
-<Warning>
-  When dealing with Tether (USDT), please ensure you are using the correct network to avoid loss of funds. We currently support USDT on the TRC20 network.
-  Any USDT sent to the wrong network will be lost.
-</Warning>
