@@ -1540,8 +1540,17 @@
             "format": "date-time",
             "example": "2021-07-01T12:00:00Z"
           },
-          "quote": {
-            "$ref": "#/components/schemas/Quote"
+          "quotes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Quote"
+            }
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
           }
         }
       },
@@ -1593,8 +1602,17 @@
             "format": "date-time",
             "example": "2021-07-01T12:00:00Z"
           },
-          "quote": {
-            "$ref": "#/components/schemas/Quote"
+          "quotes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Quote"
+            }
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
           }
         }
       },
@@ -1609,47 +1627,55 @@
           "exchangeRate": {
             "type": "number",
             "format": "number",
-            "example": 5000000.23
+            "example": 5000000.23,
+            "description": "The exchange rate of source currency to target currency for the quote. e.g 1 BTC = 5000000.23 NGN"
           },
           "usdToTargetCurrencyRate": {
             "type": "number",
             "format": "number",
-            "example": 1500.65
+            "example": 1500.65,
+            "description": "The USD to target currency rate for the quote"
           },
           "sourceCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTCSAT", "NGNKOBO", "KESCENT"]
+            "enum": ["BTCSAT", "NGNKOBO", "KESCENT", "ZARCENT"],
+            "description": "The source currency for the quote"
           },
           "targetCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGNKOBO", "KESCENT"]
+            "enum": ["NGNKOBO", "KESCENT", "ZARCENT"],
+            "description": "The target currency for the quote"
           },
           "transactionFeesInSourceCurrency": {
             "type": "number",
             "format": "number",
-            "example": 11163
+            "example": 13.23,
+            "description": "The transaction fees in the source currency in its lowest denomination"
           },
           "transactionFeesInTargetCurrency": {
             "type": "string",
             "format": "string",
-            "example": "3750.00"
+            "example": "3750.00",
+            "description": "The transaction fees in the target currency in its lowest denomination"
           },
           "amountInSourceCurrency": {
             "type": "number",
             "format": "number",
-            "example": 1499589
+            "example": 1499,
+            "description": "The amount in the source currency in its lowest denomination"
           },
           "amountInTargetCurrency": {
             "type": "string",
             "format": "string",
-            "example": "50000.00"
+            "example": "50000.00",
+            "description": "The amount in the target currency in its lowest denomination"
           },
           "paymentMethod": {
             "type": "string",
             "format": "string",
-            "enum": ["LIGHTNING", "ONCHAIN", "USDT"]
+            "enum": ["LIGHTNING"]
           },
           "expiry": {
             "type": "string",
@@ -1661,15 +1687,41 @@
             "format": "boolean",
             "example": true
           },
+          "invoice": {
+            "type": "string",
+            "format": "string",
+            "example": "lntbs36020n1pnehfzcpp5zc8g9tfpwnmaevh62ak2vu6zjqyt5cpph3gjm4zfyqz9srjjdsaqdz5296k7ar98gsy6ctkvys9qcteyqmnyenr8yunswfdvyer2v3dx33kxe3dvymnsefdv5mnjcm9x5mrydm9vccqcqzpuxqzfvsp5utd7hdfmjp7vw3lc6hal8psqruwcnu89hxfukyzugxh40jhv8xcq9qxpqysgq2lry5dgzu2g04s74tpvctwe37rkprs3k579jw6yt7ncrsg62p29yalw8gf5fawfvpydqv4jjve0nsysfhsxa35dtwug9e6gzxkq0h5gp636wc3",
+            "description": "The lightning invoice to pay for the quote"
+          },
+          "hash": {
+            "type": "string",
+            "format": "string",
+            "example": "189727ef2e0f35921af7858b96e27cbad960b0ec2bb2a4ab73b6a231f9ce8727",
+            "description": "The payment hash for the lightning invoice attached to the quote"
+          },
+          "totalAmountInSourceCurrency": {
+            "type": "number",
+            "format": "number",
+            "example": 1499,
+            "description": "The total amount in the source currency in its lowest denomination"
+          },
+          "customerInternalFee": {
+            "type": "number",
+            "format": "number",
+            "description": "An internal fee you can set to charge the customer. This fee is in the source currency in its lowest denomination",
+            "example": 0
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
-            "example": "2021-07-01T12:00:00Z"
+            "example": "2021-07-01T12:00:00Z",
+            "description": "The date and time the quote was created"
           },
           "updatedAt": {
             "type": "string",
             "format": "date-time",
-            "example": "2021-07-01T12:00:00Z"
+            "example": "2021-07-01T12:00:00Z",
+            "description": "The date and time the quote was last updated"
           }
         }
       },
@@ -1708,106 +1760,6 @@
           }
         }
       },
-      "AcceptQuoteResponse": {
-        "type": "object",
-        "properties": {
-          "orderId": {
-            "type": "string",
-            "format": "string",
-            "example": "99854-2345"
-          },
-          "currency": {
-            "type": "string",
-            "format": "string",
-            "enum": ["NGN", "KES"]
-          },
-          "paymentCollectionMethod": {
-            "type": "string",
-            "format": "string",
-            "enum": ["LIGHTNING", "ONCHAIN", "USDT"]
-          },
-          "isValid": {
-            "type": "boolean",
-            "format": "boolean",
-            "example": true
-          },
-          "displayAmount": {
-            "type": "string",
-            "format": "string",
-            "example": "1000.00 NGN"
-          },
-          "paymentBtcDetail": {
-            "type": "string",
-            "format": "string",
-            "example": "lntbs14912790n1pjnruqtpp5xmrq39nwyhgde4a94wsnuacj4stacls05g4x5du2req9pvjpqz6sdz9296k7ar98gsxgdm9vvmx2v3s95ckyceh956xvd3595uxyetr95cnydrxxv6nvwrxv5mngcqzpuxqzfvsp578t78k4628snkkhc43eqrpn6sem28w4cwgzn7ceyyr320kwm4uss9qyyssqcwxw8wy2qenwgm7gagx9lwvcs9w9tw47ntuc823yclasjqczvvj545hr4d9nmg996l0cswudgeawclwytafmh66a2fafk4heksyae5sq3vzd28"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2021-07-01T12:00:00Z"
-          },
-          "quote": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
-              },
-              "btcToTargetCurrencyRate": {
-                "type": "number",
-                "format": "number",
-                "example": 5000000.23
-              },
-              "usdToTargetCurrencyRate": {
-                "type": "number",
-                "format": "number",
-                "example": 1500.65
-              },
-              "totalSatAmount": {
-                "type": "number",
-                "format": "number",
-                "example": 1499589
-              },
-              "finalPayableAmountInTargetCurrency": {
-                "type": "string",
-                "format": "string",
-                "example": "50000.00"
-              },
-              "transactionFeesInSourceCurrency": {
-                "type": "number",
-                "format": "number",
-                "example": 11163
-              },
-              "transactionFeesInTargetCurrency": {
-                "type": "string",
-                "format": "string",
-                "example": "3750.00"
-              },
-              "customerInternalFee": {
-                "type": "number",
-                "format": "number",
-                "example": 1000
-              },
-              "sourceCurrency": {
-                "type": "string",
-                "format": "string",
-                "enum": ["BTCSAT", "NGNKOBO", "KESCENT"]
-              },
-              "targetCurrency": {
-                "type": "string",
-                "format": "string",
-                "enum": ["NGNKOBO", "KESCENT"]
-              },
-              "expiresAt": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2021-07-01T12:00:00Z"
-              }
-            }
-          }
-        }
-      },
       "Wallet": {
         "type": "object",
         "properties": {
@@ -1839,62 +1791,74 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b",
+            "description": "The unique identifier for the transaction"
           },
           "walletId": {
             "type": "string",
             "format": "uuid",
-            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+            "example": "d1614a76-9c7f-4111-98a7-43199f307e5b",
+            "description": "The unique identifier for the wallet"
           },
           "ref": {
             "type": "string",
             "format": "string",
-            "example": "99eeff854ffd345fffs67890"
+            "example": "99eeff854ffd345fffs67890",
+            "description": "The reference for the transaction"
           },
           "hash": {
             "type": "string",
             "format": "string",
-            "example": "99eeff854ffd345fffs67890"
+            "example": "189727ef2e0f35921af7858b96e27cbad960b0ec2bb2a4ab73b6a231f9ce8727",
+            "description": "The payment hash for the lightning invoice attached to the quote related to the transaction"
           },
           "amount": {
             "type": "number",
             "format": "number",
-            "example": 1000
+            "example": 1000,
+            "description": "The amount of the transaction in its lowest denomination"
           },
           "fees": {
             "type": "number",
             "format": "number",
-            "example": 0
+            "example": 0,
+            "description": "The fees for the transaction in its lowest denomination"
           },
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "KES", "BTC", "USD"]
+            "enum": ["NGN", "KES", "BTC", "ZAR"],
+            "description": "The currency of the transaction"
           },
           "type": {
             "type": "string",
             "format": "string",
-            "enum": ["WITHDRAWAL", "DEPOSIT", "TRANSFER"]
+            "enum": ["WITHDRAWAL", "DEPOSIT", "TRANSFER"],
+            "description": "The type of the transaction"
           },
           "status": {
             "type": "string",
             "format": "string",
-            "enum": ["SUCCESS", "PENDING", "FAILED"]
+            "enum": ["SUCCESS", "PENDING", "FAILED"],
+            "description": "The status of the transaction"
           },
           "autopayout": {
             "type": "boolean",
             "format": "boolean",
-            "example": true
+            "example": true,
+            "description": "Whether the transaction is an instant payout"
           },
           "createdAt": {
             "type": "string",
             "format": "date-time",
-            "example": "2021-07-01T12:00:00Z"
+            "example": "2021-07-01T12:00:00Z",
+            "description": "The date and time the transaction was created"
           },
           "updatedAt": {
             "type": "string",
             "format": "date-time",
-            "example": "2021-07-01T12:00:00Z"
+            "example": "2021-07-01T12:00:00Z",
+            "description": "The date and time the transaction was last updated"
           },
           "transactionMetadata": {
             "$ref": "#/components/schemas/TransactionMetadata"
@@ -1913,11 +1877,6 @@
             "type": "string",
             "format": "string",
             "example": "99854-2345"
-          },
-          "eProviderRef": {
-            "type": "string",
-            "format": "string",
-            "example": "9985434567890"
           },
           "bankCode": {
             "type": "string",
