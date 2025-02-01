@@ -1016,7 +1016,7 @@
         }
       }
     },
-    "/signup/business": {
+    "/auth/signup/business": {
       "post": {
         "security": [],
         "tags": ["Signup"],
@@ -1192,6 +1192,89 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/change-password": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["User"],
+        "operationId": "changePassword",
+        "summary": "Change user password",
+        "description": "Change the user's password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "oldPassword": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "password"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "Password changed successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "Old password is incorrect"
+                    }
+                  }
                 }
               }
             }
