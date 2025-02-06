@@ -2294,6 +2294,26 @@
             "type": "string",
             "format": "string",
             "example": "+2348123456789"
+          },
+          "isDeveloper": {
+            "type": "boolean",
+            "example": true
+          },
+          "country": {
+            "type": "string",
+            "example": "Nigeria"
+          },
+          "businessCategory": {
+            "type": "string",
+            "example": "Technology"
+          },
+          "businessType": {
+            "type": "string",
+            "example": "Software"
+          },
+          "acceptedTerms": {
+            "type": "boolean",
+            "example": true
           }
         }
       },
