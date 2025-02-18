@@ -50,15 +50,16 @@
     {
       "group": "Payouts",
       "pages": [
-        "payouts/markdown",
+        "payouts/introduction",
         "payouts/ngn-payout",
-        "payouts/zar-payout"
+        "payouts/zar-payout",
+        "payouts/kes-payout"
       ]
     },
     {
       "group": "Webhooks",
       "pages": [
-        "webhooks/markdown"
+        "webhooks/introduction"
       ]
     },
     {

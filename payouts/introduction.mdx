@@ -5,10 +5,11 @@ description: 'Learn how to integrate Mavapay payouts for supported currencies'
 
 # Payouts
 
-Mavapay allows you to send money to bank accounts in supported countries using Bitcoin Lightning Network. We currently support payouts to:
+Mavapay allows you to send money to bank accounts and mobile money accounts in supported countries using Bitcoin Lightning Network. We currently support payouts to:
 
 1. [Nigerian Naira (NGN)](/payouts/ngn-payout)
 2. [South African Rand (ZAR)](/payouts/zar-payout)
+3. [Kenyan Shilling (KES)](/payouts/kes-payout)
 
 ## Overview
 
@@ -33,12 +34,21 @@ The payout process generally involves:
 - Customer internal fees currently disabled
 - [View ZAR Payout Documentation](/payouts/zar-payout)
 
+### Kenyan Shilling (KES)
+- Amounts are denominated in cents (1 KES = 100 cents)
+- All payments processed through M-Pesa
+- Supports three M-Pesa payment modes:
+  1. Mobile Money (pay to phone number)
+  2. Pay to Bill (business payments)
+  3. Pay to Account/Till
+- [View KES Payout Documentation](/payouts/kes-payout)
+
 ## Webhook Events
 
 For all payouts, you'll receive two webhook events:
 
 1. `payment.received` - When we receive the lightning payment
-2. `payment.sent` - When the money is sent to the recipient's bank account
+2. `payment.sent` - When the money is sent to the recipient
 
 For detailed webhook implementation, see our [webhook documentation](/webhooks/markdown).
 

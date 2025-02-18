@@ -1,0 +1,265 @@
+---
+title: 'Kenyan Shilling (KES) Payouts'
+description: 'Learn how to integrate Mavapay payouts for Kenyan Shilling (KES)'
+---
+
+# Kenyan Shilling (KES) Payouts
+
+This guide explains how to integrate Mavapay's payout functionality for sending money to Kenyan recipients through various M-Pesa payment modes.
+
+## Overview
+
+The KES payout process involves the following steps:
+
+1. Choose the appropriate M-Pesa payment mode
+2. Create a quote with the required beneficiary details
+3. Pay the generated lightning invoice
+4. Receive webhook notifications for payment status
+
+**Note**: All KES payments are processed through M-Pesa, Kenya's leading mobile money service.
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+1. Created a Mavapay account
+2. Obtained your API key
+3. Set up your webhook endpoint
+4. Verified your business account
+
+## Authentication
+
+All API requests must include your API key in the header:
+
+```bash
+X-API-KEY: your_api_key_here
+```
+
+**Important Notes:**
+- All amounts are in cents (1 KES = 100 cents)
+- The minimum amount for KES payouts is $2
+- Phone numbers must be in international format (e.g., +254...)
+- Account numbers for paybill payments can be text (usually business name or identifier)
+- All payments are processed through M-Pesa's payment infrastructure
+
+## Payment Modes
+
+All KES payments are processed through M-Pesa using one of the following modes:
+
+### 1. Pay to Phone Number (M-Pesa Mobile Money)
+
+Send money directly to a recipient's M-Pesa account:
+
+```bash
+curl --request POST \
+  --url https://staging.api.mavapay.co/api/v1/quote \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-KEY: your_api_key_here' \
+  --data '{
+  "amount": 500000,
+  "sourceCurrency": "BTCSAT",
+  "targetCurrency": "KESCENT",
+  "paymentMethod": "LIGHTNING",
+  "paymentCurrency": "KESCENT",
+  "autopayout": true,
+  "beneficiary": {
+    "identifierType": "paytophone",
+    "identifiers": {
+      "phoneNumber": "+254796980788"
+    }
+  }
+}'
+```
+
+### 2. Pay to Bill (M-Pesa Paybill)
+
+Pay to a business using their M-Pesa paybill number:
+
+```bash
+curl --request POST \
+  --url https://staging.api.mavapay.co/api/v1/quote \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-KEY: your_api_key_here' \
+  --data '{
+  "amount": 500000,
+  "sourceCurrency": "BTCSAT",
+  "targetCurrency": "KESCENT",
+  "paymentMethod": "LIGHTNING",
+  "paymentCurrency": "KESCENT",
+  "autopayout": true,
+  "beneficiary": {
+    "identifierType": "paytobill",
+    "identifiers": {
+      "paybillNumber": "4141031",
+      "accountNumber": "business_name"
+    }
+  }
+}'
+```
+
+### 3. Pay to Account/Till (M-Pesa Till)
+
+Pay to a business M-Pesa till number:
+
+```bash
+curl --request POST \
+  --url https://staging.api.mavapay.co/api/v1/quote \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-KEY: your_api_key_here' \
+  --data '{
+  "amount": 500000,
+  "sourceCurrency": "BTCSAT",
+  "targetCurrency": "KESCENT",
+  "paymentMethod": "LIGHTNING",
+  "paymentCurrency": "KESCENT",
+  "autopayout": true,
+  "beneficiary": {
+    "identifierType": "paytotill",
+    "identifiers": {
+      "accountNumber": "till_number"
+    }
+  }
+}'
+```
+
+## Understanding the Quote Response
+
+Sample response:
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "d1614a76-9c7f-4111-98a7-43199f307e5b",
+    "exchangeRate": 4874805.75,
+    "usdToTargetCurrencyRate": 145.977,
+    "sourceCurrency": "BTCSAT",
+    "targetCurrency": "KESCENT",
+    "transactionFeesInSourceCurrency": 13.23,
+    "transactionFeesInTargetCurrency": "3750.00",
+    "amountInSourceCurrency": 1499,
+    "amountInTargetCurrency": "50000.00",
+    "paymentMethod": "LIGHTNING",
+    "expiry": "2021-07-01T12:00:00Z",
+    "isValid": true,
+    "invoice": "lntbs36020n1pnehfzcpp...",
+    "hash": "189727ef2e0f35921af7858b96e27cbad960b0ec2bb2a4ab73b6a231f9ce8727",
+    "totalAmountInSourceCurrency": 1499,
+    "customerInternalFee": 0
+  }
+}
+```
+
+Key fields:
+- `usdToTargetCurrencyRate`: Price of 1 USD in KES
+- `exchangeRate`: Price of 1 BTC in KES
+- `amountInSourceCurrency`: Total amount in SATS to be paid (including fees)
+- `amountInTargetCurrency`: Total amount in cents to be sent to recipient
+- `transactionFeesInSourceCurrency`: Fees in SATS
+- `transactionFeesInTargetCurrency`: Fees in cents
+- `expiry`: Invoice validity (5 minutes)
+
+## Webhook Events
+
+You'll receive two webhook events:
+
+1. `payment.received` - When the lightning payment is received
+2. `payment.sent` - When the money is sent to the recipient
+
+### payment.received Event
+```json
+{
+  "event": "payment.received",
+  "data": {
+    "id": "tx_123456789",
+    "amount": 500000,
+    "currency": "KES",
+    "status": "SUCCESS",
+    "metadata": {
+      "hash": "189727ef2e0f35921af7858b96e27cbad960b0ec2bb2a4ab73b6a231f9ce8727",
+      "reference": "MP123456789"
+    }
+  }
+}
+```
+
+### payment.sent Event
+```json
+{
+  "event": "payment.sent",
+  "data": {
+    "id": "tx_123456789",
+    "amount": 500000,
+    "currency": "KES",
+    "status": "SUCCESS",
+    "metadata": {
+      "identifierType": "paytophone",
+      "phoneNumber": "+254796980788",
+      "reference": "MP123456789"
+    }
+  }
+}
+```
+
+## Checking Transaction Status
+
+You can query transactions using the payment hash, orderId, or transaction ID:
+
+```bash
+# Using hash
+curl --location 'https://staging.api.mavapay.co/api/v1/transaction?hash=08f7198fd7dd73c087b4754a20d6f63f5b87bb8fcdc10e4d5cacd27650fce2ba' \
+--header 'x-api-key: your_api_key_here'
+
+# Using transaction ID
+curl --location 'https://staging.api.mavapay.co/api/v1/transaction?id=7bac35f1-2efc-448b-8a71-0d071da43315' \
+--header 'x-api-key: your_api_key_here'
+```
+
+## Getting Price Rates
+
+To get current KES rates:
+
+```bash
+curl --location 'https://staging.api.mavapay.co/api/v1/price?currency=KES'
+```
+
+Sample response:
+```json
+{
+    "status": "ok",
+    "data": {
+        "currency": "KES",
+        "timestamp": 1738258609,
+        "btcPriceInUnitCurrency": 4874805.75,
+        "unitPricePerSat": {
+            "amount": 0.04874805,
+            "currencyUnit": "KESSAT"
+        },
+        "unitPricePerUsd": {
+            "amount": 145.977,
+            "currencyUnit": "KESUSD"
+        }
+    }
+}
+```
+
+## Testing
+
+Use our staging environment for testing:
+```bash
+https://staging.api.mavapay.co/api/v1
+```
+
+Test details:
+- Phone Number: `+254790000000`
+- Paybill Number: `4141031`
+- Account Number: `test_account`
+- Till Number: `000000`
+
+**Note**: All test environment invoices are signet invoices.
+
+## Support
+
+If you need help with integration:
+- Email: info@mavapay.co
+- Documentation: https://docs.mavapay.co
+- API Reference: https://docs.mavapay.co/api-reference 
