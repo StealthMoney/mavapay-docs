@@ -1,3 +1,49 @@
 ---
-openapi: post /webhook/register
+title: 'Register Webhook'
+description: 'Register a webhook endpoint to receive event notifications'
 ---
+
+# Register Webhook
+
+Register a webhook endpoint to receive notifications for transaction events.
+
+## API Endpoint
+
+```
+POST https://api.mavapay.co/api/v1/webhook/register
+```
+
+## Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| url | string | Yes | The URL where webhook events will be sent |
+| secret | string | Yes | A secret key used to sign webhook payloads |
+
+## Example Request
+
+```bash
+curl -X POST https://api.mavapay.co/api/v1/webhook/register \
+  -H "Content-Type: application/json" \
+  -H "X-API-KEY: your_api_key_here" \
+  -d '{
+    "url": "https://your-domain.com/webhook",
+    "secret": "your_webhook_secret"
+  }'
+```
+
+## Example Response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "wh_123456789",
+    "url": "https://your-domain.com/webhook",
+    "isActive": true,
+    "createdAt": "2024-03-21T15:30:00Z"
+  }
+}
+```
+
+For more information about webhooks, see our [webhook documentation](/webhooks/markdown).

@@ -48,36 +48,17 @@
       "pages": ["introduction", "account-setup", "development"]
     },
     {
-      "group": "Collections",
-      "pages": [
-        "collections/markdown",
-        "collections/code",
-        "collections/images",
-        "collections/settings",
-        "collections/navigation",
-        "collections/reusable-snippets"
-      ]
-    },
-    {
       "group": "Payouts",
       "pages": [
         "payouts/markdown",
-        "payouts/code",
-        "payouts/images",
-        "payouts/settings",
-        "payouts/navigation",
-        "payouts/reusable-snippets"
+        "payouts/ngn-payout",
+        "payouts/zar-payout"
       ]
     },
     {
       "group": "Webhooks",
       "pages": [
-        "webhooks/markdown",
-        "webhooks/code",
-        "webhooks/images",
-        "webhooks/settings",
-        "webhooks/navigation",
-        "webhooks/reusable-snippets"
+        "webhooks/markdown"
       ]
     },
     {

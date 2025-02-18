@@ -1,88 +1,200 @@
 ---
-title: 'Markdown Syntax'
-description: 'Text, title, and styling in standard markdown'
-icon: 'text-size'
+title: 'Introduction'
+description: 'Learn how to integrate and handle Mavapay webhooks'
 ---
 
-## Titles
+# Webhook Integration Guide
 
-Best used for section headers.
+Webhooks allow your application to receive real-time notifications about events that occur in your Mavapay account. This guide explains how to integrate, secure, and handle webhook notifications.
 
-```md
-## Titles
+## Overview
+
+Mavapay uses webhooks to notify your application when events happen in your account. Instead of polling our API, webhooks enable your application to be notified in real-time when events occur.
+
+## Setting Up Webhooks
+
+### 1. Register Your Webhook Endpoint
+
+First, [register your webhook](/api-reference/endpoint/webhook/register-webhook) endpoint using our API:
+
+```javascript
+const response = await fetch('https://api.mavapay.co/api/v1/webhook/register', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-API-KEY': 'your_api_key_here'
+  },
+  body: JSON.stringify({
+    url: 'https://your-domain.com/webhook',
+    secret: 'your_webhook_secret'
+  })
+});
 ```
 
-### Subtitles
+### 2. Update Webhook Configuration
 
-Best use to subsection headers.
+You can update your webhook configuration at any time:
 
-```md
-### Subtitles
+```javascript
+const response = await fetch('https://api.mavapay.co/api/v1/webhook', {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-API-KEY': 'your_api_key_here'
+  },
+  body: JSON.stringify({
+    url: 'https://your-new-domain.com/webhook',
+    secret: 'your_new_webhook_secret'
+  })
+});
 ```
 
-<Tip>
+## Event Types
 
-Each **title** and **subtitle** creates an anchor and also shows up on the table of contents on the right.
+Mavapay currently supports two types of webhook events:
 
-</Tip>
+1. `payment.received` - Triggered when a payment is received
+2. `payment.sent` - Triggered when a payment is sent
 
-## Text Formatting
+### Event Payloads
 
-We support most markdown formatting. Simply add `**`, `_`, or `~` around text to format it.
+#### payment.received
 
-| Style         | How to write it   | Result          |
-| ------------- | ----------------- | --------------- |
-| Bold          | `**bold**`        | **bold**        |
-| Italic        | `_italic_`        | _italic_        |
-| Strikethrough | `~strikethrough~` | ~strikethrough~ |
-
-You can combine these. For example, write `**_bold and italic_**` to get **_bold and italic_** text.
-
-You need to use HTML to write superscript and subscript text. That is, add `<sup>` or `<sub>` around your text.
-
-| Text Size   | How to write it          | Result                 |
-| ----------- | ------------------------ | ---------------------- |
-| Superscript | `<sup>superscript</sup>` | <sup>superscript</sup> |
-| Subscript   | `<sub>subscript</sub>`   | <sub>subscript</sub>   |
-
-## Linking to Pages
-
-You can add a link by wrapping text in `[]()`. You would write `[link to google](https://google.com)` to [link to google](https://google.com).
-
-Links to pages in your docs need to be root-relative. Basically, you should include the entire folder path. For example, `[link to text](/writing-content/text)` links to the page "Text" in our components section.
-
-Relative links like `[link to text](../text)` will open slower because we cannot optimize them as easily.
-
-## Blockquotes
-
-### Singleline
-
-To create a blockquote, add a `>` in front of a paragraph.
-
-> Dorothy followed her through many of the beautiful rooms in her castle.
-
-```md
-> Dorothy followed her through many of the beautiful rooms in her castle.
+```json
+{
+  "event": "payment.received",
+  "data": {
+    "id": "tx_123456789",
+    "amount": 500000,
+    "currency": "NGN",
+    "status": "SUCCESS",
+    "metadata": {
+      "hash": "189727ef2e0f35921af7858b96e27cbad960b0ec2bb2a4ab73b6a231f9ce8727",
+      "reference": "MP123456789",
+      ...
+    }
+  }
+}
 ```
 
-### Multiline
+#### payment.sent
 
-> Dorothy followed her through many of the beautiful rooms in her castle.
->
-> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
-
-```md
-> Dorothy followed her through many of the beautiful rooms in her castle.
->
-> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
+```json
+{
+  "event": "payment.sent",
+  "data": {
+    "id": "tx_123456789",
+    "amount": 500000,
+    "currency": "NGN",
+    "status": "SUCCESS",
+    "metadata": {
+      "bankAccountNumber": "0149203789",
+      "bankAccountName": "John Doe",
+      "bankName": "GTBANK PLC",
+      "reference": "MP123456789",
+      ...
+    }
+  }
+}
 ```
 
-### LaTeX
+## Security
 
-Mintlify supports [LaTeX](https://www.latex-project.org) through the Latex component.
+### Verifying Webhook Signatures
 
-<Latex>8 x (vk x H1 - H2) = (0,1)</Latex>
+To ensure the webhook requests are coming from Mavapay, we sign each request with your webhook secret. The signature is included in the `X-Mavapay-Signature` header.
 
-```md
-<Latex>8 x (vk x H1 - H2) = (0,1)</Latex>
+Here's how to verify the signature (Node.js example):
+
+```javascript
+const crypto = require('crypto');
+
+function verifyWebhookSignature(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(JSON.stringify(payload))
+    .digest('hex');
+  
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignature)
+  );
+}
+
+// In your webhook handler
+app.post('/webhook', (req, res) => {
+  const signature = req.headers['x-mavapay-signature'];
+  const isValid = verifyWebhookSignature(
+    req.body,
+    signature,
+    'your_webhook_secret'
+  );
+
+  if (!isValid) {
+    return res.status(400).json({ error: 'Invalid signature' });
+  }
+
+  // Process the webhook
+  const { event, data } = req.body;
+  // Handle the event...
+
+  res.json({ received: true });
+});
 ```
+
+## Best Practices
+
+1. **Verify Signatures**: Always verify webhook signatures to ensure requests are from Mavapay.
+
+2. **Idempotency**: Process webhooks idempotently using the event ID to avoid duplicate processing.
+
+3. **Quick Response**: Respond to webhooks quickly (within 5 seconds) to acknowledge receipt.
+
+4. **Retry Logic**: Implement retry logic in case your endpoint is temporarily unavailable.
+
+5. **Logging**: Log webhook requests for debugging and auditing purposes.
+
+6. **Error Handling**: Implement proper error handling for failed webhook processing.
+
+## Testing Webhooks
+
+You can use our staging environment to test webhooks:
+
+```bash
+https://staging.api.mavapay.co/api/v1
+```
+
+We recommend using tools like [webhook.site](https://webhook.site) or [ngrok](https://ngrok.com) for local development.
+
+### Test Event
+
+You can trigger a test event to verify your webhook setup:
+
+```javascript
+const response = await fetch('https://api.mavapay.co/api/v1/webhook/test', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-API-KEY': 'your_api_key_here'
+  }
+});
+```
+
+## Troubleshooting
+
+Common issues and solutions:
+
+1. **Invalid Signature**: Double-check your webhook secret and signature verification code.
+
+2. **Timeout**: Ensure your endpoint responds within 5 seconds.
+
+3. **SSL Error**: Make sure your endpoint has a valid SSL certificate.
+
+4. **Wrong Content-Type**: Your endpoint should accept `application/json`.
+
+## Support
+
+If you need help with webhooks:
+- Email: info@mavapay.co
+- Documentation: https://docs.mavapay.co
+- API Reference: https://docs.mavapay.co/api-reference

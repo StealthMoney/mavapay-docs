@@ -1,88 +1,59 @@
 ---
-title: 'Markdown Syntax'
-description: 'Text, title, and styling in standard markdown'
-icon: 'text-size'
+title: 'Introduction'
+description: 'Learn how to integrate Mavapay payouts for supported currencies'
 ---
 
-## Titles
+# Payouts
 
-Best used for section headers.
+Mavapay allows you to send money to bank accounts in supported countries using Bitcoin Lightning Network. We currently support payouts to:
 
-```md
-## Titles
+1. [Nigerian Naira (NGN)](/payouts/ngn-payout)
+2. [South African Rand (ZAR)](/payouts/zar-payout)
+
+## Overview
+
+The payout process generally involves:
+
+1. Creating a quote for the amount you want to pay out
+2. Paying the generated lightning invoice
+3. Receiving webhook notifications for payment status
+
+## Currency-Specific Requirements
+
+### Nigerian Naira (NGN)
+- Amounts are denominated in Kobo (1 NGN = 100 Kobo)
+- Minimum payout amount: 2000 NGN
+- Requires bank account validation before payout
+- Supports customer internal fees
+- [View NGN Payout Documentation](/payouts/ngn-payout)
+
+### South African Rand (ZAR)
+- Amounts are denominated in cents (1 ZAR = 100 cents)
+- No bank account validation required
+- Customer internal fees currently disabled
+- [View ZAR Payout Documentation](/payouts/zar-payout)
+
+## Webhook Events
+
+For all payouts, you'll receive two webhook events:
+
+1. `payment.received` - When we receive the lightning payment
+2. `payment.sent` - When the money is sent to the recipient's bank account
+
+For detailed webhook implementation, see our [webhook documentation](/webhooks/markdown).
+
+## Testing
+
+Use our staging environment for testing:
+```bash
+https://staging.api.mavapay.co/api/v1
 ```
 
-### Subtitles
+**Note**: All test environment invoices are signet invoices.
 
-Best use to subsection headers.
+## Support
 
-```md
-### Subtitles
-```
-
-<Tip>
-
-Each **title** and **subtitle** creates an anchor and also shows up on the table of contents on the right.
-
-</Tip>
-
-## Text Formatting
-
-We support most markdown formatting. Simply add `**`, `_`, or `~` around text to format it.
-
-| Style         | How to write it   | Result          |
-| ------------- | ----------------- | --------------- |
-| Bold          | `**bold**`        | **bold**        |
-| Italic        | `_italic_`        | _italic_        |
-| Strikethrough | `~strikethrough~` | ~strikethrough~ |
-
-You can combine these. For example, write `**_bold and italic_**` to get **_bold and italic_** text.
-
-You need to use HTML to write superscript and subscript text. That is, add `<sup>` or `<sub>` around your text.
-
-| Text Size   | How to write it          | Result                 |
-| ----------- | ------------------------ | ---------------------- |
-| Superscript | `<sup>superscript</sup>` | <sup>superscript</sup> |
-| Subscript   | `<sub>subscript</sub>`   | <sub>subscript</sub>   |
-
-## Linking to Pages
-
-You can add a link by wrapping text in `[]()`. You would write `[link to google](https://google.com)` to [link to google](https://google.com).
-
-Links to pages in your docs need to be root-relative. Basically, you should include the entire folder path. For example, `[link to text](/writing-content/text)` links to the page "Text" in our components section.
-
-Relative links like `[link to text](../text)` will open slower because we cannot optimize them as easily.
-
-## Blockquotes
-
-### Singleline
-
-To create a blockquote, add a `>` in front of a paragraph.
-
-> Dorothy followed her through many of the beautiful rooms in her castle.
-
-```md
-> Dorothy followed her through many of the beautiful rooms in her castle.
-```
-
-### Multiline
-
-> Dorothy followed her through many of the beautiful rooms in her castle.
->
-> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
-
-```md
-> Dorothy followed her through many of the beautiful rooms in her castle.
->
-> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
-```
-
-### LaTeX
-
-Mintlify supports [LaTeX](https://www.latex-project.org) through the Latex component.
-
-<Latex>8 x (vk x H1 - H2) = (0,1)</Latex>
-
-```md
-<Latex>8 x (vk x H1 - H2) = (0,1)</Latex>
-```
+If you need help with integration:
+- Email: info@mavapay.co
+- Documentation: https://docs.mavapay.co
+- API Reference: https://docs.mavapay.co/api-reference

@@ -1,0 +1,237 @@
+---
+title: 'South African Rand (ZAR) Payouts'
+description: 'Learn how to integrate Mavapay payouts for South African Rand (ZAR)'
+---
+
+This guide explains how to integrate Mavapay's payout functionality for sending money to South African bank accounts.
+
+## Overview
+
+The ZAR payout process involves the following steps:
+
+1. Get the list of supported South African banks
+2. Create a quote for the amount you want to pay out
+3. Pay the generated lightning invoice
+4. Receive webhook notifications for payment status
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+1. Created a Mavapay account
+2. Obtained your API key
+3. Set up your webhook endpoint
+4. Verified your business account
+
+## Authentication
+
+All API requests must include your API key in the header:
+
+```bash
+X-API-KEY: your_api_key_here
+```
+
+## Getting Bank List
+
+First, [retrieve the list of supported South African banks](/api-reference/endpoint/bank-info/bank-code):
+
+```bash
+curl --location 'https://staging.api.mavapay.co/api/v1/bank/bankcode?country=ZA' \
+--header 'x-api-key: your_api_key_here'
+```
+
+## Creating a Quote
+
+**Important Notes:**
+- All amounts are in cents (1 ZAR = 100 cents)
+- To send 3,000 ZAR, use amount = 300000 cents
+
+```bash
+curl --request POST \
+  --url https://staging.api.mavapay.co/api/v1/quote \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-KEY: your_api_key_here' \
+  --data '{
+  "amount": 300000,
+  "sourceCurrency": "BTCSAT",
+  "targetCurrency": "ZARCENT",
+  "paymentMethod": "LIGHTNING",
+  "paymentCurrency": "ZARCENT",
+  "autopayout": true,
+  "beneficiary": {
+    "name": "Ricki Tester",
+    "bankName": "CAPITEC BANK",
+    "bankAccountNumber": "1352900000"
+  }
+}'
+```
+
+Sample response:
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "d1614a76-9c7f-4111-98a7-43199f307e5b",
+    "exchangeRate": 1874805.7499999998,
+    "usdToTargetCurrencyRate": 18.4977,
+    "sourceCurrency": "BTCSAT",
+    "targetCurrency": "ZARCENT",
+    "transactionFeesInSourceCurrency": 13.23,
+    "transactionFeesInTargetCurrency": "3750.00",
+    "amountInSourceCurrency": 1499,
+    "amountInTargetCurrency": "50000.00",
+    "paymentMethod": "LIGHTNING",
+    "expiry": "2021-07-01T12:00:00Z",
+    "isValid": true,
+    "invoice": "lntbs36020n1pnehfzcpp5zc8g9tfpwnmaevh62ak2vu6zjqyt5cpph3gjm4zfyqz9srjjdsaqdz5296k7ar98gsy6ctkvys9qcteyqmnyenr8yunswfdvyer2v3dx33kxe3dvymnsefdv5mnjcm9x5mrydm9vccqcqzpuxqzfvsp5utd7hdfmjp7vw3lc6hal8psqruwcnu89hxfukyzugxh40jhv8xcq9qxpqysgq2lry5dgzu2g04s74tpvctwe37rkprs3k579jw6yt7ncrsg62p29yalw8gf5fawfvpydqv4jjve0nsysfhsxa35dtwug9e6gzxkq0h5gp636wc3",
+    "hash": "189727ef2e0f35921af7858b96e27cbad960b0ec2bb2a4ab73b6a231f9ce8727",
+    "totalAmountInSourceCurrency": 1499,
+    "customerInternalFee": 0,
+    "createdAt": "2021-07-01T12:00:00Z",
+    "updatedAt": "2021-07-01T12:00:00Z"
+  }
+}
+```
+
+### Understanding the Quote Response
+
+- `usdToTargetCurrencyRate`: Price of 1 USD in ZAR
+- `exchangeRate`: Price of 1 BTC in ZAR
+- `amountInSourceCurrency`: Total amount in SATS to be paid (including fees)
+- `amountInTargetCurrency`: Total amount in cents to be sent to recipient
+- `transactionFeesInSourceCurrency`: Fees in SATS (included in amountInSourceCurrency)
+- `transactionFeesInTargetCurrency`: Fees in cents
+- `expiry`: Invoice validity (5 minutes)
+- `customerInternalFee`: Currently disabled for ZAR payments
+
+## Webhook Events
+
+You'll receive two webhook events:
+
+1. `payment.received` - When the lightning payment is received
+2. `payment.sent` - When the money is sent to the recipient's bank account
+
+### payment.received Event
+```json
+{
+  "event": "payment.received",
+  "data": {
+    "id": "0b234e32-d5ba-4c2a-8f71-0b820a477f01",
+    "walletId": "b7e7b823-b572-41d3-86a6-a6872f35c274",
+    "ref": "f05432ecab06ca0357596af0366de",
+    "hash": "001f7fb879bb3874eb057dcce06437d45d4020d7f348a36cd583b658e98e07d6",
+    "amount": 300000,
+    "fees": 2500,
+    "currency": "ZAR",
+    "type": "DEPOSIT",
+    "status": "SUCCESS",
+    "autopayout": true,
+    "createdAt": "2025-01-17T13:20:20.575Z",
+    "updatedAt": "2025-01-17T13:20:20.575Z",
+    "transactionMetadata": {
+      "id": "570cba51-d9fd-402a-8b10-5c43e23077d8",
+      "orderId": "82958-2591",
+      "name": "Ricki Allardice",
+      "bankName": "CAPITEC BANK",
+      "bankAccountNumber": "1352906218",
+      "customerInternalFee": 0,
+      "createdAt": "2025-02-03T14:18:20.737Z",
+      "updatedAt": "2025-02-03T14:18:22.777Z"
+    }
+  }
+}
+```
+
+### payment.sent Event
+```json
+{
+  "event": "payment.sent",
+  "data": {
+    "id": "e6291848-a632-44c8-8398-bf318bbc17de",
+    "walletId": "b7e7b823-b572-41d3-86a6-a6872f35c274",
+    "ref": "06679ad012a143407d1685561dd27",
+    "hash": "001f7fb879bb3874eb057dcce06437d45d4020d7f348a36cd583b658e98e07d6",
+    "amount": 300000,
+    "fees": 0,
+    "currency": "ZAR",
+    "type": "WITHDRAWAL",
+    "status": "SUCCESS",
+    "autopayout": true,
+    "createdAt": "2025-01-17T13:20:21.126Z",
+    "updatedAt": "2025-01-17T13:20:23.476Z",
+    "transactionMetadata": {
+      "id": "570cba51-d9fd-402a-8b10-5c43e23077d8",
+      "orderId": "82958-2591",
+      "name": "Ricki Allardice",
+      "bankName": "CAPITEC BANK",
+      "bankAccountNumber": "1352906218",
+      "customerInternalFee": 0,
+      "createdAt": "2025-02-03T14:18:20.737Z",
+      "updatedAt": "2025-02-03T14:18:22.777Z"
+    }
+  }
+}
+```
+
+## Checking Transaction Status
+
+You can [query transactions](/api-reference/endpoint/transaction/get-transaction) using the payment hash, orderId, or transaction ID:
+
+```bash
+# Using hash
+curl --location 'https://staging.api.mavapay.co/api/v1/transaction?hash=08f7198fd7dd73c087b4754a20d6f63f5b87bb8fcdc10e4d5cacd27650fce2ba' \
+--header 'x-api-key: your_api_key_here'
+
+# Using transaction ID
+curl --location 'https://staging.api.mavapay.co/api/v1/transaction?id=7bac35f1-2efc-448b-8a71-0d071da43315' \
+--header 'x-api-key: your_api_key_here'
+```
+
+## Getting Price Rates
+
+To get current ZAR rates:
+
+```bash
+curl --location 'https://staging.api.mavapay.co/api/v1/price?currency=ZAR'
+```
+
+Sample response:
+```json
+{
+    "status": "ok",
+    "data": {
+        "currency": "ZAR",
+        "timestamp": 1738258609,
+        "btcPriceInUnitCurrency": 1874805.7499999998,
+        "unitPricePerSat": {
+            "amount": 0.01874805,
+            "currencyUnit": "ZARSAT"
+        },
+        "unitPricePerUsd": {
+            "amount": 18.4977,
+            "currencyUnit": "ZARUSD"
+        }
+    }
+}
+```
+
+## Testing
+
+Use our staging environment for testing:
+```bash
+https://staging.api.mavapay.co/api/v1
+```
+
+Test bank account details:
+- Account Number: `1352900000`
+- Bank: CAPITEC BANK
+- Account Holder: Ricki Tester
+
+**Note**: All test environment invoices are signet invoices.
+
+## Support
+
+If you need help with integration:
+- Email: info@mavapay.co
+- Documentation: https://docs.mavapay.co
+- API Reference: https://docs.mavapay.co/api-reference 
