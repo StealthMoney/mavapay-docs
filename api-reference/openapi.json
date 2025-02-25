@@ -930,10 +930,116 @@
         "tags": ["Transaction"],
         "operationId": "getTransactions",
         "summary": "Get all transactions",
-        "description": "Returns all transactions",
+        "description": "Returns all transactions with pagination and filtering options",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "required": false
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false
+          },
+          {
+            "name": "txId",
+            "in": "query",
+            "description": "Filter by transaction ID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          },
+          {
+            "name": "accountName",
+            "in": "query",
+            "description": "Filter by account name (only applicable for NGN and ZAR transactions)",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "type": "string",
+              "enum": ["SUCCESS", "PENDING", "FAILED"]
+            },
+            "required": false
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "type": "string",
+              "enum": ["WITHDRAWAL", "DEPOSIT"]
+            },
+            "required": false
+          },
+          {
+            "name": "minAmount",
+            "in": "query",
+            "description": "Filter by minimum amount (in lowest denomination of the currency)",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "required": false
+          },
+          {
+            "name": "maxAmount",
+            "in": "query",
+            "description": "Filter by maximum amount (in lowest denomination of the currency)",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "required": false
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "Filter transactions from this date (ISO 8601 format)",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-01-01T00:00:00Z"
+            },
+            "required": false
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "Filter transactions until this date (ISO 8601 format)",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-12-31T23:59:59Z"
+            },
+            "required": false
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Transaction response",
+            "description": "Transaction response with pagination",
             "content": {
               "application/json": {
                 "schema": {
@@ -941,8 +1047,36 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "format": "string",
-                      "example": "success"
+                      "example": "ok"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "all transaction"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "description": "Total number of transactions",
+                      "example": 1
+                    },
+                    "nextPage": {
+                      "type": "boolean",
+                      "description": "Whether there is a next page available",
+                      "example": false
+                    },
+                    "currentPage": {
+                      "type": "integer",
+                      "description": "Current page number",
+                      "example": 1
+                    },
+                    "remainingPage": {
+                      "type": "integer",
+                      "description": "Number of remaining pages",
+                      "example": 0
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "description": "Total number of pages",
+                      "example": 1
                     },
                     "data": {
                       "type": "array",
@@ -1947,7 +2081,7 @@
           "type": {
             "type": "string",
             "format": "string",
-            "enum": ["WITHDRAWAL", "DEPOSIT", "TRANSFER"],
+            "enum": ["WITHDRAWAL", "DEPOSIT"],
             "description": "The type of the transaction"
           },
           "status": {
@@ -2347,7 +2481,7 @@
           },
           "type": {
             "type": "string",
-            "enum": ["WITHDRAWAL", "DEPOSIT", "TRANSFER"]
+            "enum": ["WITHDRAWAL", "DEPOSIT"]
           },
           "status": {
             "type": "string",
