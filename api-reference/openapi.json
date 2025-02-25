@@ -995,6 +995,16 @@
             "required": false
           },
           {
+            "name": "currency",
+            "in": "query",
+            "description": "The currency of the transaction",
+            "schema": {
+              "type": "string",
+              "enum": ["NGN", "KES", "ZAR"]
+            },
+            "required": "false"
+          },
+          {
             "name": "minAmount",
             "in": "query",
             "description": "Filter by minimum amount (in lowest denomination of the currency)",
