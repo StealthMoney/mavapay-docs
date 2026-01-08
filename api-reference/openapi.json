@@ -1002,7 +1002,7 @@
               "type": "string",
               "enum": ["NGN", "KES", "ZAR"]
             },
-            "required": "false"
+            "required": false
           },
           {
             "name": "minAmount",
