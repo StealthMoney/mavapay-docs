@@ -58,9 +58,7 @@
     },
     {
       "group": "Webhooks",
-      "pages": [
-        "webhooks/introduction"
-      ]
+      "pages": ["webhooks/introduction", "webhooks/webhook-examples"]
     },
     {
       "group": "API Documentation",
@@ -68,6 +66,15 @@
         "api-reference/introduction",
         "api-reference/authentication",
         "api-reference/errors"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "api-reference/quote-examples",
+        "api-reference/beneficiary-formats",
+        "api-reference/name-enquiry-guide",
+        "api-reference/simulation"
       ]
     },
     {
@@ -100,9 +107,7 @@
         },
         {
           "group": "Quote",
-          "pages": [
-            "api-reference/endpoint/quote/get-quote"
-          ]
+          "pages": ["api-reference/endpoint/quote/get-quote"]
         },
         {
           "group": "Wallet",

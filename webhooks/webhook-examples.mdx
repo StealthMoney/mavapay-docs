@@ -1,0 +1,330 @@
+---
+title: 'Webhook Examples'
+description: 'Complete webhook payload examples for all supported currencies'
+---
+
+# Webhook Payload Examples
+
+This guide provides complete webhook payload examples for each supported currency. Mavapay sends webhooks for two main event types: `payment.received` (DEPOSIT) and `payment.sent` (WITHDRAWAL).
+
+## Event Types
+
+| Event | Type | Description |
+|-------|------|-------------|
+| `payment.received` | DEPOSIT | Triggered when Mavapay receives funds from a customer |
+| `payment.sent` | WITHDRAWAL | Triggered when Mavapay sends funds to a beneficiary |
+
+## Bitcoin (BTC) Webhooks
+
+### payment.received (Deposit)
+
+Triggered when Bitcoin payment is received via Lightning Network.
+
+```json
+{
+  "event": "payment.received",
+  "data": {
+    "id": "9830a229-1db0-4a19-9e51-37cca51586f2",
+    "walletId": "98b5093f-6913-48c6-acb4-8fdc46c7feec",
+    "ref": "678ae2e20de0dee7aecd2bd40f8c9",
+    "hash": "6834d0d46ce47f0012cb36ca",
+    "amount": 3427,
+    "fees": 17,
+    "currency": "BTC",
+    "type": "DEPOSIT",
+    "status": "SUCCESS",
+    "autopayout": true,
+    "createdAt": "2025-05-26T20:37:23.566Z",
+    "updatedAt": "2025-05-26T20:37:23.566Z",
+    "btcUsdMetadata": {
+      "id": "698daefd-1dd8-4420-9c0a-5d78080d7c27",
+      "orderId": "58772-8830",
+      "paymentMethod": "BANKTRANSFER",
+      "externalRef": null,
+      "customerInternalFee": 0,
+      "estimatedRoutingFee": 0,
+      "onChainAddress": null,
+      "lnInvoice": "lntbs34270n1p5rf5rlpp56xqq6cj9ml75v0yl6fsfrlmwfmaygnal8gd706l3epzethymhclsdz5296...",
+      "lnAddress": null,
+      "createdAt": "2025-05-26T20:37:23.576Z",
+      "updatedAt": "2025-05-26T20:37:23.576Z"
+    }
+  }
+}
+```
+
+### Key Fields
+
+| Field | Description |
+|-------|-------------|
+| `amount` | Amount in satoshis |
+| `fees` | Transaction fees in satoshis |
+| `hash` | Payment hash for tracking |
+| `btcUsdMetadata.lnInvoice` | The Lightning invoice that was paid |
+| `btcUsdMetadata.orderId` | Associated order ID |
+
+## Nigerian Naira (NGN) Webhooks
+
+### payment.received (Deposit)
+
+Triggered when NGN payment is received in your Mavapay account.
+
+```json
+{
+  "event": "payment.received",
+  "data": {
+    "id": "0b234e32-d5ba-4c2a-8f71-0b820a477f01",
+    "walletId": "b7e7b823-b572-41d3-86a6-a6872f35c274",
+    "ref": "f05432ecab06ca0357596af0366de",
+    "hash": "001f7fb879bb3874eb057dcce06437d45d4020d7f348a36cd583b658e98e07d6",
+    "amount": 300000,
+    "fees": 2500,
+    "currency": "NGN",
+    "type": "DEPOSIT",
+    "status": "SUCCESS",
+    "autopayout": true,
+    "createdAt": "2025-01-17T13:20:20.575Z",
+    "updatedAt": "2025-01-17T13:20:20.575Z",
+    "transactionMetadata": {
+      "id": "570cba51-d9fd-402a-8b10-5c43e23077d8",
+      "orderId": "82958-2591",
+      "bankCode": "09026",
+      "bankName": "KUDA MICROFINANCE BANK",
+      "bankAccountName": "OLADEJI OLAOLU",
+      "bankAccountNumber": "0123456789",
+      "customerInternalFee": 0,
+      "createdAt": "2025-02-03T14:18:20.737Z",
+      "updatedAt": "2025-02-03T14:18:22.777Z"
+    }
+  }
+}
+```
+
+### Key Fields
+
+| Field | Description |
+|-------|-------------|
+| `amount` | Amount in kobo (1 NGN = 100 kobo) |
+| `fees` | Transaction fees in kobo |
+| `transactionMetadata.bankAccountName` | Sender's bank account name |
+| `transactionMetadata.bankAccountNumber` | Sender's account number |
+| `transactionMetadata.bankName` | Sender's bank name |
+
+<Note>
+  NGN amounts are in kobo. Divide by 100 to get the amount in Naira.
+</Note>
+
+## South African Rand (ZAR) Webhooks
+
+### payment.sent (Withdrawal)
+
+Triggered when ZAR payment is sent to a beneficiary.
+
+```json
+{
+  "event": "payment.sent",
+  "data": {
+      "id": "14cfbe34-91b3-45ef-b1b0-bc7d55df7f0f",
+      "walletId": "99a8272d-c8d7-436b-952b-a13ef816df9c",
+      "ref": "d386f2c1260d53ad60bead81e1c99",
+      "hash": "08f7198fd7dd73c087b4754a20d6f63f5b87bb8fcdc10e4d5cacd27650fce2ba",
+      "amount": 5000,
+      "fees": 0,
+      "currency": "ZAR",
+      "type": "WITHDRAWAL",
+      "status": "PENDING",
+      "autopayout": true,
+      "createdAt": "2025-01-30T15:23:06.097Z",
+      "updatedAt": "2025-01-30T15:23:09.768Z",
+      "zarTransactionMetadata": {
+          "id": "7801c544-2f05-4914-91e1-d157848ac569",
+          "merchantId": "f77986d6-75df-4979-85a9-8acedcfca392",
+          "orderId": "47581-9962",
+          "merchantName": "Ricki Allardice",
+          "bankName": "CAPITEC BANK",
+          "bankAccountNumber": "1352906218",
+          "reference": "MPYMX76EvJD2FYmUAkNd",
+          "customerInternalFee": 0,
+          "createdAt": "2025-01-30T15:23:06.099Z",
+          "updatedAt": "2025-01-30T15:23:09.772Z"
+      }
+  }
+}
+```
+
+### Key Fields
+
+| Field | Description |
+|-------|-------------|
+| `amount` | Amount in cents (1 ZAR = 100 cents) |
+| `status` | Can be PENDING, SUCCESS, or FAILED |
+| `zarTransactionMetadata.merchantName` | Beneficiary name |
+| `zarTransactionMetadata.bankAccountNumber` | Beneficiary account number |
+| `zarTransactionMetadata.reference` | Unique transaction reference |
+
+<Note>
+  ZAR amounts are in cents. Divide by 100 to get the amount in Rand.
+</Note>
+
+## Kenyan Shilling (KES) Webhooks
+
+### payment.sent (Withdrawal)
+
+Triggered when KES payment is sent via M-Pesa.
+
+```json
+{
+  "event": "payment.sent",
+  "data": {
+      "id": "14cfbe34-91b3-45ef-b1b0-bc7d55df7f0f",
+      "walletId": "99a8272d-c8d7-436b-952b-a13ef816df9c",
+      "ref": "d386f2c1260d53ad60bead81e1c99",
+      "hash": "08f7198fd7dd73c087b4754a20d6f63f5b87bb8fcdc10e4d5cacd27650fce2ba",
+      "amount": 5000,
+      "fees": 0,
+      "currency": "KES",
+      "type": "WITHDRAWAL",
+      "status": "SUCCESS",
+      "autopayout": true,
+      "createdAt": "2025-01-30T15:23:06.097Z",
+      "updatedAt": "2025-01-30T15:23:09.768Z",
+      "kesTransactionMetadata": {
+          "id": "7801c544-2f05-4914-91e1-d157848ac569",
+          "transactionId": "14cfbe34-91b3-45ef-b1b0-bc7d55df7f0f",
+          "paymentId": "f77986d6-75df-4979-85a9-8acedcfca392",
+          "customerInternalFee": 0,
+          "identifierType": "paytophone",
+          "identifiers": {
+            "phoneNumber": "+254796980711"
+          },
+          "createdAt": "2025-01-30T15:23:06.099Z",
+          "updatedAt": "2025-01-30T15:23:09.772Z"
+      }
+  }
+}
+```
+
+### Key Fields
+
+| Field | Description |
+|-------|-------------|
+| `amount` | Amount in cents (1 KES = 100 cents) |
+| `kesTransactionMetadata.identifierType` | M-Pesa payment type (paytophone, paytobill, paytotill) |
+| `kesTransactionMetadata.identifiers` | M-Pesa payment details (varies by type) |
+
+<Note>
+  KES amounts are in cents. Divide by 100 to get the amount in Shillings.
+</Note>
+
+## Transaction Status Values
+
+| Status | Description |
+|--------|-------------|
+| `PENDING` | Transaction is being processed |
+| `SUCCESS` | Transaction completed successfully |
+| `FAILED` | Transaction failed |
+
+## Handling Webhooks
+
+### 1. Verify Webhook Signature
+
+Always verify the webhook signature to ensure it's from Mavapay:
+
+```javascript
+const crypto = require('crypto');
+
+function verifyWebhookSignature(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(JSON.stringify(payload))
+    .digest('hex');
+  
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignature)
+  );
+}
+```
+
+### 2. Process Webhook Events
+
+```javascript
+app.post('/webhook', (req, res) => {
+  const signature = req.headers['x-mavapay-signature'];
+  const isValid = verifyWebhookSignature(
+    req.body,
+    signature,
+    process.env.WEBHOOK_SECRET
+  );
+
+  if (!isValid) {
+    return res.status(400).json({ error: 'Invalid signature' });
+  }
+
+  const { event, data } = req.body;
+
+  switch (event) {
+    case 'payment.received':
+      // Handle deposit
+      handleDeposit(data);
+      break;
+    case 'payment.sent':
+      // Handle withdrawal
+      handleWithdrawal(data);
+      break;
+    default:
+      console.log(`Unhandled event type: ${event}`);
+  }
+
+  res.json({ received: true });
+});
+```
+
+### 3. Implement Idempotency
+
+Use the transaction ID to prevent duplicate processing:
+
+```javascript
+function handleDeposit(data) {
+  const { id, amount, currency, status } = data;
+  
+  // Check if already processed
+  if (alreadyProcessed(id)) {
+    console.log(`Transaction ${id} already processed`);
+    return;
+  }
+  
+  // Process the deposit
+  processDeposit({ id, amount, currency, status });
+  
+  // Mark as processed
+  markAsProcessed(id);
+}
+```
+
+## Best Practices
+
+1. **Respond Quickly**: Return a 200 status within 5 seconds to acknowledge receipt
+2. **Process Asynchronously**: Handle heavy processing in background jobs
+3. **Store Raw Payloads**: Log raw webhook payloads for debugging
+4. **Handle Retries**: Implement idempotency to handle duplicate webhooks
+5. **Monitor Failures**: Set up alerts for failed webhook deliveries
+
+## Testing Webhooks
+
+Use our staging environment to test webhook integration:
+
+```bash
+https://staging.api.mavapay.co/api/v1
+```
+
+Consider using tools like:
+- [webhook.site](https://webhook.site) for inspecting payloads
+- [ngrok](https://ngrok.com) for local development
+- [RequestBin](https://requestbin.com) for testing
+
+## Next Steps
+
+- Learn how to [register webhooks](/api-reference/endpoint/webhook/register-webhook)
+- Explore [quote examples](/api-reference/quote-examples) for different currencies
+- View [beneficiary formats](/api-reference/beneficiary-formats) for payment details
