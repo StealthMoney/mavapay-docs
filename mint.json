@@ -61,21 +61,20 @@
       "pages": ["webhooks/introduction", "webhooks/webhook-examples"]
     },
     {
-      "group": "Guides",
-      "pages": [
-        "guides/buying-bitcoin",
-        "guides/quote-examples",
-        "guides/beneficiary-formats",
-        "guides/name-enquiry-guide",
-        "guides/simulation"
-      ]
-    },
-    {
       "group": "API Documentation",
       "pages": [
         "api-reference/introduction",
         "api-reference/authentication",
         "api-reference/errors"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "api-reference/quote-examples",
+        "api-reference/beneficiary-formats",
+        "api-reference/name-enquiry-guide",
+        "api-reference/simulation"
       ]
     },
     {
