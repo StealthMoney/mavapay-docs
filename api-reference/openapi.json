@@ -30,37 +30,48 @@
     }
   ],
   "paths": {
-    "/price": {
+    "/price/ticker": {
       "get": {
         "security": [],
-        "tags": ["Price"],
-        "operationId": "getPrice",
-        "summary": "Get current market price",
-        "description": "Returns the market price per dollar for a given currency",
+        "tags": [
+          "Price"
+        ],
+        "operationId": "getPriceTicker",
+        "summary": "Get price ticker for currency pair",
+        "description": "Returns the exchange rate for a given currency pair",
         "parameters": [
           {
-            "name": "currency",
+            "name": "pair",
             "in": "query",
-            "description": "The currency to get the price for",
+            "description": "Currency pair to get the exchange rate for",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "usdngn",
+                "btcusd",
+                "usdkes",
+                "usdzar",
+                "ngnzar",
+                "kesngn"
+              ]
             },
-            "required": true
+            "required": true,
+            "example": "zarngn"
           }
         ],
         "responses": {
           "200": {
-            "description": "Price response",
+            "description": "Price ticker response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Price"
+                  "$ref": "#/components/schemas/PriceTicker"
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Invalid currency pair",
             "content": {
               "application/json": {
                 "schema": {
@@ -82,7 +93,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Bank Account"],
+        "tags": [
+          "Bank Account"
+        ],
         "operationId": "getBankAccount",
         "summary": "Get bank account details",
         "description": "Returns all your saved bank accounts for a given currency. The bank account details used to make payouts to your customers.",
@@ -103,7 +116,9 @@
             "description": "The currency to get the bank account for (optional). Only NGN is supported at the moment.",
             "schema": {
               "type": "string",
-              "enum": ["NGN"]
+              "enum": [
+                "NGN"
+              ]
             },
             "required": false
           }
@@ -153,7 +168,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Bank Account"],
+        "tags": [
+          "Bank Account"
+        ],
         "operationId": "createBankAccount",
         "summary": "Register a bank account",
         "description": "Register a bank account that can be used for withdrawal for a given currency. Only NGN is supported at the moment.",
@@ -204,7 +221,9 @@
     "/bank/bankcode": {
       "get": {
         "security": [],
-        "tags": ["Bank Code"],
+        "tags": [
+          "Bank Code"
+        ],
         "operationId": "getBankCode",
         "summary": "Get bank code",
         "description": "Returns all bank codes for a given country. This endpoint is currently limited to Nigeria(NGN) and South Africa(ZAR) only.",
@@ -215,7 +234,10 @@
             "description": "The country to get the bank codes for. Use 'NG' for Nigeria and 'ZA' for South Africa.",
             "schema": {
               "type": "string",
-              "enum": ["NG", "ZA"]
+              "enum": [
+                "NG",
+                "ZA"
+              ]
             },
             "required": true
           }
@@ -251,7 +273,9 @@
             "ApiKeyAuth": []
           }
         ],
-        "tags": ["Bank Account"],
+        "tags": [
+          "Bank Account"
+        ],
         "operationId": "getBankNameEnquiry",
         "summary": "Verify bank account details if it is correct",
         "description": "Verify bank account details if it is correct. The response returned should match the account number and account name of the user. This endpoint is currently limited to Nigeria(NGN) only",
@@ -311,7 +335,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Order"],
+        "tags": [
+          "Order"
+        ],
         "operationId": "getOrder",
         "summary": "Get order details",
         "description": "Returns the order details for a given order ID",
@@ -371,7 +397,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Order"],
+        "tags": [
+          "Order"
+        ],
         "operationId": "getAllOrders",
         "summary": "Get all orders",
         "description": "Returns all orders",
@@ -422,7 +450,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Quote"],
+        "tags": [
+          "Quote"
+        ],
         "operationId": "createQuote",
         "summary": "Create a quote",
         "description": "Create a quote for a given currency",
@@ -480,7 +510,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Wallet"],
+        "tags": [
+          "Wallet"
+        ],
         "operationId": "getWallet",
         "summary": "Get wallet details",
         "description": "Returns the wallet details for a given wallet ID or all wallets",
@@ -501,7 +533,12 @@
             "description": "The currency to get the details for (optional)",
             "schema": {
               "type": "string",
-              "enum": ["NGN", "KES", "BTC", "USD"]
+              "enum": [
+                "NGN",
+                "KES",
+                "BTC",
+                "USD"
+              ]
             },
             "required": false
           }
@@ -553,7 +590,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Withdraw"],
+        "tags": [
+          "Withdraw"
+        ],
         "operationId": "withdraw",
         "summary": "Withdraw fiat",
         "description": "Withdraw funds to a bank account",
@@ -571,7 +610,12 @@
                   "currency": {
                     "type": "string",
                     "format": "string",
-                    "enum": ["NGN", "KES", "BTC", "USD"]
+                    "enum": [
+                      "NGN",
+                      "KES",
+                      "BTC",
+                      "USD"
+                    ]
                   },
                   "bankAccountNumber": {
                     "type": "string",
@@ -634,7 +678,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Withdraw"],
+        "tags": [
+          "Withdraw"
+        ],
         "operationId": "withdrawBtc",
         "summary": "Withdraw BTC",
         "description": "Withdraw BTC to a wallet",
@@ -705,7 +751,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Webhook"],
+        "tags": [
+          "Webhook"
+        ],
         "operationId": "registerWebhook",
         "summary": "Register a webhook",
         "description": "Register a webhook to receive notifications for transaction events",
@@ -776,7 +824,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Webhook"],
+        "tags": [
+          "Webhook"
+        ],
         "operationId": "updateWebhook",
         "summary": "Update a webhook",
         "description": "Update a webhook to receive notifications for transaction events",
@@ -847,7 +897,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Transaction"],
+        "tags": [
+          "Transaction"
+        ],
         "operationId": "getTransaction",
         "summary": "Get transaction details",
         "description": "Returns the transaction details for a given transaction ID or transactions associated with an order",
@@ -927,7 +979,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["Transaction"],
+        "tags": [
+          "Transaction"
+        ],
         "operationId": "getTransactions",
         "summary": "Get all transactions",
         "description": "Returns all transactions with pagination and filtering options",
@@ -980,7 +1034,11 @@
             "description": "Filter by transaction status",
             "schema": {
               "type": "string",
-              "enum": ["SUCCESS", "PENDING", "FAILED"]
+              "enum": [
+                "SUCCESS",
+                "PENDING",
+                "FAILED"
+              ]
             },
             "required": false
           },
@@ -990,7 +1048,10 @@
             "description": "Filter by transaction type",
             "schema": {
               "type": "string",
-              "enum": ["WITHDRAWAL", "DEPOSIT"]
+              "enum": [
+                "WITHDRAWAL",
+                "DEPOSIT"
+              ]
             },
             "required": false
           },
@@ -1000,7 +1061,11 @@
             "description": "The currency of the transaction",
             "schema": {
               "type": "string",
-              "enum": ["NGN", "KES", "ZAR"]
+              "enum": [
+                "NGN",
+                "KES",
+                "ZAR"
+              ]
             },
             "required": false
           },
@@ -1122,7 +1187,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "operationId": "getUser",
         "summary": "Get user profile",
         "description": "Returns an exhaustive user profile detail",
@@ -1163,7 +1230,9 @@
     "/auth/signup/business": {
       "post": {
         "security": [],
-        "tags": ["Signup"],
+        "tags": [
+          "Signup"
+        ],
         "operationId": "signupBusiness",
         "summary": "Create a business account",
         "description": "Create a new Mavapay business account",
@@ -1250,7 +1319,9 @@
     "/auth/signin": {
       "post": {
         "security": [],
-        "tags": ["Signin"],
+        "tags": [
+          "Signin"
+        ],
         "operationId": "signin",
         "summary": "Sign in to your account",
         "description": "Sign in to your Mavapay account",
@@ -1353,7 +1424,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "operationId": "changePassword",
         "summary": "Change user password",
         "description": "Change the user's password",
@@ -1433,7 +1506,9 @@
             "bearerAuth": []
           }
         ],
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "operationId": "getUserApiKey",
         "summary": "Get user API key",
         "description": "Returns the user's API key. This generates a new API key even if the user already has one",
@@ -1470,63 +1545,6 @@
   },
   "components": {
     "schemas": {
-      "Price": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "format": "string",
-            "example": "success"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "currency": {
-                "type": "string",
-                "enum": ["NGN", "KES"]
-              },
-              "timeStamp": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2021-07-01T12:00:00Z"
-              },
-              "btcPriceInUnitCurrency": {
-                "type": "number",
-                "format": "number",
-                "example": 9000000.23
-              },
-              "unitPricePerSat": {
-                "type": "object",
-                "properties": {
-                  "amount": {
-                    "type": "number",
-                    "format": "number",
-                    "example": 0.334561234
-                  },
-                  "currencyUnit": {
-                    "type": "string",
-                    "enum": ["NGNSAT", "KESSAT"]
-                  }
-                }
-              },
-              "unitPricePerUsd": {
-                "type": "object",
-                "properties": {
-                  "amount": {
-                    "type": "number",
-                    "format": "number",
-                    "example": 1500.65
-                  },
-                  "currencyUnit": {
-                    "type": "string",
-                    "enum": ["NGNUSD", "KESUSD"]
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       "BankAccount": {
         "type": "object",
         "properties": {
@@ -1553,7 +1571,9 @@
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN"]
+            "enum": [
+              "NGN"
+            ]
           },
           "walletId": {
             "type": "string",
@@ -1656,17 +1676,29 @@
           "status": {
             "type": "string",
             "format": "string",
-            "enum": ["PAID", "PENDING", "EXPIRED", "FAILED"]
+            "enum": [
+              "PAID",
+              "PENDING",
+              "EXPIRED",
+              "FAILED"
+            ]
           },
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "KES"]
+            "enum": [
+              "NGN",
+              "KES"
+            ]
           },
           "paymentCollectionMethod": {
             "type": "string",
             "format": "string",
-            "enum": ["LIGHTNING", "ONCHAIN", "USDT"]
+            "enum": [
+              "LIGHTNING",
+              "ONCHAIN",
+              "USDT"
+            ]
           },
           "isValid": {
             "type": "boolean",
@@ -1718,17 +1750,29 @@
           "status": {
             "type": "string",
             "format": "string",
-            "enum": ["PAID", "PENDING", "EXPIRED", "FAILED"]
+            "enum": [
+              "PAID",
+              "PENDING",
+              "EXPIRED",
+              "FAILED"
+            ]
           },
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "KES"]
+            "enum": [
+              "NGN",
+              "KES"
+            ]
           },
           "paymentMethod": {
             "type": "string",
             "format": "string",
-            "enum": ["LIGHTNING", "ONCHAIN", "USDT"]
+            "enum": [
+              "LIGHTNING",
+              "ONCHAIN",
+              "USDT"
+            ]
           },
           "isValid": {
             "type": "boolean",
@@ -1787,13 +1831,22 @@
           "sourceCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTCSAT", "NGNKOBO", "KESCENT", "ZARCENT"],
+            "enum": [
+              "BTCSAT",
+              "NGNKOBO",
+              "KESCENT",
+              "ZARCENT"
+            ],
             "description": "The source currency for the quote"
           },
           "targetCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGNKOBO", "KESCENT", "ZARCENT"],
+            "enum": [
+              "NGNKOBO",
+              "KESCENT",
+              "ZARCENT"
+            ],
             "description": "The target currency for the quote"
           },
           "transactionFeesInSourceCurrency": {
@@ -1823,7 +1876,9 @@
           "paymentMethod": {
             "type": "string",
             "format": "string",
-            "enum": ["LIGHTNING"]
+            "enum": [
+              "LIGHTNING"
+            ]
           },
           "expiry": {
             "type": "string",
@@ -1885,28 +1940,40 @@
           "sourceCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTCSAT"],
+            "enum": [
+              "BTCSAT"
+            ],
             "default": "BTCSAT",
             "description": "The source currency for the quote"
           },
           "targetCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGNKOBO", "KESCENT", "ZARCENT"],
+            "enum": [
+              "NGNKOBO",
+              "KESCENT",
+              "ZARCENT"
+            ],
             "default": "NGNKOBO",
             "description": "The local currency to convert the source currency to"
           },
           "paymentMethod": {
             "type": "string",
             "format": "string",
-            "enum": ["LIGHTNING"],
+            "enum": [
+              "LIGHTNING"
+            ],
             "default": "LIGHTNING",
             "description": "The payment method for the quote"
           },
           "paymentCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGNKOBO", "KESCENT", "ZARCENT"]
+            "enum": [
+              "NGNKOBO",
+              "KESCENT",
+              "ZARCENT"
+            ]
           },
           "autopayout": {
             "type": "boolean",
@@ -1955,7 +2022,10 @@
                 "properties": {
                   "identifierType": {
                     "type": "string",
-                    "enum": ["paytophone", "paytobill"],
+                    "enum": [
+                      "paytophone",
+                      "paytobill"
+                    ],
                     "example": "paytophone",
                     "description": "The type of identifier to use for the beneficiary"
                   },
@@ -1980,7 +2050,10 @@
                     }
                   }
                 },
-                "required": ["identifierType", "identifiers"]
+                "required": [
+                  "identifierType",
+                  "identifiers"
+                ]
               },
               {
                 "title": "ZAR Beneficiary",
@@ -2002,7 +2075,11 @@
                     "description": "The bank account number of the beneficiary"
                   }
                 },
-                "required": ["name", "bankName", "bankAccountNumber"]
+                "required": [
+                  "name",
+                  "bankName",
+                  "bankAccountNumber"
+                ]
               }
             ]
           }
@@ -2033,7 +2110,12 @@
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "KES", "BTC", "ZAR"]
+            "enum": [
+              "NGN",
+              "KES",
+              "BTC",
+              "ZAR"
+            ]
           },
           "balance": {
             "type": "number",
@@ -2085,19 +2167,31 @@
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "KES", "BTC", "ZAR"],
+            "enum": [
+              "NGN",
+              "KES",
+              "BTC",
+              "ZAR"
+            ],
             "description": "The currency of the transaction"
           },
           "type": {
             "type": "string",
             "format": "string",
-            "enum": ["WITHDRAWAL", "DEPOSIT"],
+            "enum": [
+              "WITHDRAWAL",
+              "DEPOSIT"
+            ],
             "description": "The type of the transaction"
           },
           "status": {
             "type": "string",
             "format": "string",
-            "enum": ["SUCCESS", "PENDING", "FAILED"],
+            "enum": [
+              "SUCCESS",
+              "PENDING",
+              "FAILED"
+            ],
             "description": "The status of the transaction"
           },
           "autopayout": {
@@ -2267,7 +2361,11 @@
               "status": {
                 "type": "string",
                 "format": "string",
-                "enum": ["PENDING", "APPROVED", "REJECTED"]
+                "enum": [
+                  "PENDING",
+                  "APPROVED",
+                  "REJECTED"
+                ]
               }
             }
           },
@@ -2282,12 +2380,19 @@
               "type": {
                 "type": "string",
                 "format": "string",
-                "enum": ["INDIVIDUAL", "BUSINESS", "ADMIN"]
+                "enum": [
+                  "INDIVIDUAL",
+                  "BUSINESS",
+                  "ADMIN"
+                ]
               },
               "status": {
                 "type": "string",
                 "format": "string",
-                "enum": ["ACTIVE", "INACTIVE"]
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
               },
               "walletDetails": {
                 "type": "object",
@@ -2300,7 +2405,12 @@
                   "currency": {
                     "type": "string",
                     "format": "string",
-                    "enum": ["NGN", "KES", "BTC", "USD"]
+                    "enum": [
+                      "NGN",
+                      "KES",
+                      "BTC",
+                      "USD"
+                    ]
                   },
                   "balance": {
                     "type": "number",
@@ -2374,7 +2484,11 @@
                   "language": {
                     "type": "string",
                     "format": "string",
-                    "enum": ["EN", "FR", "ES"]
+                    "enum": [
+                      "EN",
+                      "FR",
+                      "ES"
+                    ]
                   },
                   "notification": {
                     "type": "object",
@@ -2398,7 +2512,10 @@
         }
       },
       "Error": {
-        "required": ["error", "message"],
+        "required": [
+          "error",
+          "message"
+        ],
         "type": "object",
         "properties": {
           "status": {
@@ -2487,15 +2604,27 @@
           },
           "currency": {
             "type": "string",
-            "enum": ["NGN", "KES", "BTC", "ZAR"]
+            "enum": [
+              "NGN",
+              "KES",
+              "BTC",
+              "ZAR"
+            ]
           },
           "type": {
             "type": "string",
-            "enum": ["WITHDRAWAL", "DEPOSIT"]
+            "enum": [
+              "WITHDRAWAL",
+              "DEPOSIT"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["SUCCESS", "PENDING", "FAILED"]
+            "enum": [
+              "SUCCESS",
+              "PENDING",
+              "FAILED"
+            ]
           },
           "autopayout": {
             "type": "boolean",
@@ -2562,15 +2691,26 @@
                   },
                   "currency": {
                     "type": "string",
-                    "enum": ["NGN", "KES", "ZAR"]
+                    "enum": [
+                      "NGN",
+                      "KES",
+                      "ZAR"
+                    ]
                   },
                   "paymentMethod": {
                     "type": "string",
-                    "enum": ["LIGHTNING"]
+                    "enum": [
+                      "LIGHTNING"
+                    ]
                   },
                   "status": {
                     "type": "string",
-                    "enum": ["PAID", "PENDING", "EXPIRED", "FAILED"]
+                    "enum": [
+                      "PAID",
+                      "PENDING",
+                      "EXPIRED",
+                      "FAILED"
+                    ]
                   },
                   "quote": {
                     "type": "object",
@@ -2592,7 +2732,9 @@
                       },
                       "paymentMethod": {
                         "type": "string",
-                        "enum": ["LIGHTNING"]
+                        "enum": [
+                          "LIGHTNING"
+                        ]
                       },
                       "totalAmount": {
                         "type": "number",
@@ -2608,21 +2750,100 @@
                       },
                       "sourceCurrency": {
                         "type": "string",
-                        "enum": ["BTCSAT"]
+                        "enum": [
+                          "BTCSAT"
+                        ]
                       },
                       "targetCurrency": {
                         "type": "string",
-                        "enum": ["NGNKOBO", "KESCENT", "ZARCENT"]
+                        "enum": [
+                          "NGNKOBO",
+                          "KESCENT",
+                          "ZARCENT"
+                        ]
                       },
                       "paymentCurrency": {
                         "type": "string",
-                        "enum": ["NGNKOBO", "KESCENT", "ZARCENT"]
+                        "enum": [
+                          "NGNKOBO",
+                          "KESCENT",
+                          "ZARCENT"
+                        ]
                       },
                       "customerInternalFee": {
                         "type": "number",
                         "example": 0
                       }
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "PriceTicker": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "ask": {
+                "type": "number",
+                "description": "Ask price (selling price)",
+                "example": 1475.42
+              },
+              "bid": {
+                "type": "number",
+                "description": "Bid price (buying price)",
+                "example": 1455.42
+              },
+              "timestamp": {
+                "type": "number",
+                "description": "Unix timestamp in milliseconds",
+                "example": 1767896752409
+              },
+              "meta": {
+                "type": "object",
+                "properties": {
+                  "pair": {
+                    "type": "string",
+                    "description": "Currency pair in uppercase",
+                    "example": "USDNGN"
+                  },
+                  "payoutMethods": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "BANKTRANSFER"
+                    ]
+                  },
+                  "collectionMethods": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "LIGHTNING"
+                    ]
+                  },
+                  "unitPricePerUsd": {
+                    "type": "object",
+                    "description": "Exchange rates per USD"
+                  },
+                  "unitPricePerSat": {
+                    "type": "object",
+                    "description": "Exchange rates per satoshi"
+                  },
+                  "fees": {
+                    "type": "object",
+                    "description": "Fee information for ask and bid"
                   }
                 }
               }
