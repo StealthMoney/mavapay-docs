@@ -1,15 +1,19 @@
 ---
 title: 'Name Enquiry Guide'
-description: 'How to validate Nigerian bank account details before creating quotes'
+description: 'Complete guide to validating Nigerian bank account details before creating quotes'
 ---
 
-# Name Enquiry for NGN Accounts
+# Name Enquiry Implementation Guide
 
-Name enquiry allows you to validate Nigerian bank account details before creating a quote. This helps ensure payments are sent to the correct recipient and reduces failed transactions.
+This guide shows you how to implement bank account validation for Nigerian Naira (NGN) payouts using Mavapay's Name Enquiry API.
 
 <Note>
   Name enquiry is currently supported for **Nigerian Naira (NGN) accounts only**.
 </Note>
+
+<Card title="API Reference" icon="book" href="/api-reference/endpoint/bank-info/name-enquiry">
+  View the complete API documentation for the Name Enquiry endpoint
+</Card>
 
 ## Recommended Flow
 
@@ -17,7 +21,7 @@ Follow this flow to collect and validate beneficiary bank details:
 
 ### 1. Fetch List of Supported Banks
 
-Get all Nigerian banks with their NIP bank codes.
+Get all Nigerian banks with their NIP bank codes using the [Get Bank Codes endpoint](/api-reference/endpoint/bank-info/bank-code).
 
 ```bash
 GET /api/v1/bank/bankcode?country=NG
@@ -68,7 +72,7 @@ const accountNumber = "0123456789"; // User input
 
 ### 4. Verify Account Details
 
-Call the name enquiry endpoint to get the account name.
+Call the [Name Enquiry endpoint](/api-reference/endpoint/bank-info/name-enquiry) to get the account name.
 
 ```bash
 GET /api/v1/bank/name-enquiry?accountNumber=0123456789&bankCode=000013
@@ -104,7 +108,7 @@ Show the retrieved account name to the user for confirmation.
 
 ### 6. Create Quote with Validated Details
 
-Once confirmed, use the validated details to create a quote.
+Once confirmed, use the validated details to [create a quote](/api-reference/endpoint/quote/get-quote).
 
 ```json
 {
@@ -295,60 +299,22 @@ router.post('/verify-account', async (req, res) => {
 module.exports = router;
 ```
 
-## API Endpoints
+## API Endpoints Reference
 
-### Get Bank Codes
+For complete API documentation, see:
+- [Get Bank Codes endpoint](/api-reference/endpoint/bank-info/bank-code) - Fetch list of Nigerian banks
+- [Name Enquiry endpoint](/api-reference/endpoint/bank-info/name-enquiry) - Validate bank account details
 
-```
+### Quick Reference
+
+**Get Bank Codes:**
+```bash
 GET /api/v1/bank/bankcode?country=NG
 ```
 
-**Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `country` | string | Yes | Must be `"NG"` for Nigeria |
-
-**Response:**
-
-```json
-{
-  "status": "ok",
-  "message": "All bank codes",
-  "data": [
-    {
-      "bankName": "ACCESS BANK",
-      "nipBankCode": "000014"
-    }
-  ]
-}
-```
-
-### Name Enquiry
-
-```
+**Name Enquiry:**
+```bash
 GET /api/v1/bank/name-enquiry?accountNumber={accountNumber}&bankCode={bankCode}
-```
-
-**Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `accountNumber` | string | Yes | 10-digit Nigerian bank account number |
-| `bankCode` | string | Yes | NIP bank code from the bank list |
-
-**Response:**
-
-```json
-{
-  "status": "ok",
-  "message": "Account name retrieved successfully",
-  "data": {
-    "accountName": "OLADEJI OLAOLU",
-    "accountNumber": "0123456789",
-    "bankCode": "000013"
-  }
-}
 ```
 
 ## Error Handling
@@ -393,6 +359,23 @@ GET /api/v1/bank/name-enquiry?accountNumber={accountNumber}&bankCode={bankCode}
 - Not available for South African Rand (ZAR) or Kenyan Shilling (KES)
 - Requires valid NIP bank code
 - Account must be active and valid
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card title="Name Enquiry API" icon="code" href="/api-reference/endpoint/bank-info/name-enquiry">
+    Complete API reference for the Name Enquiry endpoint
+  </Card>
+  <Card title="Get Bank Codes API" icon="building-columns" href="/api-reference/endpoint/bank-info/bank-code">
+    API reference for fetching Nigerian bank codes
+  </Card>
+  <Card title="Beneficiary Formats" icon="user-check" href="/api-reference/beneficiary-formats">
+    Required formats for all supported currencies
+  </Card>
+  <Card title="Create Quote" icon="file-invoice-dollar" href="/api-reference/endpoint/quote/get-quote">
+    Learn how to create quotes with validated details
+  </Card>
+</CardGroup>
 
 ## Next Steps
 
