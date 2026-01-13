@@ -1,0 +1,309 @@
+---
+title: 'Beneficiary Formats'
+description: 'Required beneficiary object formats for each supported currency'
+---
+
+# Beneficiary Formats
+
+When creating a quote, you must provide beneficiary information in the correct format for the target currency. This guide shows the required format for each supported currency.
+
+## Bitcoin (BTC)
+
+For Bitcoin payouts, you can use one of three methods: Lightning Network invoice, Lightning address, or on-chain address.
+
+### Lightning Network Invoice
+
+```json
+{
+  "beneficiary": {
+    "lnInvoice": "lntbs20u1p5dmy87pp5l2pm..."
+  }
+}
+```
+
+### Lightning Address
+
+```json
+{
+  "beneficiary": {
+    "lnAddress": "user@getalby.com"
+  }
+}
+```
+
+### On-Chain Address
+
+```json
+{
+  "beneficiary": {
+    "onChainAddress": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
+  }
+}
+```
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `lnInvoice` | string | No* | Lightning Network invoice for the payout |
+| `lnAddress` | string | No* | Lightning address (e.g., user@domain.com) |
+| `onChainAddress` | string | No* | Bitcoin on-chain address (bech32, P2PKH, or P2SH) |
+
+*One of these fields is required for BTC payouts.
+
+<Note>
+  - Lightning invoices must be valid and not expired when the payout is processed
+  - Lightning addresses provide a reusable payment destination
+  - On-chain addresses support standard Bitcoin address formats
+</Note>
+
+## Nigerian Naira (NGN)
+
+For Nigerian Naira payouts, provide complete bank account details.
+
+```json
+{
+  "beneficiary": {
+    "bankAccountName": "olaolu olajide",
+    "bankCode": "000013",
+    "bankName": "GTBANK PLC",
+    "bankAccountNumber": "0087241555"
+  }
+}
+```
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `bankAccountName` | string | Yes | Account holder's name as registered with the bank |
+| `bankCode` | string | Yes | NIP bank code (get from `/bank/bankcode?country=NG`) |
+| `bankName` | string | Yes | Full bank name |
+| `bankAccountNumber` | string | Yes | 10-digit Nigerian bank account number |
+
+<Tip>
+  Use the [Name Enquiry endpoint](/api-reference/endpoint/bank-info/name-enquiry) to validate the account details before creating a quote.
+</Tip>
+
+## South African Rand (ZAR)
+
+For South African Rand payouts, provide the beneficiary name and bank details.
+
+```json
+{
+  "beneficiary": {
+    "name": "test merchant 1",
+    "bankName": "CAPITEC BANK",
+    "bankAccountNumber": "1325558779"
+  }
+}
+```
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Beneficiary's full name |
+| `bankName` | string | Yes | South African bank name |
+| `bankAccountNumber` | string | Yes | South African bank account number |
+
+<Warning>
+  Bank account validation is not currently available for ZAR. Ensure account details are correct before creating a quote.
+</Warning>
+
+## Kenyan Shilling (KES)
+
+Kenyan payouts are processed through M-Pesa. There are three supported M-Pesa payment methods:
+
+### Pay to Phone (Mobile Money)
+
+Send money directly to a mobile phone number.
+
+```json
+{
+  "beneficiary": {
+    "identifierType": "paytophone",
+    "identifiers": {
+      "phoneNumber": "+254796980711"
+    }
+  }
+}
+```
+
+#### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `identifierType` | string | Yes | Must be `"paytophone"` |
+| `identifiers.phoneNumber` | string | Yes | Kenyan phone number in international format (+254...) |
+
+### Pay to Bill (Business Payments)
+
+Send money to a business paybill number with an account reference.
+
+```json
+{
+  "beneficiary": {
+    "identifierType": "paytobill",
+    "identifiers": {
+      "paybillNumber": "4141031",
+      "accountNumber": "vlad"
+    }
+  }
+}
+```
+
+#### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `identifierType` | string | Yes | Must be `"paytobill"` |
+| `identifiers.paybillNumber` | string | Yes | M-Pesa paybill number |
+| `identifiers.accountNumber` | string | Yes | Account number/reference for the paybill |
+
+### Pay to Till
+
+Send money to a business till number.
+
+```json
+{
+  "beneficiary": {
+    "identifierType": "paytotill",
+    "identifiers": {
+      "tillNumber": "796980711"
+    }
+  }
+}
+```
+
+#### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `identifierType` | string | Yes | Must be `"paytotill"` |
+| `identifiers.tillNumber` | string | Yes | M-Pesa till number |
+
+<Note>
+  All Kenyan phone numbers must be in international format starting with +254.
+</Note>
+
+## Complete Quote Examples
+
+### Example: NGN Payout
+
+```json
+{
+  "amount": "1000000",
+  "sourceCurrency": "BTCSAT",
+  "targetCurrency": "NGNKOBO",
+  "paymentMethod": "LIGHTNING",
+  "paymentCurrency": "NGNKOBO",
+  "autopayout": true,
+  "beneficiary": {
+    "bankAccountName": "olaolu olajide",
+    "bankCode": "000013",
+    "bankName": "GTBANK PLC",
+    "bankAccountNumber": "0087241555"
+  }
+}
+```
+
+### Example: KES Payout (Pay to Phone)
+
+```json
+{
+  "amount": "100000",
+  "sourceCurrency": "BTCSAT",
+  "targetCurrency": "KESCENT",
+  "paymentMethod": "LIGHTNING",
+  "paymentCurrency": "BTCSAT",
+  "autopayout": true,
+  "beneficiary": {
+    "identifierType": "paytophone",
+    "identifiers": {
+      "phoneNumber": "+254796980711"
+    }
+  }
+}
+```
+
+### Example: ZAR Payout
+
+```json
+{
+  "amount": "1000000",
+  "sourceCurrency": "BTCSAT",
+  "targetCurrency": "ZARCENT",
+  "paymentMethod": "LIGHTNING",
+  "paymentCurrency": "ZARCENT",
+  "autopayout": true,
+  "beneficiary": {
+    "name": "test merchant 1",
+    "bankName": "CAPITEC BANK",
+    "bankAccountNumber": "1325558779"
+  }
+}
+```
+
+### Example: BTC Payout (Lightning Invoice)
+
+```json
+{
+  "amount": "2000",
+  "sourceCurrency": "NGNKOBO",
+  "targetCurrency": "BTCSAT",
+  "paymentMethod": "BANKTRANSFER",
+  "paymentCurrency": "BTCSAT",
+  "autopayout": true,
+  "beneficiary": {
+    "lnInvoice": "lntbs20u1p5dmy87pp5l2pm..."
+  }
+}
+```
+
+### Example: BTC Payout (Lightning Address)
+
+```json
+{
+  "amount": "2000",
+  "sourceCurrency": "NGNKOBO",
+  "targetCurrency": "BTCSAT",
+  "paymentMethod": "BANKTRANSFER",
+  "paymentCurrency": "BTCSAT",
+  "autopayout": true,
+  "beneficiary": {
+    "lnAddress": "user@getalby.com"
+  }
+}
+```
+
+### Example: BTC Payout (On-Chain Address)
+
+```json
+{
+  "amount": "2000",
+  "sourceCurrency": "NGNKOBO",
+  "targetCurrency": "BTCSAT",
+  "paymentMethod": "BANKTRANSFER",
+  "paymentCurrency": "BTCSAT",
+  "autopayout": true,
+  "beneficiary": {
+    "onChainAddress": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
+  }
+}
+```
+
+## Validation
+
+Before creating a quote, you can validate beneficiary details:
+
+- **NGN**: Use the [Name Enquiry endpoint](/api-reference/endpoint/bank-info/name-enquiry) to validate account details
+- **ZAR**: Validation not currently available
+- **KES**: Ensure phone numbers are in correct format (+254...)
+- **BTC**: Ensure Lightning invoice is valid and not expired
+
+## Next Steps
+
+- View [complete quote examples](/api-reference/quote-examples) for all currency pairs
+- Learn about [webhook notifications](/webhooks/introduction) for tracking payments
+- Test your integration in our [staging environment](https://staging.api.mavapay.co/api/v1)

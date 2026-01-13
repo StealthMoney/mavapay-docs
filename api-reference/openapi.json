@@ -30,37 +30,46 @@
     }
   ],
   "paths": {
-    "/price": {
+    "/price/ticker": {
       "get": {
         "security": [],
         "tags": ["Price"],
-        "operationId": "getPrice",
-        "summary": "Get current market price",
-        "description": "Returns the market price per dollar for a given currency",
+        "operationId": "getPriceTicker",
+        "summary": "Get price ticker for currency pair",
+        "description": "Returns the exchange rate for a given currency pair",
         "parameters": [
           {
-            "name": "currency",
+            "name": "pair",
             "in": "query",
-            "description": "The currency to get the price for",
+            "description": "Currency pair to get the exchange rate for",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "usdngn",
+                "btcusd",
+                "usdkes",
+                "usdzar",
+                "zarngn",
+                "kesngn"
+              ]
             },
-            "required": true
+            "required": true,
+            "example": "usdngn"
           }
         ],
         "responses": {
           "200": {
-            "description": "Price response",
+            "description": "Price ticker response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Price"
+                  "$ref": "#/components/schemas/PriceTicker"
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Invalid currency pair",
             "content": {
               "application/json": {
                 "schema": {
@@ -1002,7 +1011,7 @@
               "type": "string",
               "enum": ["NGN", "KES", "ZAR"]
             },
-            "required": "false"
+            "required": false
           },
           {
             "name": "minAmount",
@@ -1470,63 +1479,6 @@
   },
   "components": {
     "schemas": {
-      "Price": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "format": "string",
-            "example": "success"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "currency": {
-                "type": "string",
-                "enum": ["NGN", "KES"]
-              },
-              "timeStamp": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2021-07-01T12:00:00Z"
-              },
-              "btcPriceInUnitCurrency": {
-                "type": "number",
-                "format": "number",
-                "example": 9000000.23
-              },
-              "unitPricePerSat": {
-                "type": "object",
-                "properties": {
-                  "amount": {
-                    "type": "number",
-                    "format": "number",
-                    "example": 0.334561234
-                  },
-                  "currencyUnit": {
-                    "type": "string",
-                    "enum": ["NGNSAT", "KESSAT"]
-                  }
-                }
-              },
-              "unitPricePerUsd": {
-                "type": "object",
-                "properties": {
-                  "amount": {
-                    "type": "number",
-                    "format": "number",
-                    "example": 1500.65
-                  },
-                  "currencyUnit": {
-                    "type": "string",
-                    "enum": ["NGNUSD", "KESUSD"]
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       "BankAccount": {
         "type": "object",
         "properties": {
@@ -2623,6 +2575,71 @@
                         "example": 0
                       }
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "PriceTicker": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "ask": {
+                "type": "number",
+                "description": "Ask price (selling price)",
+                "example": 1475.42
+              },
+              "bid": {
+                "type": "number",
+                "description": "Bid price (buying price)",
+                "example": 1455.42
+              },
+              "timestamp": {
+                "type": "number",
+                "description": "Unix timestamp in milliseconds",
+                "example": 1767896752409
+              },
+              "meta": {
+                "type": "object",
+                "properties": {
+                  "pair": {
+                    "type": "string",
+                    "description": "Currency pair in uppercase",
+                    "example": "USDNGN"
+                  },
+                  "payoutMethods": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["BANKTRANSFER"]
+                  },
+                  "collectionMethods": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["LIGHTNING"]
+                  },
+                  "unitPricePerUsd": {
+                    "type": "object",
+                    "description": "Exchange rates per USD"
+                  },
+                  "unitPricePerSat": {
+                    "type": "object",
+                    "description": "Exchange rates per satoshi"
+                  },
+                  "fees": {
+                    "type": "object",
+                    "description": "Fee information for ask and bid"
                   }
                 }
               }

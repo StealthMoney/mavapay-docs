@@ -1,8 +1,8 @@
 {
   "name": "Mavapay",
   "logo": {
-    "dark": "/logo/mavapay.svg",
-    "light": "/logo/mavapay.svg"
+    "dark": "/logo/mavapay-logo.png",
+    "light": "/logo/mavapay-logo.png"
   },
   "favicon": "/favicon.svg",
   "colors": {
@@ -58,8 +58,15 @@
     },
     {
       "group": "Webhooks",
+      "pages": ["webhooks/introduction", "webhooks/webhook-examples"]
+    },
+    {
+      "group": "Guides",
       "pages": [
-        "webhooks/introduction"
+        "guides/quote-examples",
+        "guides/beneficiary-formats",
+        "guides/name-enquiry-guide",
+        "guides/simulation"
       ]
     },
     {
@@ -70,6 +77,7 @@
         "api-reference/errors"
       ]
     },
+
     {
       "group": "API Endpoints",
       "pages": [
@@ -100,9 +108,7 @@
         },
         {
           "group": "Quote",
-          "pages": [
-            "api-reference/endpoint/quote/get-quote"
-          ]
+          "pages": ["api-reference/endpoint/quote/get-quote"]
         },
         {
           "group": "Wallet",
