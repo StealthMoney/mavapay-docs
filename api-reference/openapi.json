@@ -54,7 +54,7 @@
               ]
             },
             "required": true,
-            "example": "zarngn"
+            "example": "usdngn"
           }
         ],
         "responses": {
