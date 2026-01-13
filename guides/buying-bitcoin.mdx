@@ -1,0 +1,533 @@
+---
+title: 'Buying Bitcoin'
+description: 'Complete guide to implementing Bitcoin purchase functionality with fiat currencies'
+---
+
+# Buying Bitcoin with Fiat Currencies
+
+Learn how to integrate Bitcoin buying functionality into your application using Mavapay's API.
+
+## Overview
+
+Mavapay allows your users to buy Bitcoin using Nigerian Naira (NGN). The API provides flexible options for how amounts are specified and how Bitcoin is delivered.
+
+## Use Cases
+
+1. **Fixed Fiat Amount**: User wants to spend exactly ₦5,000
+2. **Fixed Bitcoin Amount**: User wants to receive exactly 10,000 sats  
+3. **Instant Delivery**: Bitcoin sent immediately to user's Lightning wallet
+
+## Understanding Payment Currency
+
+The `paymentCurrency` parameter is crucial for buy Bitcoin flows. It determines what the `amount` field represents:
+
+- **`paymentCurrency: "NGNKOBO"`** → amount is in Naira (you're specifying how much to spend)
+- **`paymentCurrency: "BTCSAT"`** → amount is in Bitcoin (you're specifying how much to receive)
+
+This allows you to support both "I want to spend ₦5,000" and "I want to buy 10,000 sats" use cases with the same API.
+
+## Integration Flow
+
+### Step 1: Create a Quote
+
+Choose one of two approaches based on your use case:
+
+#### Option A: User Specifies Fiat Amount
+
+When a user wants to spend exactly ₦5,000:
+
+```bash
+curl -X POST https://api.mavapay.co/api/v1/quote \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <your-api-key>" \
+  -d '{
+    "amount": "500000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "BTCSAT",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "NGNKOBO",
+    "autopayout": false
+  }'
+```
+
+The response tells you how much Bitcoin they'll receive.
+
+#### Option B: User Specifies Bitcoin Amount
+
+When a user wants to receive exactly 10,000 sats:
+
+```bash
+curl -X POST https://api.mavapay.co/api/v1/quote \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <your-api-key>" \
+  -d '{
+    "amount": "10000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "BTCSAT",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "BTCSAT",
+    "autopayout": false
+  }'
+```
+
+The response tells you how much Naira they need to pay.
+
+<Note>
+  See the [Create Quote API reference](/api-reference/endpoint/quote/get-quote) for interactive examples you can test.
+</Note>
+
+### Step 2: Display Payment Instructions
+
+Show the user the bank account details from the quote response:
+
+```javascript
+const quote = response.data;
+
+// Display to user
+const paymentInstructions = {
+  bank: quote.bankName,              // e.g., "GLOBUS BANK"
+  accountNumber: quote.ngnBankAccountNumber,  // e.g., "3242273802"
+  accountName: quote.ngnAccountName,          // e.g., "Mava Digital Solutions Limited"
+  amount: quote.amountInSourceCurrency / 100, // Convert kobo to Naira
+  expiresAt: quote.expiry,
+  orderId: quote.orderId
+};
+```
+
+**Example UI:**
+
+```
+Please transfer ₦8,445.40 to:
+
+Bank: GLOBUS BANK  
+Account: 3242273802
+Name: Mava Digital Solutions Limited
+
+Order ID: 43477-4306
+Quote expires in: 14:32
+```
+
+<Warning>
+  Quotes expire after approximately 10 minutes for bank transfers and 5 minutes for lightning invoice payments. Display a countdown timer and prompt users to complete payment quickly.
+</Warning>
+
+### Step 3: Wait for Payment Confirmation
+
+You'll receive a `payment.received` webhook when the user makes the bank transfer:
+
+```json
+{
+  "event": "payment.received",
+  "data": {
+    "id": "9830a229-1db0-4a19-9e51-37cca51586f2",
+    "amount": 3427,
+    "currency": "BTC",
+    "type": "DEPOSIT",
+    "status": "SUCCESS",
+    "orderId": "58772-8830",
+    ...
+  }
+}
+```
+
+See [Webhook Examples](/webhooks/webhook-examples#bitcoin-btc-webhooks) for complete payload details.
+
+### Step 4: Credit User's Account
+
+You have two options for delivering Bitcoin:
+
+#### Manual Payout (autopayout: false)
+
+- Bitcoin is credited to your Mavapay wallet
+- You handle crediting user's account in your system
+- Later withdraw to user's wallet using the [Withdraw BTC API](/api-reference/endpoint/withdraw/withdraw-btc)
+
+#### Auto Payout (autopayout: true)
+
+- Bitcoin is automatically sent to the provided Lightning invoice
+- You receive both `payment.received` and `payment.sent` webhooks
+- User receives Bitcoin within seconds
+
+## Auto Payout with Lightning Invoice
+
+For instant Bitcoin delivery, set `autopayout: true` and provide a Lightning invoice:
+
+```bash
+curl -X POST https://api.mavapay.co/api/v1/quote \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <your-api-key>" \
+  -d '{
+    "amount": "208238",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "BTCSAT",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "BTCSAT",
+    "autopayout": true,
+    "beneficiary": {
+      "lnInvoice": "lnbc2082380n1p5fhytm..."
+    }
+  }'
+```
+
+### Requirements for Autopayout
+
+<Warning>
+  - `autopayout` can only be `true` when `paymentCurrency` equals the target currency (BTCSAT)
+  - A valid `beneficiary` with Lightning invoice must be provided
+  - The invoice amount **must match** the `amount` field in the request
+</Warning>
+
+### Webhooks Flow
+
+1. **payment.received** - Naira payment confirmed
+2. **payment.sent** - Bitcoin delivered to invoice
+
+```json
+// First webhook
+{
+  "event": "payment.received",
+  "data": {
+    "type": "DEPOSIT",
+    "currency": "BTC",
+    "status": "SUCCESS",
+    ...
+  }
+}
+
+// Second webhook (a few seconds later)
+{
+  "event": "payment.sent",
+  "data": {
+    "type": "WITHDRAWAL",
+    "currency": "BTC", 
+    "status": "SUCCESS",
+    ...
+  }
+}
+```
+
+## Implementation Examples
+
+### Example 1: Basic Buy Bitcoin (No Autopayout)
+
+```javascript
+async function buyBitcoin(amountNaira) {
+  // 1. Create quote
+  const quote = await fetch('https://api.mavapay.co/api/v1/quote', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.MAVAPAY_API_KEY
+    },
+    body: JSON.stringify({
+      amount: (amountNaira * 100).toString(), // Convert to kobo
+      sourceCurrency: 'NGNKOBO',
+      targetCurrency: 'BTCSAT',
+      paymentMethod: 'BANKTRANSFER',
+      paymentCurrency: 'NGNKOBO',
+      autopayout: false
+    })
+  });
+
+  const { data } = await quote.json();
+
+  // 2. Store quote and show bank details to user
+  await saveQuote(data.id, data.orderId);
+  
+  return {
+    orderId: data.orderId,
+    bankName: data.bankName,
+    accountNumber: data.ngnBankAccountNumber,
+    accountName: data.ngnAccountName,
+    amount: data.amountInSourceCurrency / 100,
+    bitcoinAmount: data.amountInTargetCurrency,
+    expiry: data.expiry
+  };
+}
+
+// 3. Handle webhook
+app.post('/webhook', async (req, res) => {
+  const { event, data } = req.body;
+
+  if (event === 'payment.received' && data.currency === 'BTC') {
+    // Credit user's BTC balance
+    await creditUserBitcoin(data.orderId, data.amount);
+  }
+
+  res.json({ received: true });
+});
+```
+
+### Example 2: Instant Bitcoin Delivery
+
+```javascript
+async function buyBitcoinInstant(satoshiAmount, userLightningInvoice) {
+  // Decode invoice to verify amount
+  const decoded = await decodeInvoice(userLightningInvoice);
+  
+  if (decoded.satoshis !== satoshiAmount) {
+    throw new Error('Invoice amount does not match requested amount');
+  }
+
+  // Create quote with autopayout
+  const quote = await fetch('https://api.mavapay.co/api/v1/quote', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.MAVAPAY_API_KEY
+    },
+    body: JSON.stringify({
+      amount: satoshiAmount.toString(),
+      sourceCurrency: 'NGNKOBO',
+      targetCurrency: 'BTCSAT',
+      paymentMethod: 'BANKTRANSFER',
+      paymentCurrency: 'BTCSAT',
+      autopayout: true,
+      beneficiary: {
+        lnInvoice: userLightningInvoice
+      }
+    })
+  });
+
+  const { data } = await quote.json();
+
+  return {
+    orderId: data.orderId,
+    bankDetails: {
+      bank: data.bankName,
+      account: data.ngnBankAccountNumber,
+      name: data.ngnAccountName
+    },
+    amountToPay: data.amountInSourceCurrency / 100,
+    bitcoinAmount: satoshiAmount,
+    deliveryMethod: 'Lightning (Instant)',
+    expiry: data.expiry
+  };
+}
+
+// Handle both webhooks
+app.post('/webhook', async (req, res) => {
+  const { event, data } = req.body;
+
+  if (event === 'payment.received') {
+    await updateOrderStatus(data.orderId, 'payment_received');
+    await notifyUser(data.orderId, 'Payment received, sending Bitcoin...');
+  }
+
+  if (event === 'payment.sent') {
+    await updateOrderStatus(data.orderId, 'completed');
+    await notifyUser(data.orderId, 'Bitcoin delivered to your wallet!');
+  }
+
+  res.json({ received: true });
+});
+```
+
+## Important Considerations
+
+### Quote Expiration
+
+Quotes are valid for approximately 10 minutes for bank transfers and 5 minutes for lightning invoice payments. If a user pays after expiration:
+
+- Payment may be refunded
+- Or applied manually by contacting support
+- Always display a clear countdown timer
+
+### Exchange Rate Volatility
+
+Exchange rates update frequently. For the best rate:
+
+- Create a fresh quote each time
+- Don't cache quotes for long periods
+- Explain to users that rates may change
+
+### Amount Validation
+
+When using autopayout with Lightning invoices:
+
+```javascript
+// Always decode and verify invoice amount
+const bolt11 = require('bolt11');
+
+function validateInvoice(invoice, expectedSats) {
+  const decoded = bolt11.decode(invoice);
+  const invoiceAmount = decoded.satoshis;
+  
+  if (invoiceAmount !== expectedSats) {
+    throw new Error(
+      `Invoice amount (${invoiceAmount} sats) does not match ` +
+      `expected amount (${expectedSats} sats)`
+    );
+  }
+  
+  return true;
+}
+```
+
+## Testing
+
+Test your integration in the staging environment:
+
+```
+https://staging.api.mavapay.co/api/v1
+```
+
+Use the [Simulation endpoint](/guides/simulation) to test payment flows without real money:
+
+```bash
+# After creating a quote
+curl -X POST https://staging.api.mavapay.co/api/v1/simulation/pay-in \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <your-staging-key>" \
+  -d '{
+    "currency": "NGN",
+    "quoteId": "53a87b44-2ecc-4106-8297-f1fd15d010a9",
+    "amount": 844540
+  }'
+```
+
+## Best Practices
+
+### 1. Show Real-Time Rates
+
+Create new quotes to show current exchange rates:
+
+```javascript
+// Good: Fresh quote every time
+const quote = await createQuote(amount);
+
+// Bad: Cached quote from 10 minutes ago
+const quote = getCachedQuote();
+```
+
+### 2. Display Expiry Prominently
+
+```javascript
+function CountdownTimer({ expiryDate }) {
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(expiryDate));
+  
+  return (
+    <div className="alert alert-warning">
+      Quote expires in: <strong>{timeLeft}</strong>
+      <br />
+      <small>Pay quickly to lock in this rate</small>
+    </div>
+  );
+}
+```
+
+### 3. Handle Webhooks Idempotently
+
+The same webhook may be sent multiple times:
+
+```javascript
+async function handlePaymentReceived(data) {
+  const { id, orderId, amount } = data;
+  
+  // Check if already processed
+  const existing = await db.transactions.findOne({ id });
+  if (existing) {
+    console.log(`Transaction ${id} already processed`);
+    return;
+  }
+  
+  // Process and mark as complete
+  await db.transactions.insert({ id, orderId, amount, processed: true });
+  await creditUserAccount(orderId, amount);
+}
+```
+
+### 4. Provide Status Updates
+
+Keep users informed throughout the process:
+
+```javascript
+const STATUS_MESSAGES = {
+  'quote_created': 'Please make payment to the account below',
+  'payment_received': 'Payment confirmed! Processing...',
+  'bitcoin_sent': 'Bitcoin delivered to your wallet',
+  'expired': 'Quote expired. Please create a new order.'
+};
+```
+
+### 5. Handle Errors Gracefully
+
+```javascript
+try {
+  const quote = await createQuote(amount);
+} catch (error) {
+  if (error.message.includes('amount too small')) {
+    return 'Minimum purchase is ₦1,000';
+  }
+  if (error.message.includes('quote expired')) {
+    return 'Quote expired. Please try again.';
+  }
+  return 'Unable to create quote. Please try again.';
+}
+```
+
+## Supported Currencies
+
+Currently available:
+- NGNKOBO => BTCSAT (Nigerian Naira to Bitcoin)
+
+Coming soon:
+- KESCENT => BTCSAT (Kenyan Shilling to Bitcoin)
+- ZARCENT => BTCSAT (South African Rand to Bitcoin)
+
+## Related Resources
+
+- [Create Quote API](/api-reference/endpoint/quote/get-quote) - Interactive API documentation
+- [Withdraw Bitcoin API](/api-reference/endpoint/withdraw/withdraw-btc) - Manual Bitcoin payouts
+- [Webhook Examples](/webhooks/webhook-examples) - Complete webhook payloads
+- [Beneficiary Formats](/guides/beneficiary-formats) - Beneficiary object structures
+- [Payment Simulation](/guides/simulation) - Testing in staging
+
+## Troubleshooting
+
+### Quote Creation Fails
+
+**Error: "Invalid payment currency"**
+- Ensure `paymentCurrency` is either `sourceCurrency` or `targetCurrency`
+- For buying BTC, use `NGNKOBO` or `BTCSAT`
+
+**Error: "Amount too small"**
+- Check minimum amounts in the API response
+- Amounts are in the lowest denomination (kobo for NGN, satoshis for BTC)
+
+### Autopayout Not Working
+
+**Error: "Autopayout requires payment currency to be target currency"**
+- Set `paymentCurrency: "BTCSAT"` when buying BTC with autopayout
+- Provide a valid Lightning invoice in the `beneficiary` field
+
+**Error: "Invoice amount mismatch"**
+- The Lightning invoice amount must exactly match the `amount` field
+- Decode invoice and verify before creating quote
+
+### Payment Not Detected
+
+- Ensure webhook is registered and publicly accessible
+- Check that user sent the exact amount shown in the quote
+- Verify payment was sent to the correct bank account
+- Contact support with the `orderId` for manual verification
+
+## FAQ
+
+**Q: What's the minimum amount I can buy?**  
+A: Minimum amounts vary. Check the API response for current limits.
+
+**Q: How long does autopayout take?**  
+A: Usually within seconds of receiving Naira payment.
+
+**Q: Can I use on-chain addresses instead of Lightning?**  
+A: Currently only Lightning invoices and addresses are supported for autopayout.
+
+**Q: What happens if the user pays after the quote expires?**  
+A: The payment may be refunded or processed manually. Contact support with the order ID.
+
+**Q: Can I set my own exchange rate markup?**  
+A: Yes, use the `customerInternalFee` field to add your margin.
+
+**Q: How do I handle partial payments?**  
+A: Partial payments are not automatically processed. Contact support for manual handling.
