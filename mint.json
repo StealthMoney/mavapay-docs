@@ -1,8 +1,8 @@
 {
   "name": "Mavapay",
   "logo": {
-    "dark": "/logo/mavapay.svg",
-    "light": "/logo/mavapay.svg"
+    "dark": "/logo/mavapay-logo.png",
+    "light": "/logo/mavapay-logo.png"
   },
   "favicon": "/favicon.svg",
   "colors": {
