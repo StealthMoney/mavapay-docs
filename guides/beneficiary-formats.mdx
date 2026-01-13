@@ -9,7 +9,9 @@ When creating a quote, you must provide beneficiary information in the correct f
 
 ## Bitcoin (BTC)
 
-For Bitcoin payouts, provide a Lightning Network invoice.
+For Bitcoin payouts, you can use one of three methods: Lightning Network invoice, Lightning address, or on-chain address.
+
+### Lightning Network Invoice
 
 ```json
 {
@@ -19,14 +21,40 @@ For Bitcoin payouts, provide a Lightning Network invoice.
 }
 ```
 
+### Lightning Address
+
+```json
+{
+  "beneficiary": {
+    "lnAddress": "user@getalby.com"
+  }
+}
+```
+
+### On-Chain Address
+
+```json
+{
+  "beneficiary": {
+    "onChainAddress": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
+  }
+}
+```
+
 ### Fields
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `lnInvoice` | string | Yes | Lightning Network invoice for the payout |
+| `lnInvoice` | string | No* | Lightning Network invoice for the payout |
+| `lnAddress` | string | No* | Lightning address (e.g., user@domain.com) |
+| `onChainAddress` | string | No* | Bitcoin on-chain address (bech32, P2PKH, or P2SH) |
+
+*One of these fields is required for BTC payouts.
 
 <Note>
-  The invoice must be valid and not expired when the payout is processed.
+  - Lightning invoices must be valid and not expired when the payout is processed
+  - Lightning addresses provide a reusable payment destination
+  - On-chain addresses support standard Bitcoin address formats
 </Note>
 
 ## Nigerian Naira (NGN)
@@ -217,7 +245,7 @@ Send money to a business till number.
 }
 ```
 
-### Example: BTC Payout
+### Example: BTC Payout (Lightning Invoice)
 
 ```json
 {
@@ -229,6 +257,38 @@ Send money to a business till number.
   "autopayout": true,
   "beneficiary": {
     "lnInvoice": "lntbs20u1p5dmy87pp5l2pm..."
+  }
+}
+```
+
+### Example: BTC Payout (Lightning Address)
+
+```json
+{
+  "amount": "2000",
+  "sourceCurrency": "NGNKOBO",
+  "targetCurrency": "BTCSAT",
+  "paymentMethod": "BANKTRANSFER",
+  "paymentCurrency": "BTCSAT",
+  "autopayout": true,
+  "beneficiary": {
+    "lnAddress": "user@getalby.com"
+  }
+}
+```
+
+### Example: BTC Payout (On-Chain Address)
+
+```json
+{
+  "amount": "2000",
+  "sourceCurrency": "NGNKOBO",
+  "targetCurrency": "BTCSAT",
+  "paymentMethod": "BANKTRANSFER",
+  "paymentCurrency": "BTCSAT",
+  "autopayout": true,
+  "beneficiary": {
+    "onChainAddress": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
   }
 }
 ```
