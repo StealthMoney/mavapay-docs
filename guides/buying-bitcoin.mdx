@@ -11,6 +11,12 @@ Learn how to integrate Bitcoin buying functionality into your application using 
 
 Mavapay allows your users to buy Bitcoin using Nigerian Naira (NGN). The API provides flexible options for how amounts are specified and how Bitcoin is delivered.
 
+<Note>
+  **Two Bitcoin Delivery Options:**
+  - **Internal Wallet** (`autopayout: false`): Bitcoin is credited to your Mavapay wallet. The `beneficiary` field is ignored. You control when and how to deliver Bitcoin to your users.
+  - **Instant Delivery** (`autopayout: true`): Bitcoin is automatically sent to the provided Lightning invoice immediately after payment is received.
+</Note>
+
 ## Use Cases
 
 1. **Fixed Fiat Amount**: User wants to spend exactly ₦5,000
@@ -139,6 +145,7 @@ You have two options for delivering Bitcoin:
 #### Manual Payout (autopayout: false)
 
 - Bitcoin is credited to your Mavapay wallet
+- **The `beneficiary` field is ignored** when `autopayout` is false
 - You handle crediting user's account in your system
 - Later withdraw to user's wallet using the [Withdraw BTC API](/api-reference/endpoint/withdraw/withdraw-btc)
 
@@ -173,8 +180,9 @@ curl -X POST https://api.mavapay.co/api/v1/quote \
 
 <Warning>
   - `autopayout` can only be `true` when `paymentCurrency` equals the target currency (BTCSAT)
-  - A valid `beneficiary` with Lightning invoice must be provided
-  - The invoice amount **must match** the `amount` field in the request
+  - A valid `beneficiary` with Lightning invoice or Lightning address must be provided
+  - For Lightning invoices: The invoice amount **must match** the `amount` field in the request
+  - For Lightning addresses: Amount matching is not required since the invoice is generated on the fly
 </Warning>
 
 ### Webhooks Flow
@@ -518,7 +526,7 @@ Coming soon:
 A: Minimum amounts vary. Check the API response for current limits.
 
 **Q: How long does autopayout take?**  
-A: Usually within seconds of receiving Naira payment.
+A: Usually within seconds of receiving Naira or Bitcoin payment.
 
 **Q: Can I use on-chain addresses instead of Lightning?**  
 A: Currently only Lightning invoices and addresses are supported for autopayout.
