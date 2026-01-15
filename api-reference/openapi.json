@@ -571,6 +571,112 @@
         }
       }
     },
+    "/quote/validate-kes-identifier": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Quote"],
+        "operationId": "validateKesIdentifier",
+        "summary": "Validate KES identifier",
+        "description": "Validate a Kenyan M-Pesa PayBill or Till number and retrieve the associated business name. This endpoint is only available in production.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["identifier", "identifierType"],
+                "properties": {
+                  "identifier": {
+                    "type": "string",
+                    "description": "The paybill or till number to validate",
+                    "example": "247247"
+                  },
+                  "identifierType": {
+                    "type": "string",
+                    "enum": ["PayBill", "Till"],
+                    "description": "The type of identifier to validate",
+                    "example": "PayBill"
+                  }
+                }
+              },
+              "examples": {
+                "validatePaybill": {
+                  "summary": "Validate Paybill",
+                  "description": "Validate a Kenyan M-Pesa paybill number",
+                  "value": {
+                    "identifier": "247247",
+                    "identifierType": "PayBill"
+                  }
+                },
+                "validateTill": {
+                  "summary": "Validate Till",
+                  "description": "Validate a Kenyan M-Pesa till number",
+                  "value": {
+                    "identifier": "796980711",
+                    "identifierType": "Till"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Validation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "organization_name": {
+                          "type": "string",
+                          "description": "The name of the business associated with the identifier"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "paybillResponse": {
+                    "summary": "Paybill Validation Response",
+                    "value": {
+                      "status": "ok",
+                      "data": {
+                        "organization_name": "Equity Paybill Account"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/wallet": {
       "get": {
         "security": [

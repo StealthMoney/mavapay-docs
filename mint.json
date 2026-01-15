@@ -108,7 +108,10 @@
         },
         {
           "group": "Quote",
-          "pages": ["api-reference/endpoint/quote/get-quote"]
+          "pages": [
+            "api-reference/endpoint/quote/get-quote",
+            "api-reference/endpoint/quote/validate-kes-identifier"
+          ]
         },
         {
           "group": "Wallet",

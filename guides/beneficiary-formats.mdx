@@ -122,9 +122,9 @@ Send money directly to a mobile phone number.
 {
   "beneficiary": {
     "identifierType": "paytophone",
-    "accountName": "John Doe",
     "identifiers": {
-      "phoneNumber": "+254796980711"
+      "phoneNumber": "+254796980711",
+      "accountName": "John Doe"
     }
   }
 }
@@ -135,8 +135,8 @@ Send money directly to a mobile phone number.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `identifierType` | string | Yes | Must be `"paytophone"` |
-| `accountName` | string | Yes | Name associated with the M-Pesa account |
 | `identifiers.phoneNumber` | string | Yes | Kenyan phone number in international format (+254...) |
+| `identifiers.accountName` | string | Yes | Name associated with the M-Pesa account |
 
 ### Pay to Bill (Business Payments)
 
@@ -165,7 +165,7 @@ Send money to a business paybill number with an account reference.
 | `identifiers.accountNumber` | string | Yes | Account number/reference for the paybill |
 
 <Tip>
-  You can validate the paybill business name using the [KES Identifier Validation endpoint](#kes-identifier-validation).
+  You can validate the paybill business name using the [KES Identifier Validation endpoint](/api-reference/endpoint/quote/validate-kes-identifier). See [detailed documentation](#kes-identifier-validation) below.
 </Tip>
 
 ### Pay to Till
@@ -193,7 +193,7 @@ Send money to a business till number.
 | `identifiers.tillNumber` | string | Yes | M-Pesa till number |
 
 <Tip>
-  You can validate the till business name using the [KES Identifier Validation endpoint](#kes-identifier-validation).
+  You can validate the till business name using the [KES Identifier Validation endpoint](/api-reference/endpoint/quote/validate-kes-identifier). See [detailed documentation](#kes-identifier-validation) below.
 </Tip>
 
 <Note>
@@ -316,9 +316,9 @@ curl --location 'https://api.mavapay.co/api/v1/quote/validate-kes-identifier' \
   "autopayout": true,
   "beneficiary": {
     "identifierType": "paytophone",
-    "accountName": "John Doe",
     "identifiers": {
-      "phoneNumber": "+254796980711"
+      "phoneNumber": "+254796980711",
+      "accountName": "John Doe"
     }
   }
 }
@@ -398,7 +398,7 @@ Before creating a quote, you can validate beneficiary details:
 - **ZAR**: Validation not currently available
 - **KES**: 
   - For Pay to Phone: Ensure phone numbers are in correct format (+254...)
-  - For Pay to Bill and Pay to Till: Use the [KES Identifier Validation endpoint](#kes-identifier-validation) to validate business names (production only)
+  - For Pay to Bill and Pay to Till: Use the [KES Identifier Validation endpoint](/api-reference/endpoint/quote/validate-kes-identifier) to validate business names (production only)
 - **BTC**: Ensure Lightning invoice is valid and not expired
 
 ## Next Steps
