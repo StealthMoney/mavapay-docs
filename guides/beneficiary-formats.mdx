@@ -147,6 +147,7 @@ Send money to a business paybill number with an account reference.
   "beneficiary": {
     "identifierType": "paytobill",
     "identifiers": {
+      "accountName": "vlad",
       "paybillNumber": "4141031",
       "accountNumber": "vlad"
     }
@@ -159,6 +160,7 @@ Send money to a business paybill number with an account reference.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `identifierType` | string | Yes | Must be `"paytobill"` |
+| `accountName` | string | Yes | Account name (usually the same as the account number) |
 | `identifiers.paybillNumber` | string | Yes | M-Pesa paybill number |
 | `identifiers.accountNumber` | string | Yes | Account number/reference for the paybill |
 
@@ -396,7 +398,7 @@ Before creating a quote, you can validate beneficiary details:
 - **ZAR**: Validation not currently available
 - **KES**: 
   - For Pay to Phone: Ensure phone numbers are in correct format (+254...)
-  - For Pay to Bill and Pay to Till: Use the [KES Identifier Validation endpoint](/api-reference/endpoint/quote/validate-kes-identifier) to validate business names (production only)
+  - For Pay to Bill and Pay to Till: Use the [KES Identifier Validation endpoint](#kes-identifier-validation) to validate business names (production only)
 - **BTC**: Ensure Lightning invoice is valid and not expired
 
 ## Next Steps
