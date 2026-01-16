@@ -1,0 +1,344 @@
+---
+title: 'Quote Examples'
+description: 'Comprehensive examples for creating quotes across all supported currency pairs'
+---
+
+# Quote Request & Response Examples
+
+This guide provides complete request and response examples for all supported currency pairs on Mavapay.
+
+## Supported Currency Pairs
+
+Mavapay supports the following currency conversions:
+
+- BTCSAT => NGNKOBO (Bitcoin to Nigerian Naira)
+- BTCSAT => ZARCENT (Bitcoin to South African Rand)
+- BTCSAT => KESCENT (Bitcoin to Kenyan Shilling)
+- NGNKOBO => BTCSAT (Nigerian Naira to Bitcoin)
+- NGNKOBO => ZARCENT (Nigerian Naira to South African Rand)
+- NGNKOBO => KESCENT (Nigerian Naira to Kenyan Shilling)
+
+<Note>
+  For the Get Price endpoint, use currency codes: `NGN`, `KES`, or `ZAR`
+</Note>
+
+## Bitcoin to Kenyan Shilling (BTCSAT => KESCENT)
+
+### Request
+
+```json
+{
+   "amount": "100000",
+   "sourceCurrency": "BTCSAT",
+   "targetCurrency": "KESCENT",
+   "paymentMethod": "LIGHTNING",
+   "paymentCurrency": "BTCSAT",
+   "autopayout": true,
+   "beneficiary": {
+       "identifierType": "paytophone",
+       "identifiers": {
+           "phoneNumber": "+254796980711"
+       }
+   }
+}
+```
+
+### Response
+
+```json
+{
+  "status": "ok",
+  "data": {
+     "id": "1577613a-6dc6-4af9-b0b3-e14d356c5a72",
+     "exchangeRate": 14720643,
+     "usdToTargetCurrencyRate": 128.99896800825593,
+     "sourceCurrency": "BTCSAT",
+     "targetCurrency": "KESCENT",
+     "transactionFeesInSourceCurrency": 498,
+     "transactionFeesInTargetCurrency": 7340,
+     "amountInSourceCurrency": 100000,
+     "amountInTargetCurrency": 1460784,
+     "paymentMethod": "LIGHTNING",
+     "expiry": "2025-09-30T23:18:03.000Z",
+     "isValid": true,
+     "invoice": "lntbs1m1p5dccllpp590cxxjtkhxql7xl9frxuc56nq5svf28vrl5w073uzvt0ytjfuedsdz5296...",
+     "hash": "2bf0634976b981ff1be548cdcc53530520c4a8ec1fe8e7fa3c1316f22e49e65b",
+     "totalAmountInSourceCurrency": 100000,
+     "customerInternalFee": 0,
+     "orderId": "63493-3037"
+  }
+}
+```
+
+## Nigerian Naira to Kenyan Shilling (NGNKOBO => KESCENT)
+
+### Request
+
+```json
+{
+   "amount": "1000000",
+   "sourceCurrency": "NGNKOBO",
+   "targetCurrency": "KESCENT",
+   "paymentMethod": "BANKTRANSFER",
+   "paymentCurrency": "NGNKOBO",
+   "autopayout": true,
+   "beneficiary": {
+       "identifierType": "paytophone",
+       "identifiers": {
+           "phoneNumber": "+254796980711"
+       }
+   }
+}
+```
+
+### Response
+
+```json
+{
+   "status": "ok",
+   "data": {
+       "id": "ab60815e-b939-4634-bb84-9b80499f026f",
+       "exchangeRate": 15191446,
+       "usdToTargetCurrencyRate": 128.99896800825593,
+       "sourceCurrency": "NGNKOBO",
+       "targetCurrency": "KESCENT",
+       "transactionFeesInSourceCurrency": 5860,
+       "transactionFeesInTargetCurrency": 440,
+       "amountInSourceCurrency": 1000000,
+       "amountInTargetCurrency": 87590,
+       "paymentMethod": "BANKTRANSFER",
+       "expiry": "2025-10-01T20:29:56.497Z",
+       "isValid": true,
+       "invoice": "",
+       "hash": "68dd8ced9145820012b30903",
+       "totalAmountInSourceCurrency": 1000000,
+       "customerInternalFee": 0,
+       "bankName": "WEMA BANK",
+       "ngnBankAccountNumber": "7824655568",
+       "ngnAccountName": "Mava Digital Solutions Limited",
+       "ngnBankCode": "000027",
+       "orderId": "52209-7505"
+   }
+}
+```
+
+<Note>
+  When using BANKTRANSFER as payment method, the response includes bank details where you should send the NGN payment.
+</Note>
+
+## Bitcoin to Nigerian Naira (BTCSAT => NGNKOBO)
+
+### Request
+
+```json
+{
+   "amount": "1000000",
+   "sourceCurrency": "BTCSAT",
+   "targetCurrency": "NGNKOBO",
+   "paymentMethod": "LIGHTNING",
+   "paymentCurrency": "NGNKOBO",
+   "autopayout": true,
+   "beneficiary": {
+       "bankAccountName": "olaolu olajide",
+       "bankCode": "000013",
+       "bankName": "GTBANK PLC",
+       "bankAccountNumber": "0087241555"
+   }
+}
+```
+
+### Response
+
+```json
+{
+   "status": "ok",
+   "data": {
+       "id": "e3cdeb26-5375-4758-adb0-957f0de97c4d",
+       "exchangeRate": 168375961.2972606,
+       "usdToTargetCurrencyRate": 1434.964752,
+       "sourceCurrency": "BTCSAT",
+       "targetCurrency": "NGNKOBO",
+       "transactionFeesInSourceCurrency": 59,
+       "transactionFeesInTargetCurrency": 10000,
+       "amountInSourceCurrency": 6016,
+       "amountInTargetCurrency": 1000000,
+       "paymentMethod": "LIGHTNING",
+       "expiry": "2025-10-01T20:27:57.000Z",
+       "isValid": true,
+       "invoice": "lntbs60160n1p5dmrdppp5vadgr37wqyn3vudwkhf3qqyq0tk7nkc7k2dw4pg0zk2fd7f28r3s...",
+       "hash": "675a81c7ce01271671aeb5d31000807aede9db1eb29aea850f159496f92a38e3",
+       "totalAmountInSourceCurrency": 6016,
+       "customerInternalFee": 0,
+       "orderId": "56188-2561"
+   }
+}
+```
+
+## Bitcoin to South African Rand (BTCSAT => ZARCENT)
+
+### Request
+
+```json
+{
+   "amount": "1000000",
+   "sourceCurrency": "BTCSAT",
+   "targetCurrency": "ZARCENT",
+   "paymentMethod": "LIGHTNING",
+   "paymentCurrency": "ZARCENT",
+   "autopayout": true,
+   "beneficiary": {
+       "name": "test merchant 1",
+       "bankName": "CAPITEC BANK",
+       "bankAccountNumber": "1325558779"
+   }
+}
+```
+
+### Response
+
+```json
+{
+ "status": "ok",
+ "data": {
+     "id": "f53d1e18-acfb-445e-a78f-6f781653f7da",
+     "exchangeRate": 2026652.625,
+     "usdToTargetCurrencyRate": 17.22934675,
+     "sourceCurrency": "BTCSAT",
+     "targetCurrency": "ZARCENT",
+     "transactionFeesInSourceCurrency": 2467,
+     "transactionFeesInTargetCurrency": 5000,
+     "amountInSourceCurrency": 500408,
+     "amountInTargetCurrency": 1000000,
+     "paymentMethod": "LIGHTNING",
+     "expiry": "2025-10-01T20:30:33.000Z",
+     "isValid": true,
+     "invoice": "lntbs5004080n1p5dmr3app52h5ag3n3p5x74utqxgg3wug6a2ladey8kfmc325kjypcdfh47...",
+     "hash": "55e9d446710d0deaf160321117711aeabfd6e487b27788aa96910386a6f5f36d",
+     "totalAmountInSourceCurrency": 500408,
+     "customerInternalFee": 0,
+     "orderId": "62602-9933"
+ }
+}
+```
+
+## Nigerian Naira to South African Rand (NGNKOBO => ZARCENT)
+
+### Request
+
+```json
+{
+ "amount": "300000",
+ "sourceCurrency": "NGNKOBO",
+ "targetCurrency": "ZARCENT",
+ "paymentMethod": "BANKTRANSFER",
+ "paymentCurrency": "NGNKOBO",
+ "autopayout": true,
+ "beneficiary": {
+     "name": "test merchant 1",
+     "bankName": "CAPITEC BANK",
+     "bankAccountNumber": "1325558779"
+ }
+}
+```
+
+### Response
+
+```json
+{
+   "status": "ok",
+   "data": {
+       "id": "9e6f8a73-79d3-44d3-b8f4-000fdc8a9199",
+       "exchangeRate": 2028008,
+       "usdToTargetCurrencyRate": 17.22934675,
+       "sourceCurrency": "NGNKOBO",
+       "targetCurrency": "ZARCENT",
+       "transactionFeesInSourceCurrency": 128850,
+       "transactionFeesInTargetCurrency": 1513,
+       "amountInSourceCurrency": 300000,
+       "amountInTargetCurrency": 301238,
+       "paymentMethod": "BANKTRANSFER",
+       "expiry": "2025-10-01T20:39:27.550Z",
+       "isValid": true,
+       "bankName": "WEMA BANK",
+       "ngnBankAccountNumber": "7824829602",
+       "ngnAccountName": "Mava Digital Solutions Limited",
+       "ngnBankCode": "000027",
+       "orderId": "59651-5544"
+   }
+}
+```
+
+## Nigerian Naira to Bitcoin (NGNKOBO => BTCSAT)
+
+### Request
+
+```json
+{
+   "amount": "2000",
+   "sourceCurrency": "NGNKOBO",
+   "targetCurrency": "BTCSAT",
+   "paymentMethod": "BANKTRANSFER",
+   "paymentCurrency": "BTCSAT",
+   "autopayout": true,
+   "beneficiary": {
+      "lnInvoice": "lntbs20u1p5dmy87pp5l2pm..."
+   }
+}
+```
+
+### Response
+
+```json
+{
+   "status": "ok",
+   "data": {
+       "id": "2ca718ea-4a41-4e8a-aa63-36d27e337c21",
+       "exchangeRate": 1,
+       "usdToTargetCurrencyRate": 0.000008515171041180565,
+       "sourceCurrency": "NGNKOBO",
+       "targetCurrency": "BTCSAT",
+       "transactionFeesInSourceCurrency": 2927,
+       "transactionFeesInTargetCurrency": 10,
+       "amountInSourceCurrency": 346900,
+       "amountInTargetCurrency": 2000,
+       "paymentMethod": "BANKTRANSFER",
+       "expiry": "2025-10-01T20:48:03.778Z",
+       "isValid": true,
+       "hash": "68dd912c9145820012b30963",
+       "totalAmountInSourceCurrency": 346900,
+       "customerInternalFee": 0,
+       "bankName": "WEMA BANK",
+       "ngnBankAccountNumber": "7824182598",
+       "ngnAccountName": "Mava Digital Solutions Limited",
+       "ngnBankCode": "000027",
+       "orderId": "21997-7910"
+   }
+}
+```
+
+## Understanding Quote Fields
+
+| Field | Description |
+|-------|-------------|
+| `exchangeRate` | The exchange rate between source and target currencies |
+| `usdToTargetCurrencyRate` | USD to target currency exchange rate |
+| `transactionFeesInSourceCurrency` | Fees in the source currency's lowest denomination |
+| `transactionFeesInTargetCurrency` | Fees in the target currency's lowest denomination |
+| `amountInSourceCurrency` | Amount to be paid in source currency |
+| `amountInTargetCurrency` | Amount recipient receives in target currency |
+| `totalAmountInSourceCurrency` | Total amount including fees |
+| `customerInternalFee` | Custom fee you can set for your customers |
+| `invoice` | Lightning invoice to pay (when payment method is LIGHTNING) |
+| `hash` | Payment hash for tracking the transaction |
+| `orderId` | Unique order identifier |
+| `expiry` | Quote expiration timestamp |
+
+<Tip>
+  All amounts are in the lowest denomination of the currency (kobo for NGN, cents for KES/ZAR, satoshis for BTC).
+</Tip>
+
+## Next Steps
+
+- Learn about [beneficiary formats](/api-reference/beneficiary-formats) for different currencies
+- Explore [webhook integration](/webhooks/introduction) for payment notifications
+- Test your integration in our [staging environment](https://staging.api.mavapay.co/api/v1)

@@ -63,6 +63,7 @@
     {
       "group": "Guides",
       "pages": [
+        "guides/buying-bitcoin",
         "guides/quote-examples",
         "guides/beneficiary-formats",
         "guides/name-enquiry-guide",
@@ -77,7 +78,6 @@
         "api-reference/errors"
       ]
     },
-
     {
       "group": "API Endpoints",
       "pages": [
@@ -108,7 +108,10 @@
         },
         {
           "group": "Quote",
-          "pages": ["api-reference/endpoint/quote/get-quote"]
+          "pages": [
+            "api-reference/endpoint/quote/get-quote",
+            "api-reference/endpoint/quote/validate-kes-identifier"
+          ]
         },
         {
           "group": "Wallet",

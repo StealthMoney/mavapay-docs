@@ -2,15 +2,14 @@
 title: 'Beneficiary Formats'
 description: 'Required beneficiary object formats for each supported currency'
 ---
-<Tip>
+
+# Beneficiary Formats
+
 When creating a quote, you must provide beneficiary information in the correct format for the target currency. This guide shows the required format for each supported currency.
-</Tip>
 
 ## Bitcoin (BTC)
 
-For Bitcoin payouts, you can use one of three methods: Lightning Network invoice, Lightning address, or on-chain address.
-
-### Lightning Network Invoice
+For Bitcoin payouts, provide a Lightning Network invoice.
 
 ```json
 {
@@ -20,40 +19,14 @@ For Bitcoin payouts, you can use one of three methods: Lightning Network invoice
 }
 ```
 
-### Lightning Address
-
-```json
-{
-  "beneficiary": {
-    "lnAddress": "user@getalby.com"
-  }
-}
-```
-
-### On-Chain Address
-
-```json
-{
-  "beneficiary": {
-    "onChainAddress": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
-  }
-}
-```
-
 ### Fields
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `lnInvoice` | string | No* | Lightning Network invoice for the payout |
-| `lnAddress` | string | No* | Lightning address (e.g., user@domain.com) |
-| `onChainAddress` | string | No* | Bitcoin on-chain address (bech32, P2PKH, or P2SH) |
-
-*One of these fields is required for BTC payouts.
+| `lnInvoice` | string | Yes | Lightning Network invoice for the payout |
 
 <Note>
-  - Lightning invoices must be valid and not expired when the payout is processed
-  - Lightning addresses provide a reusable payment destination
-  - On-chain addresses support standard Bitcoin address formats
+  The invoice must be valid and not expired when the payout is processed.
 </Note>
 
 ## Nigerian Naira (NGN)
@@ -123,8 +96,7 @@ Send money directly to a mobile phone number.
   "beneficiary": {
     "identifierType": "paytophone",
     "identifiers": {
-      "phoneNumber": "+254796980711",
-      "accountName": "John Doe"
+      "phoneNumber": "+254796980711"
     }
   }
 }
@@ -136,7 +108,6 @@ Send money directly to a mobile phone number.
 |-------|------|----------|-------------|
 | `identifierType` | string | Yes | Must be `"paytophone"` |
 | `identifiers.phoneNumber` | string | Yes | Kenyan phone number in international format (+254...) |
-| `identifiers.accountName` | string | Yes | Name associated with the M-Pesa account |
 
 ### Pay to Bill (Business Payments)
 
@@ -147,7 +118,6 @@ Send money to a business paybill number with an account reference.
   "beneficiary": {
     "identifierType": "paytobill",
     "identifiers": {
-      "accountName": "vlad",
       "paybillNumber": "4141031",
       "accountNumber": "vlad"
     }
@@ -160,13 +130,8 @@ Send money to a business paybill number with an account reference.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `identifierType` | string | Yes | Must be `"paytobill"` |
-| `accountName` | string | Yes | Account name (usually the same as the account number) |
 | `identifiers.paybillNumber` | string | Yes | M-Pesa paybill number |
 | `identifiers.accountNumber` | string | Yes | Account number/reference for the paybill |
-
-<Tip>
-  You can validate the paybill business name using the [KES Identifier Validation endpoint](/api-reference/endpoint/quote/validate-kes-identifier). See [detailed documentation](#kes-identifier-validation) below.
-</Tip>
 
 ### Pay to Till
 
@@ -176,7 +141,6 @@ Send money to a business till number.
 {
   "beneficiary": {
     "identifierType": "paytotill",
-    "accountName": "Business Name",
     "identifiers": {
       "tillNumber": "796980711"
     }
@@ -189,98 +153,10 @@ Send money to a business till number.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `identifierType` | string | Yes | Must be `"paytotill"` |
-| `accountName` | string | Yes | Name of the business |
 | `identifiers.tillNumber` | string | Yes | M-Pesa till number |
-
-<Tip>
-  You can validate the till business name using the [KES Identifier Validation endpoint](/api-reference/endpoint/quote/validate-kes-identifier). See [detailed documentation](#kes-identifier-validation) below.
-</Tip>
 
 <Note>
   All Kenyan phone numbers must be in international format starting with +254.
-</Note>
-
-## KES Identifier Validation
-
-For Pay to Bill and Pay to Till payment methods, you can validate the business name before creating a quote. This endpoint is only available in production.
-
-### Endpoint
-
-```
-POST https://api.mavapay.co/api/v1/quote/validate-kes-identifier
-```
-
-### Headers
-
-| Header | Value |
-|--------|-------|
-| `Content-Type` | `application/json` |
-| `x-api-key` | Your API key |
-
-### Request Body
-
-For Paybill validation:
-
-```json
-{
-  "identifier": "247247",
-  "identifierType": "PayBill"
-}
-```
-
-For Till validation:
-
-```json
-{
-  "identifier": "796980711",
-  "identifierType": "Till"
-}
-```
-
-### Parameters
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `identifier` | string | Yes | The paybill or till number to validate |
-| `identifierType` | string | Yes | Either `"PayBill"` or `"Till"` |
-
-### Response
-
-```json
-{
-  "status": "ok",
-  "data": {
-    "organization_name": "Equity Paybill Account"
-  }
-}
-```
-
-### Example: Validate Paybill
-
-```bash
-curl --location 'https://api.mavapay.co/api/v1/quote/validate-kes-identifier' \
---header 'Content-Type: application/json' \
---header 'x-api-key: <your-api-key>' \
---data '{
-    "identifier": "247247",
-    "identifierType": "PayBill"
-}'
-```
-
-### Example: Validate Till
-
-```bash
-curl --location 'https://api.mavapay.co/api/v1/quote/validate-kes-identifier' \
---header 'Content-Type: application/json' \
---header 'x-api-key: <your-api-key>' \
---data '{
-    "identifier": "796980711",
-    "identifierType": "Till"
-}'
-```
-
-<Note>
-  This validation endpoint is only available in the production environment.
 </Note>
 
 ## Complete Quote Examples
@@ -317,8 +193,7 @@ curl --location 'https://api.mavapay.co/api/v1/quote/validate-kes-identifier' \
   "beneficiary": {
     "identifierType": "paytophone",
     "identifiers": {
-      "phoneNumber": "+254796980711",
-      "accountName": "John Doe"
+      "phoneNumber": "+254796980711"
     }
   }
 }
@@ -342,7 +217,7 @@ curl --location 'https://api.mavapay.co/api/v1/quote/validate-kes-identifier' \
 }
 ```
 
-### Example: BTC Payout (Lightning Invoice)
+### Example: BTC Payout
 
 ```json
 {
@@ -358,47 +233,13 @@ curl --location 'https://api.mavapay.co/api/v1/quote/validate-kes-identifier' \
 }
 ```
 
-### Example: BTC Payout (Lightning Address)
-
-```json
-{
-  "amount": "2000",
-  "sourceCurrency": "NGNKOBO",
-  "targetCurrency": "BTCSAT",
-  "paymentMethod": "BANKTRANSFER",
-  "paymentCurrency": "BTCSAT",
-  "autopayout": true,
-  "beneficiary": {
-    "lnAddress": "user@getalby.com"
-  }
-}
-```
-
-### Example: BTC Payout (On-Chain Address)
-
-```json
-{
-  "amount": "2000",
-  "sourceCurrency": "NGNKOBO",
-  "targetCurrency": "BTCSAT",
-  "paymentMethod": "BANKTRANSFER",
-  "paymentCurrency": "BTCSAT",
-  "autopayout": true,
-  "beneficiary": {
-    "onChainAddress": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
-  }
-}
-```
-
 ## Validation
 
 Before creating a quote, you can validate beneficiary details:
 
 - **NGN**: Use the [Name Enquiry endpoint](/api-reference/endpoint/bank-info/name-enquiry) to validate account details
 - **ZAR**: Validation not currently available
-- **KES**: 
-  - For Pay to Phone: Ensure phone numbers are in correct format (+254...)
-  - For Pay to Bill and Pay to Till: Use the [KES Identifier Validation endpoint](#kes-identifier-validation) to validate business names (production only)
+- **KES**: Ensure phone numbers are in correct format (+254...)
 - **BTC**: Ensure Lightning invoice is valid and not expired
 
 ## Next Steps

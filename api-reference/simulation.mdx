@@ -20,7 +20,7 @@ POST /api/v1/simulation/pay-in
 ## How It Works
 
 1. Create a quote using the [Create Quote endpoint](/api-reference/endpoint/quote/get-quote)
-2. Use the `quoteId` (or `orderId` if you don't have the quote) from the response
+2. Use the `quoteId` from the response
 3. Call the simulation endpoint to simulate payment
 4. Your webhook will receive `payment.received` event
 5. If autopayout is enabled, you'll also receive `payment.sent` event
@@ -51,11 +51,8 @@ POST /api/v1/simulation/pay-in
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `currency` | string | Yes | Must be `"NGN"` |
-| `quoteId` | string (UUID) | No* | The quote ID from your created quote |
-| `orderId` | string (UUID) | No* | The order ID (use if you don't have the quote ID) |
+| `quoteId` | string (UUID) | Yes | The quote ID from your created quote |
 | `amount` | number | Yes | Amount in kobo (must match quote amount) |
-
-*Either `quoteId` or `orderId` is required.
 
 ## Bitcoin (BTC) Simulation
 
@@ -82,10 +79,7 @@ POST /api/v1/simulation/pay-in
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `currency` | string | Yes | Must be `"BTC"` |
-| `quoteId` | string (UUID) | No* | The quote ID from your created quote |
-| `orderId` | string (UUID) | No* | The order ID (use if you don't have the quote ID) |
-
-*Either `quoteId` or `orderId` is required.
+| `quoteId` | string (UUID) | Yes | The quote ID from your created quote |
 
 <Note>
   For BTC simulations, the `amount` parameter is not required as it's determined by the Lightning invoice.
@@ -153,21 +147,6 @@ If autopayout is enabled, you'll also receive a `payment.sent` event shortly aft
 ### Test Successful Payment
 
 Use the simulation endpoint as shown above to test successful payment flows.
-
-### Using Order ID Instead of Quote ID
-
-If you don't have access to the quote ID, you can use the order ID instead:
-
-```bash
-curl -X POST https://staging.api.mavapay.co/api/v1/simulation/pay-in \
-  -H "Content-Type: application/json" \
-  -H "X-API-KEY: your_staging_api_key" \
-  -d '{
-    "currency": "NGN",
-    "orderId": "5466-3532",
-    "amount": 604300
-  }'
-```
 
 ### Test Different Currency Pairs
 
