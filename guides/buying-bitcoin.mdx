@@ -1,7 +1,11 @@
 ---
-title: 'Buying Bitcoin'
-description: 'Complete guide to implementing Bitcoin purchase functionality with fiat currencies'
+title: 'Buying Bitcoin (Lightning)'
+description: 'Complete guide to implementing Bitcoin purchase functionality with fiat currencies via Lightning Network'
 ---
+
+<Note>
+  This guide covers buying Bitcoin via **Lightning Network** (instant, low fees). For on-chain Bitcoin purchases, see [Buying Bitcoin (On-Chain)](/guides/buying-bitcoin-onchain).
+</Note>
 
 ## Overview
 
@@ -525,7 +529,7 @@ A: Minimum amounts vary. Check the API response for current limits.
 A: Usually within seconds of receiving Naira or Bitcoin payment.
 
 **Q: Can I use on-chain addresses instead of Lightning?**  
-A: Currently only Lightning invoices and addresses are supported for autopayout.
+A: Yes! See [Buying Bitcoin (On-Chain)](/guides/buying-bitcoin-onchain) for on-chain integration with standard Bitcoin addresses.
 
 **Q: What happens if the user pays after the quote expires?**  
 A: The payment may be refunded or processed manually. Contact support with the order ID.

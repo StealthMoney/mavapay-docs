@@ -13,6 +13,7 @@ This guide provides complete webhook payload examples for each supported currenc
 |-------|------|-------------|
 | `payment.received` | DEPOSIT | Triggered when Mavapay receives funds from a customer |
 | `payment.sent` | WITHDRAWAL | Triggered when Mavapay sends funds to a beneficiary |
+| `payment_link.settled` | SETTLEMENT | Triggered when a Payment Link transaction is fully settled |
 
 ## Bitcoin (BTC) Webhooks
 
@@ -62,6 +63,116 @@ Triggered when Bitcoin payment is received via Lightning Network.
 | `hash` | Payment hash for tracking |
 | `btcUsdMetadata.lnInvoice` | The Lightning invoice that was paid |
 | `btcUsdMetadata.orderId` | Associated order ID |
+
+### payment.sent (On-Chain Withdrawal)
+
+Triggered when Bitcoin is sent on-chain to a beneficiary address.
+
+```json
+{
+  "event": "payment.sent",
+  "data": {
+    "id": "220b23dc-38f7-413c-b2d1-b7f765c50add",
+    "walletId": "40aa2b67-1498-449d-85f2-17b93eab2d74",
+    "ref": "19d4793744af1e9fc77cb64d374d6",
+    "hash": "691f836d4e7ce000125478be",
+    "amount": 6000,
+    "fees": 0,
+    "currency": "BTC",
+    "type": "WITHDRAWAL",
+    "status": "SUCCESS",
+    "autopayout": true,
+    "createdAt": "2025-11-20T21:10:12.180Z",
+    "updatedAt": "2025-11-20T23:35:52.986Z",
+    "btcUsdMetadata": {
+      "id": "b6d82314-0148-413e-bfad-ccd74a45969e",
+      "orderId": "44092-3881",
+      "paymentMethod": "BANKTRANSFER",
+      "externalRef": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
+      "customerInternalFee": 0,
+      "estimatedRoutingFee": 172,
+      "lnInvoice": null,
+      "lnAddress": null,
+      "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5",
+      "onchainTxid": "5c5df6db67a8fbe684d48560fe151a0ecfade509d640bd21b6a787707b972f62",
+      "onchainNetworkSpeed": "medium",
+      "createdAt": "2025-11-20T21:10:12.185Z",
+      "updatedAt": "2025-11-20T23:35:53.036Z"
+    }
+  }
+}
+```
+
+### On-Chain Specific Fields
+
+| Field | Description |
+|-------|-------------|
+| `btcUsdMetadata.onChainAddress` | The Bitcoin address that received the payment |
+| `btcUsdMetadata.onchainTxid` | The Bitcoin transaction ID (viewable on block explorers) |
+| `btcUsdMetadata.onchainNetworkSpeed` | Fee priority used: `slow`, `medium`, or `fast` |
+
+<Note>
+  On-chain withdrawals remain in `PENDING` status until there are **3 block confirmations**, after which the status changes to `SUCCESS`.
+</Note>
+
+## Payment Link Webhooks
+
+### payment_link.settled
+
+Triggered when a Payment Link transaction is fully settled (after block confirmations for on-chain).
+
+```json
+{
+  "event": "payment_link.settled",
+  "data": {
+    "paymentRef": "1c50bb6a-9f49-493c-86b5-75a9e790f7c9",
+    "paymentLink": "https://checkout.mavapay.co/1c50bb6a-9f49-493c-86b5-75a9e790f7c9",
+    "callbackUrl": "https://your-app.com/callback",
+    "settlementCurrency": "BTC",
+    "paymentCurrency": "BTC",
+    "paymentMethod": "BANKTRANSFER",
+    "transaction": {
+      "id": "220b23dc-38f7-413c-b2d1-b7f765c50add",
+      "walletId": "40aa2b67-1498-449d-85f2-17b93eab2d74",
+      "ref": "19d4793744af1e9fc77cb64d374d6",
+      "hash": "691f836d4e7ce000125478be",
+      "amount": 6000,
+      "fees": 0,
+      "currency": "BTC",
+      "type": "WITHDRAWAL",
+      "status": "SUCCESS",
+      "autopayout": true,
+      "createdAt": "2025-11-20T21:10:12.180Z",
+      "updatedAt": "2025-11-20T23:35:52.986Z",
+      "btcUsdMetadata": {
+        "id": "b6d82314-0148-413e-bfad-ccd74a45969e",
+        "orderId": "44092-3881",
+        "paymentMethod": "BANKTRANSFER",
+        "externalRef": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
+        "customerInternalFee": 0,
+        "estimatedRoutingFee": 172,
+        "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5",
+        "lnInvoice": null,
+        "lnAddress": null,
+        "onchainTxid": "5c5df6db67a8fbe684d48560fe151a0ecfade509d640bd21b6a787707b972f62",
+        "onchainNetworkSpeed": "medium",
+        "createdAt": "2025-11-20T21:10:12.185Z",
+        "updatedAt": "2025-11-20T23:35:53.036Z"
+      }
+    }
+  }
+}
+```
+
+### Key Fields
+
+| Field | Description |
+|-------|-------------|
+| `paymentRef` | Unique reference for the payment link |
+| `paymentLink` | The checkout URL |
+| `callbackUrl` | Your registered callback URL |
+| `settlementCurrency` | The currency received (e.g., BTC) |
+| `transaction` | Full transaction details including `btcUsdMetadata` |
 
 ## Nigerian Naira (NGN) Webhooks
 
