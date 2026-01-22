@@ -8,9 +8,9 @@ When creating a quote, you must provide beneficiary information in the correct f
 
 ## Bitcoin (BTC)
 
-For Bitcoin payouts, you can use one of three methods: Lightning Network invoice, Lightning address, or on-chain address.
+For Bitcoin payouts, you can use one of three methods: Lightning Invoice, Lightning Address, or On-Chain Address.
 
-### Lightning Network Invoice
+### Lightning Invoice
 
 ```json
 {
@@ -20,41 +20,47 @@ For Bitcoin payouts, you can use one of three methods: Lightning Network invoice
 }
 ```
 
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `lnInvoice` | string | Yes | Lightning Network invoice for the payout |
+
+<Note>
+  The invoice must be valid and not expired when the payout is processed.
+</Note>
+
 ### Lightning Address
 
 ```json
 {
   "beneficiary": {
-    "lnAddress": "user@getalby.com"
+    "lnAddress": "user@wallet.com"
   }
 }
 ```
 
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `lnAddress` | string | Yes | Lightning address (email-like format) |
+
 ### On-Chain Address
+
+For on-chain Bitcoin payouts to a standard Bitcoin address:
 
 ```json
 {
   "beneficiary": {
-    "onChainAddress": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
+    "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5"
   }
 }
 ```
 
-### Fields
-
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `lnInvoice` | string | No* | Lightning Network invoice for the payout |
-| `lnAddress` | string | No* | Lightning address (e.g., user@domain.com) |
-| `onChainAddress` | string | No* | Bitcoin on-chain address (bech32, P2PKH, or P2SH) |
+| `onChainAddress` | string | Yes | Bitcoin address (legacy, P2SH, or native SegWit) |
 
-*One of these fields is required for BTC payouts.
-
-<Note>
-  - Lightning invoices must be valid and not expired when the payout is processed
-  - Lightning addresses provide a reusable payment destination
-  - On-chain addresses support standard Bitcoin address formats
-</Note>
+<Warning>
+  On-chain transactions have a minimum amount of **6000 SATs** and require blockchain confirmations. For faster, lower-fee payments, consider using Lightning.
+</Warning>
 
 ## Nigerian Naira (NGN)
 
