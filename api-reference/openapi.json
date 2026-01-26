@@ -3019,7 +3019,7 @@
             "type": "string",
             "format": "uri",
             "description": "The hosted payment page URL",
-            "example": "https://checkout.mavapay.co/9d1c20db-c46b-4a15-8233-1bb999e38195"
+            "example": "https://checkout.staging.mavapay.co/9d1c20db-c46b-4a15-8233-1bb999e38195"
           },
           "paymentRef": {
             "type": "string",
