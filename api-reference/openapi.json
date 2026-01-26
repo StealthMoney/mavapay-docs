@@ -2936,7 +2936,7 @@
           },
           "type": {
             "type": "string",
-            "enum": ["One_Time", "Recurring"],
+            "enum": ["One_Time"],
             "description": "Type of payment link",
             "example": "One_Time"
           },
@@ -2947,9 +2947,9 @@
           },
           "settlementCurrency": {
             "type": "string",
-            "enum": ["BTC"],
+            "enum": ["NGN, ZAR, BTC"],
             "description": "The currency to settle in",
-            "example": "BTC"
+            "example": "NGN, ZAR, BTC"
           },
           "settlementMethod": {
             "type": "string",
@@ -2965,39 +2965,102 @@
           },
           "paymentCurrency": {
             "type": "string",
-            "enum": ["NGN"],
+            "enum": ["NGN, ZAR, BTC"],
             "description": "The currency the user pays in",
-            "example": "NGN"
+            "example": "NGN, ZAR, BTC"
           },
           "paymentMethods": {
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["BANKTRANSFER"]
+              "enum": ["BANKTRANSFER, LIGHTNING"]
             },
-            "description": "Accepted payment methods. Currently only BANKTRANSFER is supported",
-            "example": ["BANKTRANSFER"]
+            "description": "Accepted payment methods. Currently only BANKTRANSFER and LIGHTNING are supported e.g for ZAR payment link, you can specify two payment methods [BANKTRANSFER, LIGHTNING]",
+            "example": ["BANKTRANSFER, LIGHTNING"]
           },
           "beneficiary": {
             "type": "object",
-            "description": "Beneficiary details for Bitcoin settlement",
-            "properties": {
-              "onChainAddress": {
-                "type": "string",
-                "description": "Bitcoin on-chain address for settlement (required for ONCHAIN settlementMethod)",
-                "example": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5"
+            "description": "Beneficiary details for settlement. Structure depends on settlement type: Bitcoin (on-chain or Lightning), NGN bank account, or ZAR bank account.",
+            "oneOf": [
+              {
+                "title": "Bitcoin Beneficiary",
+                "type": "object",
+                "description": "For BTC settlement via on-chain or Lightning",
+                "properties": {
+                  "onChainAddress": {
+                    "type": "string",
+                    "description": "Bitcoin on-chain address for settlement (required for ONCHAIN settlementMethod)",
+                    "example": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5"
+                  },
+                  "lnAddress": {
+                    "type": "string",
+                    "description": "Lightning address for settlement (for LIGHTNING settlementMethod)",
+                    "example": "user@getalby.com"
+                  },
+                  "lnInvoice": {
+                    "type": "string",
+                    "description": "Lightning invoice for settlement (for LIGHTNING settlementMethod)",
+                    "example": "lnbc..."
+                  }
+                }
               },
-              "lnAddress": {
-                "type": "string",
-                "description": "Lightning address for settlement (for LIGHTNING settlementMethod)",
-                "example": "user@getalby.com"
+              {
+                "title": "NGN Bank Beneficiary",
+                "type": "object",
+                "description": "For NGN settlement to a Nigerian bank account",
+                "properties": {
+                  "bankAccountNumber": {
+                    "type": "string",
+                    "description": "Nigerian bank account number",
+                    "example": "0149203789"
+                  },
+                  "bankAccountName": {
+                    "type": "string",
+                    "description": "Account holder name",
+                    "example": "John Doe"
+                  },
+                  "bankCode": {
+                    "type": "string",
+                    "description": "Nigerian bank code (NIP code)",
+                    "example": "000013"
+                  },
+                  "bankName": {
+                    "type": "string",
+                    "description": "Name of the bank",
+                    "example": "GTBANK PLC"
+                  }
+                },
+                "required": [
+                  "bankAccountNumber",
+                  "bankAccountName",
+                  "bankCode",
+                  "bankName"
+                ]
               },
-              "lnInvoice": {
-                "type": "string",
-                "description": "Lightning invoice for settlement (for LIGHTNING settlementMethod)",
-                "example": "lnbc..."
+              {
+                "title": "ZAR Bank Beneficiary",
+                "type": "object",
+                "description": "For ZAR settlement to a South African bank account",
+                "properties": {
+                  "bankAccountNumber": {
+                    "type": "string",
+                    "description": "South African bank account number",
+                    "example": "12077363256"
+                  },
+                  "bankName": {
+                    "type": "string",
+                    "description": "Name of the bank",
+                    "example": "FNB"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Account holder name",
+                    "example": "John Doe"
+                  }
+                },
+                "required": ["bankAccountNumber", "bankName", "name"]
               }
-            }
+            ]
           },
           "amount": {
             "type": "number",
@@ -3007,8 +3070,8 @@
           "callbackUrl": {
             "type": "string",
             "format": "uri",
-            "description": "URL to receive webhook notifications for this payment link",
-            "example": "https://your-app.com/callback"
+            "description": "Redirect URL where users are sent after payment completion",
+            "example": "https://your-app.com/payment-success"
           }
         }
       },
@@ -3054,8 +3117,8 @@
               "callbackUrl": {
                 "type": "string",
                 "format": "uri",
-                "description": "Webhook callback URL",
-                "example": "https://your-app.com/callback"
+                "description": "Redirect URL where users are sent after payment completion",
+                "example": "https://your-app.com/payment-success"
               },
               "settlementCurrency": {
                 "type": "string",
@@ -3122,7 +3185,7 @@
                   },
                   "targetAmount": {
                     "type": "number",
-                    "description": "Target amount in satoshis",
+                    "description": "Target amount in the settlement currency (lowest denomination)",
                     "example": 6034
                   }
                 }
@@ -3206,8 +3269,8 @@
           "callbackUrl": {
             "type": "string",
             "format": "uri",
-            "description": "Webhook callback URL",
-            "example": "https://mavapay.co/login"
+            "description": "Redirect URL where users are sent after payment completion",
+            "example": "https://your-app.com/payment-success"
           },
           "channel": {
             "type": "string",
