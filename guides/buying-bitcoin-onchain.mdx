@@ -124,6 +124,10 @@ const paymentInstructions = {
 
 Payment Links simplify the checkout process by creating a hosted payment page. Users can complete payments without your application handling the bank transfer details directly.
 
+<Card title="Payment Link API Reference" icon="link" href="/api-reference/endpoint/payment-link/create-payment-link">
+  View the complete API reference for creating and managing payment links.
+</Card>
+
 ### Key Constraints for On-Chain Payment Links
 
 | Parameter | Requirement |
@@ -234,12 +238,59 @@ Test the on-chain flow in staging without real funds.
 
 ### Step 1: Get the Order ID
 
-For Payment Links, retrieve the order ID:
+For Payment Links, retrieve the order ID from the payment link orders endpoint:
 
 ```bash
 curl -X GET "https://staging.api.mavapay.co/api/v1/paymentlink/orders?id={paymentRef}" \
   -H "x-api-key: <your-staging-key>"
 ```
+
+The response includes the payment link details and all associated orders:
+
+```json
+{
+    "status": "success",
+    "message": "paymentlink order details",
+    "data": {
+        "id": "7e644e02-e652-42d8-8857-e8ae46bccd59",
+        "name": "Bitcoin Purchase",
+        "description": "On-chain Bitcoin payment",
+        "type": "ONE_TIME",
+        "amount": "800000",
+        "settlementCurrency": "BTC",
+        "settlementMethod": "ONCHAIN",
+        "speed": "medium",
+        "paymentCurrency": "NGN",
+        "paymentMethods": ["BANKTRANSFER"],
+        "status": "ACTIVE",
+        "beneficiaryId": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5",
+        "orders": [
+            {
+                "id": "eb1377a8-5afd-4888-a702-d510d070466b",
+                "status": "EXPIRED",
+                "orderId": "49508-6205",
+                "paymentLinkId": "7e644e02-e652-42d8-8857-e8ae46bccd59",
+                "paymentMethod": "BANKTRANSFER",
+                "createdAt": "2026-01-09T12:36:25.924Z",
+                "updatedAt": "2026-01-09T12:47:10.254Z"
+            },
+            {
+                "id": "35a153c9-dff0-4cb5-a603-e494965ed6ad",
+                "status": "PENDING",
+                "orderId": "17454-1571",
+                "paymentLinkId": "7e644e02-e652-42d8-8857-e8ae46bccd59",
+                "paymentMethod": "BANKTRANSFER",
+                "createdAt": "2026-01-09T13:09:59.212Z",
+                "updatedAt": "2026-01-09T13:09:59.212Z"
+            }
+        ]
+    }
+}
+```
+
+<Note>
+  **Order Expiration**: When an order expires, a new order is automatically created for the payment link. Use the `orderId` from the order with `status: "PENDING"` for simulation.
+</Note>
 
 ### Step 2: Simulate Payment
 
@@ -429,6 +480,7 @@ async function buyBitcoinOnChain(satoshiAmount, userBitcoinAddress, speed = 'med
       paymentMethod: 'BANKTRANSFER',
       paymentCurrency: 'BTCSAT',
       autopayout: true,
+      speed: speed,
       beneficiary: {
         onChainAddress: userBitcoinAddress
       }
@@ -496,18 +548,24 @@ On-chain transactions require blockchain confirmations:
 The `estimatedRoutingFee` field shows the expected on-chain fee. Actual fees may vary based on network congestion.
 
 ### Address Validation
-Always validate Bitcoin addresses before creating quotes:
+Always validate Bitcoin addresses before creating quotes. Use a proper library like `bitcoinjs-lib` to validate addresses with checksum verification:
 
 ```javascript
+import * as bitcoin from 'bitcoinjs-lib'; //make sure the bitcoinjs-lib is installed
+
 function isValidBitcoinAddress(address) {
-  // Basic validation - supports legacy, segwit, and native segwit
-  const patterns = [
-    /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/,  // Legacy (1...) or P2SH (3...)
-    /^bc1[a-z0-9]{39,59}$/i                // Native SegWit (bc1...)
-  ];
-  return patterns.some(pattern => pattern.test(address));
+  try {
+    bitcoin.address.toOutputScript(address, bitcoin.networks.bitcoin);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 ```
+
+<Warning>
+  Avoid regex-based validation as it doesn't verify checksums and can accept invalid addresses. Always use a library that performs proper checksum validation.
+</Warning>
 
 ---
 
@@ -515,6 +573,7 @@ function isValidBitcoinAddress(address) {
 
 - [Buying Bitcoin (Lightning)](/guides/buying-bitcoin) - Lightning Network integration
 - [Create Quote API](/api-reference/endpoint/quote/get-quote) - API reference
+- [Create Payment Link API](/api-reference/endpoint/payment-link/create-payment-link) - Payment Link API reference
 - [Beneficiary Formats](/guides/beneficiary-formats) - All beneficiary object formats
 - [Webhook Examples](/webhooks/webhook-examples) - Complete webhook payloads
 - [Payment Simulation](/guides/simulation) - Testing in staging

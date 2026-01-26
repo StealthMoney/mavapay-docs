@@ -115,6 +115,14 @@
           ]
         },
         {
+          "group": "Payment Link",
+          "pages": [
+            "api-reference/endpoint/payment-link/create-payment-link",
+            "api-reference/endpoint/payment-link/get-payment-link-details",
+            "api-reference/endpoint/payment-link/get-payment-link-orders"
+          ]
+        },
+        {
           "group": "Wallet",
           "pages": ["api-reference/endpoint/wallet/get-wallets"]
         },
