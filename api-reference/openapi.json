@@ -1673,6 +1673,299 @@
           }
         }
       }
+    },
+    "/paymentlink": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Payment Link"],
+        "operationId": "createPaymentLink",
+        "summary": "Create a payment link",
+        "description": "Create a hosted payment link for collecting payments. Payment links simplify the checkout process by creating a hosted payment page where users can complete payments.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentLink"
+              },
+              "examples": {
+                "onChainPaymentLink": {
+                  "summary": "On-Chain Bitcoin Payment Link",
+                  "description": "Create a payment link for on-chain Bitcoin settlement",
+                  "value": {
+                    "name": "Bitcoin Purchase",
+                    "description": "On-chain Bitcoin payment",
+                    "type": "One_Time",
+                    "addFeeToTotalCost": false,
+                    "settlementCurrency": "BTC",
+                    "settlementMethod": "ONCHAIN",
+                    "speed": "medium",
+                    "paymentCurrency": "NGN",
+                    "paymentMethods": ["BANKTRANSFER"],
+                    "beneficiary": {
+                      "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5"
+                    },
+                    "amount": 800000,
+                    "callbackUrl": "https://your-app.com/callback"
+                  }
+                },
+                "lightningPaymentLink": {
+                  "summary": "Lightning Bitcoin Payment Link",
+                  "description": "Create a payment link for Lightning Network settlement",
+                  "value": {
+                    "name": "Lightning Payment",
+                    "description": "Lightning Bitcoin payment",
+                    "type": "One_Time",
+                    "addFeeToTotalCost": false,
+                    "settlementCurrency": "BTC",
+                    "settlementMethod": "LIGHTNING",
+                    "paymentCurrency": "NGN",
+                    "paymentMethods": ["BANKTRANSFER"],
+                    "beneficiary": {
+                      "lnAddress": "user@getalby.com"
+                    },
+                    "amount": 500000,
+                    "callbackUrl": "https://your-app.com/callback"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Payment link created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "payment link created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaymentLinkResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/paymentlink/details": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Payment Link"],
+        "operationId": "getPaymentLinkDetails",
+        "summary": "Get payment link details",
+        "description": "Retrieve details about a payment link for rendering a custom UI or checking payment status.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The payment link ID (paymentRef) to get details for",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "example": "9f8bf7da-f1d8-4c78-8f93-28eebe17c35e"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment link details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "payment link details"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaymentLinkDetails"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payment link not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/paymentlink/orders": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Payment Link"],
+        "operationId": "getPaymentLinkOrders",
+        "summary": "Get payment link orders",
+        "description": "Retrieve orders associated with a payment link. Useful for getting the order ID for payment simulation in staging.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The payment link ID (paymentRef) to get orders for",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "example": "9f8bf7da-f1d8-4c78-8f93-28eebe17c35e"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment link order details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "paymentlink order details"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaymentLinkOrderDetails"
+                    }
+                  }
+                },
+                "examples": {
+                  "paymentLinkOrdersResponse": {
+                    "summary": "Payment Link Orders Response",
+                    "value": {
+                      "status": "success",
+                      "message": "paymentlink order details",
+                      "data": {
+                        "id": "7e644e02-e652-42d8-8857-e8ae46bccd59",
+                        "name": "Small payment for Solomon",
+                        "description": "Small Payment for Demo Purposes",
+                        "type": "ONE_TIME",
+                        "amount": "2000000",
+                        "fee": null,
+                        "addFeeToTotalCost": false,
+                        "settlementCurrency": "BTC",
+                        "settlementMethod": "ONCHAIN",
+                        "speed": "medium",
+                        "paymentCurrency": "NGN",
+                        "paymentMethods": ["BANKTRANSFER"],
+                        "callbackUrl": "https://mavapay.co/login",
+                        "channel": "API",
+                        "status": "ACTIVE",
+                        "accountId": "1a0f79fb-0f3e-4b5b-98f1-1e14324ca62e",
+                        "expiresAt": null,
+                        "invoice": null,
+                        "companyLogo": null,
+                        "beneficiaryId": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5",
+                        "createdAt": "2026-01-09T12:36:09.582Z",
+                        "updatedAt": "2026-01-09T12:36:09.582Z",
+                        "orders": [
+                          {
+                            "id": "eb1377a8-5afd-4888-a702-d510d070466b",
+                            "status": "EXPIRED",
+                            "orderId": "49508-6205",
+                            "paymentLinkId": "7e644e02-e652-42d8-8857-e8ae46bccd59",
+                            "paymentMethod": "BANKTRANSFER",
+                            "createdAt": "2026-01-09T12:36:25.924Z",
+                            "updatedAt": "2026-01-09T12:47:10.254Z"
+                          },
+                          {
+                            "id": "35a153c9-dff0-4cb5-a603-e494965ed6ad",
+                            "status": "PENDING",
+                            "orderId": "17454-1571",
+                            "paymentLinkId": "7e644e02-e652-42d8-8857-e8ae46bccd59",
+                            "paymentMethod": "BANKTRANSFER",
+                            "createdAt": "2026-01-09T13:09:59.212Z",
+                            "updatedAt": "2026-01-09T13:09:59.212Z"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2619,6 +2912,474 @@
           }
         }
       },
+      "CreatePaymentLink": {
+        "type": "object",
+        "required": [
+          "name",
+          "settlementCurrency",
+          "settlementMethod",
+          "paymentCurrency",
+          "paymentMethods",
+          "beneficiary",
+          "amount"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name or title for the payment link",
+            "example": "Bitcoin Purchase"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the payment",
+            "example": "On-chain Bitcoin payment"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["One_Time"],
+            "description": "Type of payment link",
+            "example": "One_Time"
+          },
+          "addFeeToTotalCost": {
+            "type": "boolean",
+            "description": "Whether to add transaction fees to the total cost",
+            "example": false
+          },
+          "settlementCurrency": {
+            "type": "string",
+            "enum": ["NGN, ZAR, BTC"],
+            "description": "The currency to settle in",
+            "example": "NGN, ZAR, BTC"
+          },
+          "settlementMethod": {
+            "type": "string",
+            "enum": ["ONCHAIN", "LIGHTNING"],
+            "description": "Settlement method for Bitcoin. ONCHAIN for on-chain transactions, LIGHTNING for Lightning Network",
+            "example": "ONCHAIN"
+          },
+          "speed": {
+            "type": "string",
+            "enum": ["slow", "medium", "fast"],
+            "description": "Network fee priority for on-chain transactions. Required when settlementMethod is ONCHAIN",
+            "example": "medium"
+          },
+          "paymentCurrency": {
+            "type": "string",
+            "enum": ["NGN, ZAR, BTC"],
+            "description": "The currency the user pays in",
+            "example": "NGN, ZAR, BTC"
+          },
+          "paymentMethods": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["BANKTRANSFER, LIGHTNING"]
+            },
+            "description": "Accepted payment methods. Currently only BANKTRANSFER and LIGHTNING are supported e.g for ZAR payment link, you can specify two payment methods [BANKTRANSFER, LIGHTNING]",
+            "example": ["BANKTRANSFER, LIGHTNING"]
+          },
+          "beneficiary": {
+            "type": "object",
+            "description": "Beneficiary details for settlement. Structure depends on settlement type: Bitcoin (on-chain or Lightning), NGN bank account, or ZAR bank account.",
+            "oneOf": [
+              {
+                "title": "Bitcoin Beneficiary",
+                "type": "object",
+                "description": "For BTC settlement via on-chain or Lightning",
+                "properties": {
+                  "onChainAddress": {
+                    "type": "string",
+                    "description": "Bitcoin on-chain address for settlement (required for ONCHAIN settlementMethod)",
+                    "example": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5"
+                  },
+                  "lnAddress": {
+                    "type": "string",
+                    "description": "Lightning address for settlement (for LIGHTNING settlementMethod)",
+                    "example": "user@getalby.com"
+                  },
+                  "lnInvoice": {
+                    "type": "string",
+                    "description": "Lightning invoice for settlement (for LIGHTNING settlementMethod)",
+                    "example": "lnbc..."
+                  }
+                }
+              },
+              {
+                "title": "NGN Bank Beneficiary",
+                "type": "object",
+                "description": "For NGN settlement to a Nigerian bank account",
+                "properties": {
+                  "bankAccountNumber": {
+                    "type": "string",
+                    "description": "Nigerian bank account number",
+                    "example": "0149203789"
+                  },
+                  "bankAccountName": {
+                    "type": "string",
+                    "description": "Account holder name",
+                    "example": "John Doe"
+                  },
+                  "bankCode": {
+                    "type": "string",
+                    "description": "Nigerian bank code (NIP code)",
+                    "example": "000013"
+                  },
+                  "bankName": {
+                    "type": "string",
+                    "description": "Name of the bank",
+                    "example": "GTBANK PLC"
+                  }
+                },
+                "required": [
+                  "bankAccountNumber",
+                  "bankAccountName",
+                  "bankCode",
+                  "bankName"
+                ]
+              },
+              {
+                "title": "ZAR Bank Beneficiary",
+                "type": "object",
+                "description": "For ZAR settlement to a South African bank account",
+                "properties": {
+                  "bankAccountNumber": {
+                    "type": "string",
+                    "description": "South African bank account number",
+                    "example": "12077363256"
+                  },
+                  "bankName": {
+                    "type": "string",
+                    "description": "Name of the bank",
+                    "example": "FNB"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Account holder name",
+                    "example": "John Doe"
+                  }
+                },
+                "required": ["bankAccountNumber", "bankName", "name"]
+              }
+            ]
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount in the lowest denomination of the payment currency (e.g., kobo for NGN)",
+            "example": 800000
+          },
+          "callbackUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Redirect URL where users are sent after payment completion",
+            "example": "https://your-app.com/payment-success"
+          }
+        }
+      },
+      "PaymentLinkResponse": {
+        "type": "object",
+        "properties": {
+          "paymentLink": {
+            "type": "string",
+            "format": "uri",
+            "description": "The hosted payment page URL",
+            "example": "https://checkout.staging.mavapay.co/9d1c20db-c46b-4a15-8233-1bb999e38195"
+          },
+          "paymentRef": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique reference for the payment link",
+            "example": "9d1c20db-c46b-4a15-8233-1bb999e38195"
+          }
+        }
+      },
+      "PaymentLinkDetails": {
+        "type": "object",
+        "properties": {
+          "paymentLinkDetails": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Payment link ID",
+                "example": "9f8bf7da-f1d8-4c78-8f93-28eebe17c35e"
+              },
+              "name": {
+                "type": "string",
+                "description": "Name of the payment link",
+                "example": "Bitcoin Purchase"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of the payment",
+                "example": "On-chain Bitcoin payment"
+              },
+              "callbackUrl": {
+                "type": "string",
+                "format": "uri",
+                "description": "Redirect URL where users are sent after payment completion",
+                "example": "https://your-app.com/payment-success"
+              },
+              "settlementCurrency": {
+                "type": "string",
+                "description": "Settlement currency",
+                "example": "BTC"
+              },
+              "paymentLinkOrderId": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Associated order ID",
+                "example": "99366bb2-788f-4556-86db-d5063232a50a"
+              },
+              "paymentMethods": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": ["BANKTRANSFER"]
+              },
+              "account": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Business name",
+                    "example": "Your Business Name"
+                  },
+                  "logo": {
+                    "type": "string",
+                    "description": "Business logo URL",
+                    "example": ""
+                  }
+                }
+              },
+              "BANKTRANSFER": {
+                "type": "object",
+                "description": "Bank transfer payment details",
+                "properties": {
+                  "ngnAccountName": {
+                    "type": "string",
+                    "description": "Account name for bank transfer",
+                    "example": "Mava Digital Solutions Limited"
+                  },
+                  "ngnBankName": {
+                    "type": "string",
+                    "description": "Bank name",
+                    "example": "GLOBUS BANK"
+                  },
+                  "ngnBankAccountNumber": {
+                    "type": "string",
+                    "description": "Bank account number",
+                    "example": "3242569160"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "description": "Amount in lowest denomination",
+                    "example": 800000
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Expiration time for the payment",
+                    "example": "2025-11-20T20:47:41.528Z"
+                  },
+                  "targetAmount": {
+                    "type": "number",
+                    "description": "Target amount in the settlement currency (lowest denomination)",
+                    "example": 6034
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "PaymentLinkOrderDetails": {
+        "type": "object",
+        "description": "Complete payment link details including associated orders",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Payment link ID",
+            "example": "7e644e02-e652-42d8-8857-e8ae46bccd59"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the payment link",
+            "example": "Small payment for Solomon"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the payment",
+            "example": "Small Payment for Demo Purposes"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["ONE_TIME", "RECURRING"],
+            "description": "Type of payment link",
+            "example": "ONE_TIME"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount in lowest denomination of the payment currency",
+            "example": "2000000"
+          },
+          "fee": {
+            "type": "string",
+            "nullable": true,
+            "description": "Fee amount if applicable",
+            "example": null
+          },
+          "addFeeToTotalCost": {
+            "type": "boolean",
+            "description": "Whether fees are added to total cost",
+            "example": false
+          },
+          "settlementCurrency": {
+            "type": "string",
+            "description": "Currency for settlement",
+            "example": "BTC"
+          },
+          "settlementMethod": {
+            "type": "string",
+            "enum": ["ONCHAIN", "LIGHTNING"],
+            "description": "Settlement method",
+            "example": "ONCHAIN"
+          },
+          "speed": {
+            "type": "string",
+            "enum": ["slow", "medium", "fast"],
+            "description": "Network fee priority for on-chain transactions",
+            "example": "medium"
+          },
+          "paymentCurrency": {
+            "type": "string",
+            "description": "Currency the user pays in",
+            "example": "NGN"
+          },
+          "paymentMethods": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Accepted payment methods",
+            "example": ["BANKTRANSFER"]
+          },
+          "callbackUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Redirect URL where users are sent after payment completion",
+            "example": "https://your-app.com/payment-success"
+          },
+          "channel": {
+            "type": "string",
+            "description": "Channel through which payment link was created",
+            "example": "API"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ACTIVE", "INACTIVE", "EXPIRED"],
+            "description": "Payment link status",
+            "example": "ACTIVE"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Account ID of the payment link owner",
+            "example": "1a0f79fb-0f3e-4b5b-98f1-1e14324ca62e"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Expiration time of the payment link",
+            "example": null
+          },
+          "invoice": {
+            "type": "string",
+            "nullable": true,
+            "description": "Lightning invoice if applicable",
+            "example": null
+          },
+          "companyLogo": {
+            "type": "string",
+            "nullable": true,
+            "description": "Company logo URL",
+            "example": null
+          },
+          "beneficiaryId": {
+            "type": "string",
+            "description": "Beneficiary identifier (Bitcoin address or Lightning address)",
+            "example": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Payment link creation time",
+            "example": "2026-01-09T12:36:09.582Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Payment link last update time",
+            "example": "2026-01-09T12:36:09.582Z"
+          },
+          "orders": {
+            "type": "array",
+            "description": "List of orders associated with this payment link. A new order is created when a previous order expires.",
+            "items": {
+              "$ref": "#/components/schemas/PaymentLinkOrder"
+            }
+          }
+        }
+      },
+      "PaymentLinkOrder": {
+        "type": "object",
+        "description": "An order associated with a payment link",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique order identifier",
+            "example": "eb1377a8-5afd-4888-a702-d510d070466b"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "PAID", "EXPIRED", "FAILED"],
+            "description": "Order status",
+            "example": "PENDING"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "Order ID for tracking and simulation",
+            "example": "49508-6205"
+          },
+          "paymentLinkId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Associated payment link ID",
+            "example": "7e644e02-e652-42d8-8857-e8ae46bccd59"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "Payment method used",
+            "example": "BANKTRANSFER"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Order creation time",
+            "example": "2026-01-09T12:36:25.924Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Order last update time",
+            "example": "2026-01-09T12:47:10.254Z"
+          }
+        }
+      },
       "Signup": {
         "type": "object",
         "properties": {
@@ -2920,6 +3681,10 @@
     {
       "name": "Price",
       "description": "Price related endpoints"
+    },
+    {
+      "name": "Payment Link",
+      "description": "Payment Link endpoints for creating and managing hosted payment pages"
     }
   ]
 }

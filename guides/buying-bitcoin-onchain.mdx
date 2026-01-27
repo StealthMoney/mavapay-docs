@@ -1,0 +1,579 @@
+---
+title: 'Buying Bitcoin (On-Chain)'
+description: 'Complete guide to implementing on-chain Bitcoin purchase functionality with fiat currencies'
+---
+
+## Overview
+
+Mavapay allows your users to buy Bitcoin on-chain using Nigerian Naira (NGN). This guide covers two methods for on-chain Bitcoin purchases: **Quote Requests** and **Payment Links**.
+
+<Note>
+  **On-Chain vs Lightning:**
+  - **On-Chain**: Bitcoin is sent to a standard Bitcoin address. Transactions require block confirmations (slower, higher fees, but works with any Bitcoin wallet).
+  - **Lightning**: Bitcoin is sent via Lightning Network invoice or address (faster, lower fees). See [Buying Bitcoin (Lightning)](/guides/buying-bitcoin) for Lightning integration.
+</Note>
+
+<Warning>
+  **Minimum Amount**: The minimum amount for on-chain transactions is **6000 SATs**.
+</Warning>
+
+## Method 1: Using Quote Request
+
+Generate a quote to buy Bitcoin on-chain. This method allows you to lock in an exchange rate before the user makes payment.
+
+### Key Concepts
+
+| Parameter | Description |
+|-----------|-------------|
+| `sourceCurrency` | The currency the user pays with (e.g., `NGNKOBO`) |
+| `targetCurrency` | The currency to receive (e.g., `BTCSAT`) |
+| `paymentCurrency` | Determines what `amount` represents - set to `BTCSAT` to specify exact Bitcoin amount, or `NGNKOBO` to specify exact fiat amount |
+| `beneficiary.onChainAddress` | The Bitcoin address to receive the on-chain payment |
+
+### Create a Quote
+
+Request a quote specifying the on-chain address as the beneficiary:
+
+```bash
+curl -X POST https://api.mavapay.co/api/v1/quote \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <your-api-key>" \
+  -d '{
+    "amount": "6000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "BTCSAT",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "BTCSAT",
+    "speed": "medium",
+    "autopayout": true,
+    "beneficiary": {
+        "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5"
+    }
+}'
+```
+
+### Quote Response
+
+The response includes the amount to pay and bank details for the transfer:
+
+```json
+{
+    "status": "ok",
+    "data": {
+        "id": "7166a7d2-0615-4e86-b3f8-e20a29807390",
+        "exchangeRate": 1,
+        "usdToTargetCurrencyRate": 0.000011556485210588052,
+        "sourceCurrency": "NGNKOBO",
+        "targetCurrency": "BTCSAT",
+        "transactionFeesInSourceCurrency": 4458,
+        "transactionFeesInTargetCurrency": 30,
+        "amountInSourceCurrency": 820200,
+        "amountInTargetCurrency": 6000,
+        "paymentMethod": "BANKTRANSFER",
+        "expiry": "2025-11-20T20:05:02.652Z",
+        "isValid": true,
+        "invoice": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5",
+        "hash": "691f721731f71c0012df3342",
+        "totalAmountInSourceCurrency": 820200,
+        "customerInternalFee": 0,
+        "bankName": "GLOBUS BANK",
+        "ngnBankAccountNumber": "3242454461",
+        "ngnAccountName": "Mava Digital Solutions Limited",
+        "ngnBankCode": "000027",
+        "estimatedRoutingFee": 343,
+        "orderId": "54474-8334"
+    }
+}
+```
+
+### Response Fields
+
+| Field | Description |
+|-------|-------------|
+| `amountInSourceCurrency` | Amount to pay in kobo |
+| `amountInTargetCurrency` | Bitcoin amount in satoshis |
+| `bankName` | Bank name for the transfer |
+| `ngnBankAccountNumber` | Account number for the transfer |
+| `ngnAccountName` | Account name for the transfer |
+| `estimatedRoutingFee` | Estimated on-chain network fee in satoshis |
+| `orderId` | Order reference for tracking |
+| `expiry` | Quote expiration time |
+
+### Display Payment Instructions
+
+Show the user the bank account details:
+
+```javascript
+const quote = response.data;
+
+const paymentInstructions = {
+  bank: quote.bankName,
+  accountNumber: quote.ngnBankAccountNumber,
+  accountName: quote.ngnAccountName,
+  amount: quote.amountInSourceCurrency / 100, // Convert kobo to Naira
+  bitcoinAmount: quote.amountInTargetCurrency,
+  networkFee: quote.estimatedRoutingFee,
+  expiresAt: quote.expiry,
+  orderId: quote.orderId
+};
+```
+
+---
+
+## Method 2: Using Payment Links
+
+Payment Links simplify the checkout process by creating a hosted payment page. Users can complete payments without your application handling the bank transfer details directly.
+
+<Card title="Payment Link API Reference" icon="link" href="/api-reference/endpoint/payment-link/create-payment-link">
+  View the complete API reference for creating and managing payment links.
+</Card>
+
+### Key Constraints for On-Chain Payment Links
+
+| Parameter | Requirement |
+|-----------|-------------|
+| `settlementMethod` | Must be `"ONCHAIN"` |
+| `paymentMethods` | Only `["BANKTRANSFER"]` is supported |
+| `speed` | Required - controls network fee priority |
+| `settlementCurrency` | The target currency (e.g., `"BTC"`) |
+| `paymentCurrency` | The source currency (e.g., `"NGN"`) |
+
+### Speed Options
+
+The `speed` parameter determines the on-chain transaction fee and confirmation time:
+
+| Speed | Description |
+|-------|-------------|
+| `slow` | Lower fees, longer confirmation time |
+| `medium` | Balanced fees and confirmation time |
+| `fast` | Higher fees, faster confirmation |
+
+### Create a Payment Link
+
+```bash
+curl -X POST https://api.mavapay.co/api/v1/paymentlink \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <your-api-key>" \
+  -d '{
+    "name": "Bitcoin Purchase",
+    "description": "On-chain Bitcoin payment",
+    "type": "One_Time",
+    "addFeeToTotalCost": false,
+    "settlementCurrency": "BTC",
+    "settlementMethod": "ONCHAIN",
+    "speed": "medium",
+    "paymentCurrency": "NGN",
+    "paymentMethods": ["BANKTRANSFER"],
+    "beneficiary": {
+        "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5"
+    },
+    "amount": 800000,
+    "callbackUrl": "https://your-app.com/callback"
+}'
+```
+
+### Payment Link Response
+
+```json
+{
+    "status": "ok",
+    "message": "payment link created successfully",
+    "data": {
+        "paymentLink": "https://checkout.staging.mavapay.co/9d1c20db-c46b-4a15-8233-1bb999e38195",
+        "paymentRef": "9d1c20db-c46b-4a15-8233-1bb999e38195"
+    }
+}
+```
+
+### Get Payment Link Details
+
+Retrieve details about a payment link for rendering a custom UI:
+
+```bash
+curl -X GET "https://api.mavapay.co/api/v1/paymentlink/details?id=9f8bf7da-f1d8-4c78-8f93-28eebe17c35e" \
+  -H "x-api-key: <your-api-key>"
+```
+
+### Details Response
+
+```json
+{
+    "status": "ok",
+    "message": "payment link details",
+    "data": {
+        "paymentLinkDetails": {
+            "id": "9f8bf7da-f1d8-4c78-8f93-28eebe17c35e",
+            "name": "Bitcoin Purchase",
+            "description": "On-chain Bitcoin payment",
+            "callbackUrl": "https://your-app.com/callback",
+            "settlementCurrency": "BTC",
+            "paymentLinkOrderId": "99366bb2-788f-4556-86db-d5063232a50a",
+            "paymentMethods": ["BANKTRANSFER"],
+            "account": {
+                "name": "Your Business Name",
+                "logo": ""
+            },
+            "BANKTRANSFER": {
+                "ngnAccountName": "Mava Digital Solutions Limited",
+                "ngnBankName": "GLOBUS BANK",
+                "ngnBankAccountNumber": "3242569160",
+                "amount": 800000,
+                "expiresAt": "2025-11-20T20:47:41.528Z",
+                "targetAmount": 6034
+            }
+        }
+    }
+}
+```
+
+---
+
+## Testing & Simulation (Staging Only)
+
+Test the on-chain flow in staging without real funds.
+
+<Warning>
+  Simulation is only available in the **staging environment**: `https://staging.api.mavapay.co/api/v1`
+</Warning>
+
+### Step 1: Get the Order ID
+
+For Payment Links, retrieve the order ID from the payment link orders endpoint:
+
+```bash
+curl -X GET "https://staging.api.mavapay.co/api/v1/paymentlink/orders?id={paymentRef}" \
+  -H "x-api-key: <your-staging-key>"
+```
+
+The response includes the payment link details and all associated orders:
+
+```json
+{
+    "status": "success",
+    "message": "paymentlink order details",
+    "data": {
+        "id": "7e644e02-e652-42d8-8857-e8ae46bccd59",
+        "name": "Bitcoin Purchase",
+        "description": "On-chain Bitcoin payment",
+        "type": "ONE_TIME",
+        "amount": "800000",
+        "settlementCurrency": "BTC",
+        "settlementMethod": "ONCHAIN",
+        "speed": "medium",
+        "paymentCurrency": "NGN",
+        "paymentMethods": ["BANKTRANSFER"],
+        "status": "ACTIVE",
+        "beneficiaryId": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5",
+        "orders": [
+            {
+                "id": "eb1377a8-5afd-4888-a702-d510d070466b",
+                "status": "EXPIRED",
+                "orderId": "49508-6205",
+                "paymentLinkId": "7e644e02-e652-42d8-8857-e8ae46bccd59",
+                "paymentMethod": "BANKTRANSFER",
+                "createdAt": "2026-01-09T12:36:25.924Z",
+                "updatedAt": "2026-01-09T12:47:10.254Z"
+            },
+            {
+                "id": "35a153c9-dff0-4cb5-a603-e494965ed6ad",
+                "status": "PENDING",
+                "orderId": "17454-1571",
+                "paymentLinkId": "7e644e02-e652-42d8-8857-e8ae46bccd59",
+                "paymentMethod": "BANKTRANSFER",
+                "createdAt": "2026-01-09T13:09:59.212Z",
+                "updatedAt": "2026-01-09T13:09:59.212Z"
+            }
+        ]
+    }
+}
+```
+
+<Note>
+  **Order Expiration**: When an order expires, a new order is automatically created for the payment link. Use the `orderId` from the order with `status: "PENDING"` for simulation.
+</Note>
+
+### Step 2: Simulate Payment
+
+Use the order ID to simulate a bank transfer:
+
+```bash
+curl -X POST https://staging.api.mavapay.co/api/v1/simulation/pay-in \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <your-staging-key>" \
+  -d '{
+    "amount": 800000,
+    "currency": "NGN",
+    "orderId": "11110-0001"
+}'
+```
+
+<Note>
+  The `amount` is in the lowest denomination (kobo for NGN).
+</Note>
+
+---
+
+## Webhooks
+
+After a successful payment, your registered webhook endpoint receives events tracking the transaction through completion.
+
+### Event Flow
+
+1. **`payment.received`** - Fiat payment received from user
+2. **`payment.sent`** - Bitcoin sent on-chain (status: PENDING until 3 confirmations)
+3. **`payment_link.settled`** - Payment link transaction fully settled
+
+<Note>
+  On-chain withdrawals remain in `PENDING` status until there are **3 block confirmations**, after which a success event is sent.
+</Note>
+
+### payment_link.settled
+
+Sent when a Payment Link transaction is fully settled:
+
+```json
+{
+  "event": "payment_link.settled",
+  "data": {
+    "paymentRef": "1c50bb6a-9f49-493c-86b5-75a9e790f7c9",
+    "paymentLink": "https://checkout.mavapay.co/1c50bb6a-9f49-493c-86b5-75a9e790f7c9",
+    "callbackUrl": "https://your-app.com/callback",
+    "settlementCurrency": "BTC",
+    "paymentCurrency": "BTC",
+    "paymentMethod": "BANKTRANSFER",
+    "transaction": {
+      "id": "220b23dc-38f7-413c-b2d1-b7f765c50add",
+      "walletId": "40aa2b67-1498-449d-85f2-17b93eab2d74",
+      "ref": "19d4793744af1e9fc77cb64d374d6",
+      "hash": "691f836d4e7ce000125478be",
+      "amount": 6000,
+      "fees": 0,
+      "currency": "BTC",
+      "type": "WITHDRAWAL",
+      "status": "SUCCESS",
+      "autopayout": true,
+      "createdAt": "2025-11-20T21:10:12.180Z",
+      "updatedAt": "2025-11-20T23:35:52.986Z",
+      "btcUsdMetadata": {
+        "id": "b6d82314-0148-413e-bfad-ccd74a45969e",
+        "orderId": "44092-3881",
+        "paymentMethod": "BANKTRANSFER",
+        "externalRef": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
+        "customerInternalFee": 0,
+        "estimatedRoutingFee": 172,
+        "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5",
+        "lnInvoice": null,
+        "lnAddress": null,
+        "onchainTxid": "5c5df6db67a8fbe684d48560fe151a0ecfade509d640bd21b6a787707b972f62",
+        "onchainNetworkSpeed": "medium",
+        "createdAt": "2025-11-20T21:10:12.185Z",
+        "updatedAt": "2025-11-20T23:35:53.036Z"
+      }
+    }
+  }
+}
+```
+
+### payment.sent (On-Chain Withdrawal)
+
+Indicates the on-chain withdrawal has been processed:
+
+```json
+{
+  "event": "payment.sent",
+  "data": {
+    "id": "220b23dc-38f7-413c-b2d1-b7f765c50add",
+    "walletId": "40aa2b67-1498-449d-85f2-17b93eab2d74",
+    "ref": "19d4793744af1e9fc77cb64d374d6",
+    "hash": "691f836d4e7ce000125478be",
+    "amount": 6000,
+    "fees": 0,
+    "currency": "BTC",
+    "type": "WITHDRAWAL",
+    "status": "SUCCESS",
+    "autopayout": true,
+    "createdAt": "2025-11-20T21:10:12.180Z",
+    "updatedAt": "2025-11-20T23:35:52.986Z",
+    "btcUsdMetadata": {
+        "id": "b6d82314-0148-413e-bfad-ccd74a45969e",
+        "orderId": "44092-3881",
+        "paymentMethod": "BANKTRANSFER",
+        "externalRef": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
+        "customerInternalFee": 0,
+        "estimatedRoutingFee": 172,
+        "lnInvoice": null,
+        "lnAddress": null,
+        "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5",
+        "onchainTxid": "5c5df6db67a8fbe684d48560fe151a0ecfade509d640bd21b6a787707b972f62",
+        "onchainNetworkSpeed": "medium",
+        "createdAt": "2025-11-20T21:10:12.185Z",
+        "updatedAt": "2025-11-20T23:35:53.036Z"
+    }
+  }
+}
+```
+
+### On-Chain Specific Fields
+
+| Field | Description |
+|-------|-------------|
+| `onChainAddress` | The Bitcoin address that received the payment |
+| `onchainTxid` | The Bitcoin transaction ID (can be looked up on a block explorer) |
+| `onchainNetworkSpeed` | The speed setting used (`slow`, `medium`, `fast`) |
+
+### payment.received (Fiat Deposit)
+
+Indicates the fiat deposit has been received:
+
+```json
+{
+  "event": "payment.received",
+  "data": {
+    "id": "83ce7294-9127-4714-8de8-d173b42228f5",
+    "walletId": "40aa2b67-1498-449d-85f2-17b93eab2d74",
+    "ref": "944499859bb3f3d10e84bd0248b1e",
+    "hash": "691f85b24e7ce00012547906",
+    "amount": 6017,
+    "fees": 31,
+    "currency": "BTC",
+    "type": "DEPOSIT",
+    "status": "SUCCESS",
+    "autopayout": true,
+    "createdAt": "2025-11-20T21:20:24.474Z",
+    "updatedAt": "2025-11-20T21:20:24.474Z",
+    "btcUsdMetadata": {
+      "id": "997b6f65-b76c-4668-8722-7e97d37ccb3e",
+      "orderId": "25401-6132",
+      "externalRef": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
+      "customerInternalFee": 0,
+      "paymentMethod": "BANKTRANSFER",
+      "estimatedRoutingFee": 172,
+      "lnInvoice": null,
+      "lnAddress": null,
+      "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5",
+      "createdAt": "2025-11-20T21:10:12.185Z",
+      "updatedAt": "2025-11-20T23:35:53.036Z"
+    }
+  }
+}
+```
+
+---
+
+## Implementation Example
+
+### Complete On-Chain Purchase Flow
+
+```javascript
+async function buyBitcoinOnChain(satoshiAmount, userBitcoinAddress, speed = 'medium') {
+  // 1. Create quote with on-chain address
+  const quote = await fetch('https://api.mavapay.co/api/v1/quote', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.MAVAPAY_API_KEY
+    },
+    body: JSON.stringify({
+      amount: satoshiAmount.toString(),
+      sourceCurrency: 'NGNKOBO',
+      targetCurrency: 'BTCSAT',
+      paymentMethod: 'BANKTRANSFER',
+      paymentCurrency: 'BTCSAT',
+      autopayout: true,
+      speed: speed,
+      beneficiary: {
+        onChainAddress: userBitcoinAddress
+      }
+    })
+  });
+
+  const { data } = await quote.json();
+
+  // 2. Store quote and show bank details to user
+  await saveQuote(data.id, data.orderId);
+
+  return {
+    orderId: data.orderId,
+    bankName: data.bankName,
+    accountNumber: data.ngnBankAccountNumber,
+    accountName: data.ngnAccountName,
+    amountNaira: data.amountInSourceCurrency / 100,
+    bitcoinSats: data.amountInTargetCurrency,
+    networkFee: data.estimatedRoutingFee,
+    expiry: data.expiry
+  };
+}
+
+// 3. Handle webhooks
+app.post('/webhook', async (req, res) => {
+  const { event, data } = req.body;
+
+  switch (event) {
+    case 'payment.received':
+      await updateOrderStatus(data.btcUsdMetadata.orderId, 'payment_received');
+      await notifyUser('Payment received, sending Bitcoin on-chain...');
+      break;
+
+    case 'payment.sent':
+      if (data.btcUsdMetadata.onchainTxid) {
+        await updateOrderStatus(data.btcUsdMetadata.orderId, 'bitcoin_sent');
+        await notifyUser(`Bitcoin sent! TXID: ${data.btcUsdMetadata.onchainTxid}`);
+      }
+      break;
+
+    case 'payment_link.settled':
+      await updateOrderStatus(data.transaction.btcUsdMetadata.orderId, 'completed');
+      await notifyUser('Transaction confirmed on blockchain!');
+      break;
+  }
+
+  res.json({ received: true });
+});
+```
+
+---
+
+## Important Considerations
+
+### Minimum Amount
+On-chain transactions require a minimum of **6000 SATs** due to network dust limits and fees.
+
+### Confirmation Time
+On-chain transactions require blockchain confirmations:
+- `slow`: ~60+ minutes (1+ blocks)
+- `medium`: ~30-60 minutes
+- `fast`: ~10-30 minutes
+
+### Network Fees
+The `estimatedRoutingFee` field shows the expected on-chain fee. Actual fees may vary based on network congestion.
+
+### Address Validation
+Always validate Bitcoin addresses before creating quotes. Use a proper library like `bitcoinjs-lib` to validate addresses with checksum verification:
+
+```javascript
+import * as bitcoin from 'bitcoinjs-lib'; //make sure the bitcoinjs-lib is installed
+
+function isValidBitcoinAddress(address) {
+  try {
+    bitcoin.address.toOutputScript(address, bitcoin.networks.bitcoin);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+```
+
+<Warning>
+  Avoid regex-based validation as it doesn't verify checksums and can accept invalid addresses. Always use a library that performs proper checksum validation.
+</Warning>
+
+---
+
+## Related Resources
+
+- [Buying Bitcoin (Lightning)](/guides/buying-bitcoin) - Lightning Network integration
+- [Create Quote API](/api-reference/endpoint/quote/get-quote) - API reference
+- [Create Payment Link API](/api-reference/endpoint/payment-link/create-payment-link) - Payment Link API reference
+- [Beneficiary Formats](/guides/beneficiary-formats) - All beneficiary object formats
+- [Webhook Examples](/webhooks/webhook-examples) - Complete webhook payloads
+- [Payment Simulation](/guides/simulation) - Testing in staging

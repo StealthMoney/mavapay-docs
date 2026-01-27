@@ -91,6 +91,40 @@ POST /api/v1/simulation/pay-in
   For BTC simulations, the `amount` parameter is not required as it's determined by the Lightning invoice.
 </Note>
 
+## Payment Link Simulation
+
+For Payment Links (including on-chain Bitcoin purchases), you need to first retrieve the order ID.
+
+### Step 1: Get the Order ID
+
+Retrieve the order ID associated with your payment link:
+
+```bash
+curl -X GET "https://staging.api.mavapay.co/api/v1/paymentlink/orders?id={paymentRef}" \
+  -H "X-API-KEY: your_staging_api_key"
+```
+
+### Step 2: Simulate Payment
+
+Use the order ID to simulate the bank transfer:
+
+```bash
+curl -X POST https://staging.api.mavapay.co/api/v1/simulation/pay-in \
+  -H "Content-Type: application/json" \
+  -H "X-API-KEY: your_staging_api_key" \
+  -d '{
+    "amount": 800000,
+    "currency": "NGN",
+    "orderId": "11110-0001"
+}'
+```
+
+<Note>
+  For Payment Link simulations, use `orderId` instead of `quoteId`. The amount should match the payment link amount in kobo.
+</Note>
+
+---
+
 ## Complete Testing Flow
 
 ### Step 1: Create a Quote
