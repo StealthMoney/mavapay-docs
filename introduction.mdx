@@ -43,11 +43,18 @@ If you're ready to dive in, check out our quick start guides to get up and runni
 
 <CardGroup cols={2}>
   <Card
-    title="Accept Payments (coming soon)"
-    icon="palette"
-    href="#"
+    title="Buy Bitcoin (Lightning)"
+    icon="bolt"
+    href="/guides/buying-bitcoin"
   >
-    Learn how to accept payments with Mavapay (coming soon)
+    Accept fiat payments and deliver Bitcoin via Lightning Network
+  </Card>
+  <Card
+    title="Buy Bitcoin (On-Chain)"
+    icon="bitcoin"
+    href="/guides/buying-bitcoin-onchain"
+  >
+    Accept fiat payments and deliver Bitcoin to on-chain addresses
   </Card>
   <Card
     title="Verify Customers"
@@ -63,11 +70,39 @@ If you're ready to dive in, check out our quick start guides to get up and runni
   >
     Make near instant payouts to your customers
   </Card>
-  {/* <Card
-    title="Other Ways to use Mavapay"
-    icon="stars"
-    href="/collections/code"
+</CardGroup>
+
+## Guides
+
+Detailed guides and reference documentation to help you integrate Mavapay.
+
+<CardGroup cols={2}>
+  <Card
+    title="Quote Examples"
+    icon="file-code"
+    href="/guides/quote-examples"
   >
-    Check out our other products, plugins, libraries and integrations
-  </Card> */}
+    Request and response examples for all supported currency pairs
+  </Card>
+  <Card
+    title="Beneficiary Formats"
+    icon="user-check"
+    href="/guides/beneficiary-formats"
+  >
+    Required beneficiary object formats for each supported currency
+  </Card>
+  <Card
+    title="Name Enquiry Guide"
+    icon="building-columns"
+    href="/guides/name-enquiry-guide"
+  >
+    Validate Nigerian bank account details before creating quotes
+  </Card>
+  <Card
+    title="Payment Simulation"
+    icon="flask"
+    href="/guides/simulation"
+  >
+    Test payment flows in staging without real funds
+  </Card>
 </CardGroup>
