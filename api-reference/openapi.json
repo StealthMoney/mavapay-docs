@@ -2364,21 +2364,21 @@
           "sourceCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTCSAT"],
+            "enum": ["BTCSAT", "NGNKOBO", "KESCENT", "ZARCENT"],
             "default": "BTCSAT",
             "description": "The source currency for the quote"
           },
           "targetCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGNKOBO", "KESCENT", "ZARCENT"],
+            "enum": ["NGNKOBO", "KESCENT", "ZARCENT", "BTCSAT"],
             "default": "NGNKOBO",
             "description": "The local currency to convert the source currency to"
           },
           "paymentMethod": {
             "type": "string",
             "format": "string",
-            "enum": ["LIGHTNING"],
+            "enum": ["LIGHTNING", "BANKTRANSFER"],
             "default": "LIGHTNING",
             "description": "The payment method for the quote"
           },
