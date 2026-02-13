@@ -1,0 +1,200 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Mavapay",
+  "colors": {
+    "primary": "#F2B246",
+    "light": "#07C983",
+    "dark": "#F2B246"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "account-setup",
+              "development"
+            ]
+          },
+          {
+            "group": "Payouts",
+            "pages": [
+              "payouts/introduction",
+              "payouts/ngn-payout",
+              "payouts/zar-payout",
+              "payouts/kes-payout"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "pages": [
+              "webhooks/introduction",
+              "webhooks/webhook-examples"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/quote-examples",
+              "guides/beneficiary-formats",
+              "guides/name-enquiry-guide",
+              "guides/simulation",
+              "guides/buying-bitcoin",
+              "guides/buying-bitcoin-onchain",
+              "guides/internal-currency-swap"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Documentation",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/authentication",
+              "api-reference/errors"
+            ]
+          },
+          {
+            "group": "API Endpoints",
+            "pages": [
+              {
+                "group": "Price",
+                "pages": [
+                  "api-reference/endpoint/price/get-price"
+                ]
+              },
+              {
+                "group": "Bank Account",
+                "pages": [
+                  "api-reference/endpoint/bank-account/get-account",
+                  "api-reference/endpoint/bank-account/register-account"
+                ]
+              },
+              {
+                "group": "Bank Info",
+                "pages": [
+                  "api-reference/endpoint/bank-info/bank-code",
+                  "api-reference/endpoint/bank-info/name-enquiry"
+                ]
+              },
+              {
+                "group": "Order",
+                "pages": [
+                  "api-reference/endpoint/order/get-order-by-id",
+                  "api-reference/endpoint/order/get-all-orders"
+                ]
+              },
+              {
+                "group": "Quote",
+                "pages": [
+                  "api-reference/endpoint/quote/get-quote",
+                  "api-reference/endpoint/quote/validate-kes-identifier"
+                ]
+              },
+              {
+                "group": "Payment Link",
+                "pages": [
+                  "api-reference/endpoint/payment-link/create-payment-link",
+                  "api-reference/endpoint/payment-link/get-payment-link-details",
+                  "api-reference/endpoint/payment-link/get-payment-link-orders"
+                ]
+              },
+              {
+                "group": "Wallet",
+                "pages": [
+                  "api-reference/endpoint/wallet/get-wallets",
+                  "api-reference/endpoint/wallet/accept-quote"
+                ]
+              },
+              {
+                "group": "Withdraw",
+                "pages": [
+                  "api-reference/endpoint/withdraw/withdraw-fiat",
+                  "api-reference/endpoint/withdraw/withdraw-btc"
+                ]
+              },
+              {
+                "group": "Transaction",
+                "pages": [
+                  "api-reference/endpoint/transaction/get-transaction",
+                  "api-reference/endpoint/transaction/get-all-transactions"
+                ]
+              },
+              {
+                "group": "User",
+                "pages": [
+                  "api-reference/endpoint/user/get-user-profile"
+                ]
+              },
+              {
+                "group": "Webhook",
+                "pages": [
+                  "api-reference/endpoint/webhook/register-webhook",
+                  "api-reference/endpoint/webhook/update-webhook"
+                ]
+              },
+              {
+                "group": "Authentication",
+                "pages": [
+                  "api-reference/endpoint/auth/signup",
+                  "api-reference/endpoint/auth/signin",
+                  "api-reference/endpoint/auth/apikey",
+                  "api-reference/endpoint/auth/change-password"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Products",
+          "href": "https://app.mavapay.money",
+          "icon": "product-hunt"
+        },
+        {
+          "anchor": "Blog",
+          "href": "https://blog.mavapay.money",
+          "icon": "newspaper"
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/logo/mavapay-logo.png",
+    "dark": "/logo/mavapay-logo.png"
+  },
+  "api": {
+    "openapi": "api-reference/openapi.json"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:info@mavapay.co"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Sign up",
+      "href": "/api-reference/signup"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/mavapay",
+      "github": "https://github.com/mavapay",
+      "linkedin": "https://www.linkedin.com/company/mavapay"
+    }
+  }
+}
