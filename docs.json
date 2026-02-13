@@ -46,7 +46,8 @@
               "guides/simulation",
               "guides/buying-bitcoin",
               "guides/buying-bitcoin-onchain",
-              "guides/internal-currency-swap"
+              "guides/internal-currency-swap",
+              "guides/ngn-withdrawal"
             ]
           }
         ]
