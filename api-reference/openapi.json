@@ -750,6 +750,84 @@
         }
       }
     },
+    "/wallet/payout/{quoteId}/accept": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Wallet"],
+        "operationId": "acceptQuote",
+        "summary": "Accept Quote",
+        "description": "Accept a quote to perform an internal currency swap",
+        "parameters": [
+          {
+            "name": "quoteId",
+            "in": "path",
+            "description": "The ID of the quote to accept",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sourceWallet": {
+                    "type": "string",
+                    "description": "The source wallet currency (e.g., 'NGN')",
+                    "example": "NGN"
+                  }
+                },
+                "required": ["sourceWallet"]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful swap",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "quote is being processed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or expired quote",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/withdraw": {
       "post": {
         "security": [

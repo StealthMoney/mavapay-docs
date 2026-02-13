@@ -1,0 +1,97 @@
+---
+title: "Internal Currency Swap"
+description: "Learn how to perform an internal currency swap from NGN to BTC"
+---
+
+This guide outlines how to perform an internal currency swap from **NGNKOBO** (Naira Kobo) to **BTCSAT** (Bitcoin Satoshis) using the Mavapay API. This process allows you to convert funds directly from your internal NGN wallet balance.
+
+---
+
+## **Internal Swap Flow: NGN to BTC**
+
+Performing a swap is a two-step process: **Requesting a Quote** and **Accepting the Quote**.
+
+### **Step 1: Create a Swap Quote**
+
+The [quote endpoint](/api-reference/endpoint/quote/get-quote) calculates the exchange rate and fees. You must specify the amount in the lowest denomination (Kobo for NGN, Satoshis for BTC).
+
+#### **Scenario A: Swapping a specific NGN amount**
+
+If you want to spend exactly 2,000 NGN:
+
+* **Amount:** `200000` (2,000 * 100 kobo)
+* **Payment Currency:** `NGNKOBO`
+
+```bash
+curl --location 'https://api.mavapay.co/api/v1/quote' \
+--header 'Content-Type: application/json' \
+--header 'x-api-key: YOUR_API_KEY' \
+--data '{
+    "amount": "200000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "BTCSAT",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "NGNKOBO",
+    "autopayout": false
+}'
+```
+
+#### **Scenario B: Swapping for a specific BTC amount**
+
+If you need exactly 5,000 Satoshis:
+
+* **Amount:** `5000`
+* **Payment Currency:** `BTCSAT`
+
+### **Step 2: The Quote Response**
+
+Mavapay returns a quote object. Pay close attention to the `id` and the `amountInTargetCurrency`.
+The rate for the swap is returned in the quote i.e. the `usdToTragetCurrencyRate`.
+In the sample response below, you can get the USD/BTC and NGN/BTC rate by doing:
+
+BTC/USD = 1 / `usdToTargetCurrencyRate`
+
+NGNKOBO/BTCSAT = `amountInSourceCurrency` / `amountInTargetCurrency` (This is how much 1 SAT = x kobo).
+
+> **Note:** Quotes are typically valid for **5–10 minutes**. You must settle before the `expiry` timestamp.
+
+**Sample Response:**
+
+```json
+{
+    "status": "ok",
+    "data": {
+        "id": "985e2de2-0227-4348-8852-a7f9e3820e7c",
+        "usdToTargetCurrencyRate": 0.000015188346171836677",
+        "amountInSourceCurrency": 200000,
+        "amountInTargetCurrency": 2142,
+        "expiry": "2026-02-12T17:21:29.371Z",
+        "isValid": true
+        // ... other fields
+    }
+}
+```
+
+### **Step 3: Accept and Settle from Wallet**
+
+To finalize the swap, call the [accept endpoint](/api-reference/endpoint/wallet/accept-quote). This will immediately deduct the `amountInSourceCurrency` from your **NGN Internal Wallet** and credit the BTC to your account.
+
+* **Endpoint:** `.../wallet/payout/{quoteId}/accept`
+* **Payload:** Specify `NGN` as the `sourceWallet`.
+
+```bash
+curl --location 'https://api.mavapay.co/api/v1/wallet/payout/985e2de2-0227-4348-8852-a7f9e3820e7c/accept' \
+--header 'Content-Type: application/json' \
+--header 'x-api-key: YOUR_API_KEY' \
+--data '{
+    "sourceWallet": "NGN"
+}'
+```
+
+---
+
+## **Key Considerations**
+
+* **Denominations:** Always use the lowest unit.
+* **Sufficient Balance:** Ensure your internal NGN wallet has enough funds to cover the `totalAmountInSourceCurrency` (which includes fees).
+* **Rate Volatility:** Because BTC prices change rapidly, the quote `id` is short-lived. If it expires, you must generate a new quote.
