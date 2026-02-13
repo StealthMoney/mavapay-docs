@@ -808,7 +808,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Swap successful"
+                      "example": "quote is being processed"
                     }
                   }
                 }
