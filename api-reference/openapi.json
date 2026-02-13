@@ -762,7 +762,7 @@
         ],
         "tags": ["Wallet"],
         "operationId": "acceptQuote",
-        "summary": "Accept Quote",
+        "summary": "Accept Swap Quote",
         "description": "Accept a quote to perform an internal currency swap",
         "parameters": [
           {
