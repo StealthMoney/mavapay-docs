@@ -1,0 +1,91 @@
+---
+title: "NGN Withdrawal Workflow"
+description: "Learn how to perform NGN withdrawals using the Mavapay API"
+---
+
+This guide details the standard workflow for performing an NGN withdrawal to a local bank account using the Mavapay API. To ensure successful processing, you must follow the verification-payout sequence strictly.
+
+---
+
+## **The NGN Withdrawal Workflow**
+
+### **Step 1: Fetch and Cache Bank List**
+
+Before initiating a withdrawal, you need the list of supported Nigerian banks. Each bank has a unique `nipBankCode` required for the next steps.
+
+> **Note:** It is highly recommended to **cache this list** for 24 hours to reduce latency and API calls.
+
+You can use the [Get Bank Code](/api-reference/endpoint/bank-info/bank-code) endpoint to retrieve this list.
+
+```bash
+curl --location 'https://api.mavapay.co/api/v1/bank/bankcode?country=NG' \
+--header 'x-api-key: YOUR_API_KEY'
+```
+
+**Response Sample:**
+
+```json
+{
+    "status": "ok",
+    "data": [
+        {
+            "bankName": "GTBANK PLC",
+            "nipBankCode": "000013"
+        }
+    ]
+}
+```
+
+---
+
+### **Step 2: Bank Account Verification (Name Enquiry)**
+
+Once a user provides their bank account number and selects a bank name, you must verify the details using the [Name Enquiry](/api-reference/endpoint/bank-info/name-enquiry) endpoint. This step confirms the recipient's identity and provides the exact name required by the clearing system.
+
+```bash
+# Replace bankCode with the nipBankCode from Step 1
+curl --location 'https://api.mavapay.co/api/v1/bank/name-enquiry?accountNumber=0149203789&bankCode=000013' \
+--header 'x-api-key: YOUR_API_KEY'
+```
+
+**Critical Requirement:**
+You must receive a `status: "ok"` and a `200` response before proceeding. Store the `accountName` returned exactly as it appears.
+
+---
+
+### **Step 3: Initiate Withdrawal**
+
+With the verified details, you can now trigger the payout using the [Withdraw Fiat](/api-reference/endpoint/withdraw/withdraw-fiat) endpoint. Use the exact data returned from the Name Enquiry endpoint to avoid validation errors.
+
+```bash
+curl --location 'https://api.mavapay.co/api/v1/withdraw' \
+--header 'Content-Type: application/json' \
+--header 'x-api-key: YOUR_API_KEY' \
+--data '{
+    "amount": "100000",
+    "currency": "NGN",
+    "beneficiary": {
+        "bankAccountNumber": "0123456789",
+        "bankAccountName": "JOHN DOE",
+        "bankCode": "000013",
+        "bankName": "GTBANK PLC"
+    }
+}'
+```
+
+---
+
+## **Important Implementation Notes**
+
+* **Exact Matching:** The `bankCode`, `bankName`, and `bankAccountName` must match the Name Enquiry response **character-for-character**. A single extra space or a missing period will cause the request to fail.
+* **Currency Denomination:** Ensure you verify if the amount is in Kobo or Naira. For this endpoint, `100000` is typically evaluated as **1,000.00 NGN** (Kobo denomination).
+* **Instant Settlement:** Withdrawals are processed instantly via NIP (NIBSS Instant Payment).
+* **Webhooks:** Mavapay will send a webhook notification to your configured URL once the transaction reaches a final state (`SUCCESS`, `PENDING` or `FAILED`).
+
+### **Error Checklist**
+
+| Error Scenario | Likely Cause |
+| --- | --- |
+| **Name Mismatch** | The name sent in the withdrawal does not match the bank's record. |
+| **Invalid Bank Code** | You used the NGN bank code instead of the specific NIP code. |
+| **Insufficient Balance** | Your internal Mavapay NGN wallet does not have enough funds for the payout + fees. |

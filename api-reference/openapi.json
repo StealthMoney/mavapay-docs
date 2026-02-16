@@ -841,32 +841,66 @@
         "tags": ["Withdraw"],
         "operationId": "withdraw",
         "summary": "Withdraw fiat",
-        "description": "Withdraw funds to a bank account",
+        "description": "Withdraw funds to a bank account. The amount is specified in the lowest denomination of the currency (e.g., Kobo for NGN). You must first verify the bank account using the Name Enquiry endpoint before initiating a withdrawal.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": ["amount", "currency", "beneficiary"],
                 "properties": {
                   "amount": {
-                    "type": "number",
-                    "format": "number",
-                    "example": 1000
+                    "type": "string",
+                    "description": "The amount to withdraw in the lowest denomination (e.g., Kobo for NGN). For example, 100000 = 1,000.00 NGN",
+                    "example": "100000"
                   },
                   "currency": {
                     "type": "string",
-                    "format": "string",
-                    "enum": ["NGN", "KES", "BTC", "USD"]
+                    "description": "The currency to withdraw",
+                    "enum": ["NGN"]
                   },
-                  "bankAccountNumber": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "0123456789"
-                  },
-                  "walletId": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "d1614a76-9c7f-4111-98a7-43199f307e5b"
+                  "beneficiary": {
+                    "type": "object",
+                    "description": "The beneficiary bank account details. Use the exact values returned from the Name Enquiry endpoint.",
+                    "required": ["bankAccountNumber", "bankAccountName", "bankCode", "bankName"],
+                    "properties": {
+                      "bankAccountNumber": {
+                        "type": "string",
+                        "description": "The recipient's bank account number",
+                        "example": "0123456789"
+                      },
+                      "bankAccountName": {
+                        "type": "string",
+                        "description": "The account holder's name as returned by the Name Enquiry endpoint. Must match exactly.",
+                        "example": "JOHN DOE"
+                      },
+                      "bankCode": {
+                        "type": "string",
+                        "description": "The NIP bank code (nipBankCode) from the bank list",
+                        "example": "000013"
+                      },
+                      "bankName": {
+                        "type": "string",
+                        "description": "The bank name as returned from the bank list",
+                        "example": "GTBANK PLC"
+                      }
+                    }
+                  }
+                }
+              },
+              "examples": {
+                "withdrawNgn": {
+                  "summary": "Withdraw NGN to Bank Account",
+                  "description": "Withdraw Nigerian Naira to a verified bank account",
+                  "value": {
+                    "amount": "100000",
+                    "currency": "NGN",
+                    "beneficiary": {
+                      "bankAccountNumber": "0123456789",
+                      "bankAccountName": "JOHN DOE",
+                      "bankCode": "000013",
+                      "bankName": "GTBANK PLC"
+                    }
                   }
                 }
               }
