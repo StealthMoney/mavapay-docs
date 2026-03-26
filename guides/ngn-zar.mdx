@@ -24,19 +24,7 @@ curl --location 'https://api.mavapay.co/api/v1/bank/bankcode?country=ZA' \
 **Response:**
 
 ```json
-{
-  "status": "ok",
-  "data": [
-    {
-      "bankName": "CAPITEC BANK",
-      "nipBankCode": "470010"
-    },
-    {
-      "bankName": "STANDARD BANK",
-      "nipBankCode": "051001"
-    }
-  ]
-}
+{"status":"ok","message":"all bank codes","data":["ABSA","ACCESS BANK","AFRICAN BANK","ALBARAKA BANK","BANK ZERO MUTUAL BANK","BIDVEST BANK","CAPITEC BANK","CAPITEC BUSINESS BANK","DISCOVERY BANK","FINBOND EPE","FINBOND MUTUAL BANK","FNB","INVESTEC BANK LIMITED","NEDBANK","STANDARD BANK","TYMEBANK","UBANK LTD"]}
 ```
 
 <Note>
@@ -54,14 +42,7 @@ curl --location 'https://api.mavapay.co/api/v1/price/ticker?pair=zarngn'
 **Response:**
 
 ```json
-{
-  "status": "ok",
-  "data": {
-    "pair": "zarngn",
-    "ask": 1213825,
-    "bid": 1210000
-  }
-}
+{"status":"ok","data":{"ask":84.19,"bid":81.77,"timestamp":1774510841364,"meta":{"pair":"ZARNGN","payoutMethods":["BANKTRANSFER"],"collectionMethods":["BANKTRANSFER","LIGHTNING"],"unitPricePerUsd":{"ask":{},"bid":{}},"unitPricePerSat":{"ask":{},"bid":{}},"fees":{"ask":{"fee":0,"minFee":0,"maxFee":null,"feePercentage":0},"bid":{"fee":0,"minFee":0,"maxFee":null,"feePercentage":0}}}}}
 ```
 
 <Note>
@@ -135,16 +116,26 @@ The response includes a virtual NGN bank account for you to fund the transfer:
   "data": {
     "id": "18e2c0f8-a81e-46e1-ad9d-83381b79b62b",
     "exchangeRate": 1213825,
+    "usdToTargetCurrencyRate": 16.93315176,
     "sourceCurrency": "NGNKOBO",
     "targetCurrency": "ZARCENT",
+    "transactionFeesInSourceCurrency": 2830,
+    "transactionFeesInTargetCurrency": 19,
     "amountInSourceCurrency": 500000,
     "amountInTargetCurrency": 3983,
-    "totalAmountInSourceCurrency": 500000,
-    "ngnBankAccountNumber": "6167623224",
-    "ngnBankName": "Wema Bank",
-    "ngnAccountName": "Mava Digital Solutions Limited",
+    "paymentMethod": "BANKTRANSFER",
+    "expiry": "2026-03-25T13:07:50.483Z",
+    "isValid": true,
+    "invoice": "",
     "hash": "69c3dbce8c054100124b86d1",
-    "expiry": "2026-03-25T13:07:50.483Z"
+    "totalAmountInSourceCurrency": 500000,
+    "customerInternalFee": 0,
+    "bankName": "wema",
+    "ngnBankAccountNumber": "6167623224",
+    "ngnAccountName": "Mava Digital Solutions Limited",
+    "ngnBankCode": "000017",
+    "orderId": "38601-7270"
+
   }
 }
 ```
@@ -293,63 +284,6 @@ Rates update frequently. Create a fresh quote each time — don't cache quotes f
 
 ### Autopayout Requirement
 ZAR payouts **must** have `autopayout: true`. Unlike NGN or BTC flows, there is no manual wallet option for Rand.
-
-## Implementation Example
-
-```javascript
-async function sendNgntoZar(amountNaira, beneficiary) {
-  const quote = await fetch('https://api.mavapay.co/api/v1/quote', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.MAVAPAY_API_KEY
-    },
-    body: JSON.stringify({
-      amount: (amountNaira * 100).toString(), // Convert to kobo
-      sourceCurrency: 'NGNKOBO',
-      targetCurrency: 'ZARCENT',
-      paymentMethod: 'BANKTRANSFER',
-      paymentCurrency: 'NGNKOBO',
-      autopayout: true,
-      beneficiary: {
-        name: beneficiary.name,
-        bankName: beneficiary.bankName,
-        bankAccountNumber: beneficiary.accountNumber
-      }
-    })
-  });
-
-  const { data } = await quote.json();
-
-  return {
-    id: data.id,
-    hash: data.hash,
-    bankName: data.ngnBankName,
-    accountNumber: data.ngnBankAccountNumber,
-    accountName: data.ngnAccountName,
-    amountToPay: data.totalAmountInSourceCurrency / 100, // Convert to Naira
-    recipientGets: data.amountInTargetCurrency / 100,    // Convert to Rand
-    expiry: data.expiry
-  };
-}
-
-// Handle webhooks
-app.post('/webhook', async (req, res) => {
-  const { event, data } = req.body;
-
-  if (event === 'payment.received') {
-    await updateOrderStatus(data.hash, 'payment_received');
-    await notifyUser('NGN received, processing ZAR payout...');
-  }
-
-  if (event === 'payment.sent') {
-    await updateOrderStatus(data.hash, 'completed');
-    await notifyUser('Rand sent to recipient!');
-  }
-
-  res.json({ received: true });
-});
-```
 
 ## Related Resources
 
