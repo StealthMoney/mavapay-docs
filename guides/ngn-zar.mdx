@@ -1,0 +1,324 @@
+---
+title: 'NGN to ZAR'
+description: 'Complete guide to sending Nigerian Naira to South African Rand bank accounts using the Mavapay API'
+---
+
+## Overview
+
+Mavapay allows you to send Nigerian Naira (NGN) to South African bank accounts in Rand (ZAR). This guide walks you through fetching supported banks, getting exchange rates, creating quotes, and tracking payouts.
+
+<Note>
+  ZAR payouts require `autopayout: true`. Unlike NGN or BTC flows, there is no manual payout option — funds are sent directly to the beneficiary's bank account.
+</Note>
+
+## Integration Flow
+
+### Step 1: Fetch Supported South African Banks
+
+Before initiating a payout, retrieve the list of supported South African banks. Use the country ISO code `ZA`.
+
+```bash
+curl --location 'https://api.mavapay.co/api/v1/bank/bankcode?country=ZA' \
+```
+
+**Response:**
+
+```json
+{"status":"ok","message":"all bank codes","data":["ABSA","ACCESS BANK","AFRICAN BANK","ALBARAKA BANK","BANK ZERO MUTUAL BANK","BIDVEST BANK","CAPITEC BANK","CAPITEC BUSINESS BANK","DISCOVERY BANK","FINBOND EPE","FINBOND MUTUAL BANK","FNB","INVESTEC BANK LIMITED","NEDBANK","STANDARD BANK","TYMEBANK","UBANK LTD"]}
+```
+
+<Note>
+  Cache the bank list for 24 hours as this list rarely changes.
+</Note>
+
+### Step 2: Get the Exchange Rate (Optional)
+
+Use the price ticker endpoint to preview the current rate before creating a quote. The `ask` price reflects the rate for sending 1 Rand using NGN.
+
+```bash
+curl --location 'https://api.mavapay.co/api/v1/price/ticker?pair=zarngn'
+```
+
+**Response:**
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "ask": 84.12,
+    "bid": 81.69,
+    "timestamp": 1774509048809,
+    "meta": {
+      "pair": "ZARNGN",
+      "payoutMethods": ["BANKTRANSFER"],
+      "collectionMethods": ["BANKTRANSFER", "LIGHTNING"],
+      "fees": {
+        "ask": { "fee": 0, "minFee": 0, "maxFee": null, "feePercentage": 0 },
+        "bid": { "fee": 0, "minFee": 0, "maxFee": null, "feePercentage": 0 }
+      }
+    }
+  }
+}
+```
+
+<Note>
+  The rate is returned as the price of **1 Rand to Nigerian Naira**.  Use the ticker for indicative pricing only.
+</Note>
+
+### Step 3: Create a Quote
+
+Create a quote to lock in the exchange rate and receive a virtual NGN bank account to fund the transfer. The quote is valid for 10 minutes after which the virtual account number expires.
+
+#### Understanding Payment Currency
+
+The `paymentCurrency` parameter determines what the `amount` field represents:
+
+- **`paymentCurrency: "NGNKOBO"`** → amount is in Naira (you're specifying how much Naira to send)
+- **`paymentCurrency: "ZARCENT"`** → amount is in Rand (you're specifying how much the recipient should receive)
+
+#### Option A: Send a Specific NGN Amount
+
+When you want to send exactly ₦5,000:
+
+```bash
+curl --location 'https://api.mavapay.co/api/v1/quote' \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: <your-api-key>' \
+  --data '{
+    "amount": "500000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "ZARCENT",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "NGNKOBO",
+    "autopayout": true,
+    "beneficiary": {
+      "name": "John Doe",
+      "bankName": "STANDARD BANK",
+      "bankAccountNumber": "123456789"
+    }
+  }'
+```
+
+#### Option B: Recipient Gets a Specific ZAR Amount
+
+When the recipient should receive exactly R500:
+
+```bash
+curl --location 'https://api.mavapay.co/api/v1/quote' \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: <your-api-key>' \
+  --data '{
+    "amount": "50000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "ZARCENT",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "ZARCENT",
+    "autopayout": true,
+    "beneficiary": {
+      "name": "John Doe",
+      "bankName": "CAPITEC BANK",
+      "bankAccountNumber": "987654321"
+    }
+  }'
+```
+
+### Step 4: Review the Quote Response
+
+The response includes a virtual NGN bank account for you to fund the transfer:
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "18e2c0f8-a81e-46e1-ad9d-83381b79b62b",
+    "exchangeRate": 1213825,
+    "usdToTargetCurrencyRate": 16.93315176,
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "ZARCENT",
+    "transactionFeesInSourceCurrency": 2830,
+    "transactionFeesInTargetCurrency": 19,
+    "amountInSourceCurrency": 500000,
+    "amountInTargetCurrency": 3983,
+    "paymentMethod": "BANKTRANSFER",
+    "expiry": "2026-03-25T13:07:50.483Z",
+    "isValid": true,
+    "invoice": "",
+    "hash": "69c3dbce8c054100124b86d1",
+    "totalAmountInSourceCurrency": 500000,
+    "customerInternalFee": 0,
+    "bankName": "wema",
+    "ngnBankAccountNumber": "6167623224",
+    "ngnAccountName": "Mava Digital Solutions Limited",
+    "ngnBankCode": "000017",
+    "orderId": "38601-7270"
+
+  }
+}
+```
+
+**Key Fields:**
+
+| Field | Description |
+|-------|-------------|
+| `ngnBankAccountNumber` | The virtual account to transfer Naira to |
+| `ngnBankName` | Bank name for the virtual account |
+| `ngnAccountName` | Account name on the virtual account |
+| `totalAmountInSourceCurrency` | Exact amount in Kobo to transfer (includes fees) |
+| `amountInTargetCurrency` | Amount in Cents the recipient will receive |
+| `exchangeRate` | BTC-ZAR exchange rate applied |
+| `hash` | Transaction hash for tracking |
+| `expiry` | Quote expiration timestamp |
+
+### Step 5: Make the NGN Transfer
+
+Transfer the exact `totalAmountInSourceCurrency` (in Kobo) to the provided `ngnBankAccountNumber`.
+
+<Warning>
+  You must send the **exact amount** shown in the quote. Partial payments are automatically rejected and refunded.
+</Warning>
+
+### Step 6: Track Payment Status
+
+You'll receive webhooks as the transaction progresses:
+
+1. **`payment.received`** — Naira transfer confirmed
+2. **`payment.sent`** — Rand disbursed to the beneficiary's bank account
+
+```json
+// payment.received
+{
+  "event": "payment.received",
+  "data": {
+    "id": "18e2c0f8-a81e-46e1-ad9d-83381b79b62b",
+    "hash": "69c3dbce8c054100124b86d1",
+    "currency": "ZAR",
+    "type": "DEPOSIT",
+    "status": "SUCCESS",
+    ...
+  }
+}
+```
+
+```json
+// payment.sent
+{
+  "event": "payment.sent",
+  "data": {
+    "id": "18e2c0f8-a81e-46e1-ad9d-83381b79b62b",
+    "hash": "69c3dbce8c054100124b86d1",
+    "currency": "ZAR",
+    "type": "WITHDRAWAL",
+    "status": "SUCCESS",
+    ...
+  }
+}
+```
+
+You can also manually check the transaction status using the `hash`:
+
+```bash
+curl --location 'https://api.mavapay.co/api/v1/transaction?hash=<transaction-hash>' \
+  --header 'x-api-key: <your-api-key>'
+```
+
+## Beneficiary Format
+
+The ZAR beneficiary object requires three fields:
+
+```json
+{
+  "beneficiary": {
+    "name": "John Doe",
+    "bankName": "CAPITEC BANK",
+    "bankAccountNumber": "1325558779"
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Beneficiary's full name |
+| `bankName` | string | Yes | South African bank name (use exact name from bank list) |
+| `bankAccountNumber` | string | Yes | South African bank account number |
+
+<Warning>
+  Bank account validation is not currently available for ZAR. Ensure account details are correct before creating a quote.
+</Warning>
+
+## Testing in Staging
+
+Test your integration without real funds using the staging environment:
+
+```
+https://staging.api.mavapay.co/api/v1
+```
+
+Use the [Simulation endpoint](/guides/simulation) to test payment flows:
+
+```bash
+# Step 1: Create a quote in staging
+curl --location 'https://staging.api.mavapay.co/api/v1/quote' \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: <your-staging-key>' \
+  --data '{
+    "amount": "300000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "ZARCENT",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "NGNKOBO",
+    "autopayout": true,
+    "beneficiary": {
+      "name": "test merchant 1",
+      "bankName": "CAPITEC BANK",
+      "bankAccountNumber": "1325558779"
+    }
+  }'
+
+# Step 2: Simulate the NGN payment
+curl -X POST https://staging.api.mavapay.co/api/v1/simulation/pay-in \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: <your-staging-key>' \
+  --data '{
+    "currency": "NGN",
+    "quoteId": "<quote-id>",
+    "amount": 300000
+  }'
+```
+
+## Important Considerations
+
+### Currency Denominations
+All amounts are in the lowest denomination:
+- **NGNKOBO**: 100 Kobo = ₦1 (so `500000` = ₦5,000)
+- **ZARCENT**: 100 Cents = R1 (so `50000` = R500)
+
+### Quote Expiration
+Quotes expire after approximately **10 minutes**. Display a countdown timer and prompt users to transfer quickly.
+
+### Exchange Rate Volatility
+Rates update frequently. Create a fresh quote each time — don't cache quotes for long periods.
+
+### Autopayout Requirement
+ZAR payouts **must** have `autopayout: true`. Unlike NGN or BTC flows, there is no manual wallet option for Rand.
+
+## Related Resources
+
+- [Create Quote API](/api-reference/endpoint/quote/get-quote) - Interactive API documentation
+- [Beneficiary Formats](/guides/beneficiary-formats) - Required formats for all currencies
+- [Webhook Examples](/webhooks/webhook-examples) - Complete webhook payloads
+- [Payment Simulation](/guides/simulation) - Testing in staging
+- [Quote Examples](/guides/quote-examples) - Examples for all currency pairs
+
+## FAQ
+
+**Q: What is the minimum amount for NGN to ZAR?**
+A: Minimum amount is 50 Rands.
+
+**Q: How long does the ZAR payout take?**
+A: Payouts are typically processed within minutes of the NGN transfer being confirmed.
+
+**Q: Can I cancel a quote after creating it?**
+A: Quotes expire automatically. If no transfer is made, the quote simply lapses.
+
+**Q: What happens if I send the wrong amount?**
+A: Partial or incorrect payments are not automatically processed. Contact support with the `hash` for manual handling.
