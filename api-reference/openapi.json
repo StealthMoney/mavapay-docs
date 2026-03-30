@@ -128,7 +128,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "array",
@@ -187,7 +187,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "$ref": "#/components/schemas/BankAccount"
@@ -347,7 +347,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "$ref": "#/components/schemas/Order"
@@ -395,7 +395,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "array",
@@ -515,7 +515,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "$ref": "#/components/schemas/Quote"
@@ -724,7 +724,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "array",
@@ -804,7 +804,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "message": {
                       "type": "string",
@@ -924,7 +924,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "object",
@@ -995,7 +995,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "object",
@@ -1066,7 +1066,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "object",
@@ -1137,7 +1137,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "object",
@@ -1218,7 +1218,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "$ref": "#/components/schemas/TransactionResponse"
@@ -1461,7 +1461,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "$ref": "#/components/schemas/User"
@@ -1512,7 +1512,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "message": {
                       "type": "string",
@@ -1713,7 +1713,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "message": {
                       "type": "string",
@@ -1772,7 +1772,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "object",
@@ -2004,7 +2004,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "message": {
                       "type": "string",
