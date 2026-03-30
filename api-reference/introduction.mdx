@@ -1,22 +1,28 @@
 ---
-title: 'Introduction'
-description: 'Learn how to integrate our APIs into your application.'
+title: "Introduction"
+description: "Learn how to integrate our APIs into your application."
 ---
 
 <Note>
-  Before you start, you need to create a [free Mavapay account](/api-reference/endpoint/auth/signup) and get your test API keys to start building with the Mavapay API.
-  All monies transacted in the sandbox environment are not real and are for testing purposes only.
+  Before you start, you need to create a [free Mavapay
+  account](/api-reference/endpoint/auth/signup) and get your test API keys to
+  start building with the Mavapay API. All monies transacted in the sandbox
+  environment are not real and are for testing purposes only.
 </Note>
 
 ## About the API
+
 The Mavapay API is a set of RESTful APIs that allow you to interact with our platform. We provide APIs for payments, transfers, and more. You can use our APIs to build amazing payment experiences for your customers.
 We follow the [OpenAPI](https://swagger.io/specification/) specification for our API documentation.
 
 <Note>
-  Our base URL for the sandbox/staging API is `https://staging.api.mavapay.co/api/v1` while the base URL for the live API is `https://api.mavapay.co/api/v1`.
+  Our base URL for the sandbox/staging API is
+  `https://staging.api.mavapay.co/api/v1` while the base URL for the live API is
+  `https://api.mavapay.co/api/v1`.
 </Note>
 
 ### HTTP Methods
+
 Our API endpoints support the following HTTP methods:
 
 - `GET`: Retrieve data from the server.
@@ -25,6 +31,7 @@ Our API endpoints support the following HTTP methods:
 - `DELETE`: Remove data from the server.
 
 ### Status Codes
+
 Our API uses standard HTTP status codes to indicate the success or failure of an API request. Here are some common status codes you might encounter:
 
 - `200 OK`: The request was successful.
@@ -35,69 +42,56 @@ Our API uses standard HTTP status codes to indicate the success or failure of an
 - `500 Internal Server Error`: An error occurred on the server.
 
 ### Sample requests
+
 We provide sample requests for each API endpoint in our documentation. You can use these samples to understand how to interact with our APIs.
 
 ### Requests and Responses
+
 All requests to our API must include a valid API key in the `Authorization` header. Responses from our API are in JSON format. Content-Type should be set to `application/json`.
 The response body will contain the data you requested or an error message if the request was unsuccessful. Here is an example of a successful response:
 
 ```json
 {
-  "status": "success",
+  "status": "ok",
   "message": "User retrieved successfully.",
   "data": {
     "id": 1,
-    "name": "satoshi nakamoto",
+    "name": "satoshi nakamoto"
   }
 }
 ```
 
 #### keys
+
 - `status`: The status of the request (`success` or `error`).
 - `message`: A message describing the status of the request.
 - `data`: The data returned by the API. Always an object or an array.
 
 ### Supported Currencies
+
 Mavapay makes use of the [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) format for currency codes. When sending currency codes in requests, please use the appropriate ISO 4217 code for the currency you are working with.
+
+> When sending amounts, please ensure that the amount is in the smallest unit of the currency. For example, if you are sending 100 NGN, you should send `10000` as the amount `(100 * 100)`.
 >
-When sending amounts, please ensure that the amount is in the smallest unit of the currency. For example, if you are sending 100 NGN, you should send `10000` as the amount ```(100 * 100)```.
->
-Here are the list of currencies our API supports (we're constantly adding more currencies):
+> Here are the list of currencies our API supports (we're constantly adding more currencies):
 
 <ResponseField name="Fiat">
 
-  <CodeGroup>
-    ```json NGN
-    "currency code": "NGN",
-    "currency name": "Nigerian Naira",
-    "symbol": "₦",
-    "base unit": "kobo",
-    ```
-    ```json KES
-    "currency code": "KES",
-    "currency name": "Kenyan Shilling",
-    "symbol": "KSh",
-    "base unit": "cent",
-    ```
-    ```json ZAR
-    "currency code": "ZAR",
-    "currency name": "South African Rand",
-    "symbol": "R",
-    "base unit": "cent",
-    ```
-  </CodeGroup>
+<CodeGroup>
+  ```json NGN "currency code": "NGN", "currency name": "Nigerian Naira",
+  "symbol": "₦", "base unit": "kobo", ``` ```json KES "currency code": "KES",
+  "currency name": "Kenyan Shilling", "symbol": "KSh", "base unit": "cent", ```
+  ```json ZAR "currency code": "ZAR", "currency name": "South African Rand",
+  "symbol": "R", "base unit": "cent", ```
+</CodeGroup>
 
 </ResponseField>
 
 <ResponseField name="Cryptocurrency">
 
-  <CodeGroup>
-    ```json BTC
-    "currency": "BTC",
-    "currency name": "Bitcoin",
-    "symbol": "B",
-    "base unit": "satoshis"
-    ```
-  </CodeGroup>
+<CodeGroup>
+  ```json BTC "currency": "BTC", "currency name": "Bitcoin", "symbol": "B",
+  "base unit": "satoshis" ```
+</CodeGroup>
 
 </ResponseField>

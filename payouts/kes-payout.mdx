@@ -1,6 +1,6 @@
 ---
-title: 'Kenyan Shilling (KES) Payouts'
-description: 'Learn how to integrate Mavapay payouts for Kenyan Shilling (KES)'
+title: "Kenyan Shilling (KES) Payouts"
+description: "Learn how to integrate Mavapay payouts for Kenyan Shilling (KES)"
 ---
 
 # Kenyan Shilling (KES) Payouts
@@ -36,6 +36,7 @@ X-API-KEY: your_api_key_here
 ```
 
 **Important Notes:**
+
 - All amounts are in cents (1 KES = 100 cents)
 - The minimum amount for KES payouts is $2
 - Phone numbers must be in international format (e.g., +254...)
@@ -125,9 +126,10 @@ curl --request POST \
 ## Understanding the Quote Response
 
 Sample response:
+
 ```json
 {
-  "status": "success",
+  "status": "ok",
   "data": {
     "id": "d1614a76-9c7f-4111-98a7-43199f307e5b",
     "exchangeRate": 4874805.75,
@@ -150,6 +152,7 @@ Sample response:
 ```
 
 Key fields:
+
 - `usdToTargetCurrencyRate`: Price of 1 USD in KES
 - `exchangeRate`: Price of 1 BTC in KES
 - `amountInSourceCurrency`: Total amount in SATS to be paid (including fees)
@@ -166,6 +169,7 @@ You'll receive two webhook events:
 2. `payment.sent` - When the money is sent to the recipient
 
 ### payment.received Event
+
 ```json
 {
   "event": "payment.received",
@@ -183,6 +187,7 @@ You'll receive two webhook events:
 ```
 
 ### payment.sent Event
+
 ```json
 {
   "event": "payment.sent",
@@ -223,33 +228,36 @@ curl --location 'https://staging.api.mavapay.co/api/v1/price?currency=KES'
 ```
 
 Sample response:
+
 ```json
 {
-    "status": "ok",
-    "data": {
-        "currency": "KES",
-        "timestamp": 1738258609,
-        "btcPriceInUnitCurrency": 4874805.75,
-        "unitPricePerSat": {
-            "amount": 0.04874805,
-            "currencyUnit": "KESSAT"
-        },
-        "unitPricePerUsd": {
-            "amount": 145.977,
-            "currencyUnit": "KESUSD"
-        }
+  "status": "ok",
+  "data": {
+    "currency": "KES",
+    "timestamp": 1738258609,
+    "btcPriceInUnitCurrency": 4874805.75,
+    "unitPricePerSat": {
+      "amount": 0.04874805,
+      "currencyUnit": "KESSAT"
+    },
+    "unitPricePerUsd": {
+      "amount": 145.977,
+      "currencyUnit": "KESUSD"
     }
+  }
 }
 ```
 
 ## Testing
 
 Use our staging environment for testing:
+
 ```bash
 https://staging.api.mavapay.co/api/v1
 ```
 
 Test details:
+
 - Phone Number: `+254790000000`
 - Paybill Number: `4141031`
 - Account Number: `test_account`
@@ -260,6 +268,7 @@ Test details:
 ## Support
 
 If you need help with integration:
+
 - Email: info@mavapay.co
 - Documentation: https://docs.mavapay.co
-- API Reference: https://docs.mavapay.co/api-reference 
+- API Reference: https://docs.mavapay.co/api-reference

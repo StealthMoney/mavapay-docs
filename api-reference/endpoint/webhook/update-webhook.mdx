@@ -1,6 +1,6 @@
 ---
-title: 'Update Webhook'
-description: 'Update an existing webhook configuration'
+title: "Update Webhook"
+description: "Update an existing webhook configuration"
 ---
 
 # Update Webhook
@@ -15,10 +15,10 @@ PUT https://api.mavapay.co/api/v1/webhook
 
 ## Request Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| url | string | Yes | The new URL where webhook events will be sent |
-| secret | string | Yes | A new secret key used to sign webhook payloads |
+| Parameter | Type   | Required | Description                                    |
+| --------- | ------ | -------- | ---------------------------------------------- |
+| url       | string | Yes      | The new URL where webhook events will be sent  |
+| secret    | string | Yes      | A new secret key used to sign webhook payloads |
 
 ## Example Request
 
@@ -36,7 +36,7 @@ curl -X PUT https://api.mavapay.co/api/v1/webhook \
 
 ```json
 {
-  "status": "success",
+  "status": "ok",
   "data": {
     "id": "wh_123456789",
     "url": "https://your-new-domain.com/webhook",

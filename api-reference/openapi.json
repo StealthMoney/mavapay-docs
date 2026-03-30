@@ -862,7 +862,12 @@
                   "beneficiary": {
                     "type": "object",
                     "description": "The beneficiary bank account details. Use the exact values returned from the Name Enquiry endpoint.",
-                    "required": ["bankAccountNumber", "bankAccountName", "bankCode", "bankName"],
+                    "required": [
+                      "bankAccountNumber",
+                      "bankAccountName",
+                      "bankCode",
+                      "bankName"
+                    ],
                     "properties": {
                       "bankAccountNumber": {
                         "type": "string",
@@ -2014,7 +2019,7 @@
                   "paymentLinkOrdersResponse": {
                     "summary": "Payment Link Orders Response",
                     "value": {
-                      "status": "success",
+                      "status": "ok",
                       "message": "paymentlink order details",
                       "data": {
                         "id": "7e644e02-e652-42d8-8857-e8ae46bccd59",
