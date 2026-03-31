@@ -128,7 +128,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "array",
@@ -187,7 +187,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "$ref": "#/components/schemas/BankAccount"
@@ -347,7 +347,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "$ref": "#/components/schemas/Order"
@@ -395,7 +395,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "array",
@@ -515,7 +515,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "$ref": "#/components/schemas/Quote"
@@ -724,7 +724,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "array",
@@ -804,7 +804,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "message": {
                       "type": "string",
@@ -862,7 +862,12 @@
                   "beneficiary": {
                     "type": "object",
                     "description": "The beneficiary bank account details. Use the exact values returned from the Name Enquiry endpoint.",
-                    "required": ["bankAccountNumber", "bankAccountName", "bankCode", "bankName"],
+                    "required": [
+                      "bankAccountNumber",
+                      "bankAccountName",
+                      "bankCode",
+                      "bankName"
+                    ],
                     "properties": {
                       "bankAccountNumber": {
                         "type": "string",
@@ -919,7 +924,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "object",
@@ -990,7 +995,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "object",
@@ -1061,7 +1066,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "object",
@@ -1132,7 +1137,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "object",
@@ -1213,7 +1218,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "$ref": "#/components/schemas/TransactionResponse"
@@ -1456,7 +1461,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "$ref": "#/components/schemas/User"
@@ -1507,7 +1512,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "message": {
                       "type": "string",
@@ -1708,7 +1713,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "message": {
                       "type": "string",
@@ -1767,7 +1772,7 @@
                     "status": {
                       "type": "string",
                       "format": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "data": {
                       "type": "object",
@@ -1999,7 +2004,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "ok"
                     },
                     "message": {
                       "type": "string",
@@ -2014,7 +2019,7 @@
                   "paymentLinkOrdersResponse": {
                     "summary": "Payment Link Orders Response",
                     "value": {
-                      "status": "success",
+                      "status": "ok",
                       "message": "paymentlink order details",
                       "data": {
                         "id": "7e644e02-e652-42d8-8857-e8ae46bccd59",

@@ -1,6 +1,6 @@
 ---
-title: 'Register Webhook'
-description: 'Register a webhook endpoint to receive event notifications'
+title: "Register Webhook"
+description: "Register a webhook endpoint to receive event notifications"
 ---
 
 # Register Webhook
@@ -15,10 +15,10 @@ POST https://api.mavapay.co/api/v1/webhook/register
 
 ## Request Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| url | string | Yes | The URL where webhook events will be sent |
-| secret | string | Yes | A secret key used to sign webhook payloads |
+| Parameter | Type   | Required | Description                                |
+| --------- | ------ | -------- | ------------------------------------------ |
+| url       | string | Yes      | The URL where webhook events will be sent  |
+| secret    | string | Yes      | A secret key used to sign webhook payloads |
 
 ## Example Request
 
@@ -36,7 +36,7 @@ curl -X POST https://api.mavapay.co/api/v1/webhook/register \
 
 ```json
 {
-  "status": "success",
+  "status": "ok",
   "data": {
     "id": "wh_123456789",
     "url": "https://your-domain.com/webhook",

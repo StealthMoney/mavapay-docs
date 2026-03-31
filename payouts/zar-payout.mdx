@@ -1,6 +1,6 @@
 ---
-title: 'South African Rand (ZAR) Payouts'
-description: 'Learn how to integrate Mavapay payouts for South African Rand (ZAR)'
+title: "South African Rand (ZAR) Payouts"
+description: "Learn how to integrate Mavapay payouts for South African Rand (ZAR)"
 ---
 
 This guide explains how to integrate Mavapay's payout functionality for sending money to South African bank accounts.
@@ -43,6 +43,7 @@ curl --location 'https://staging.api.mavapay.co/api/v1/bank/bankcode?country=ZA'
 ## Creating a Quote
 
 **Important Notes:**
+
 - All amounts are in cents (1 ZAR = 100 cents)
 - To send 3,000 ZAR, use amount = 300000 cents
 - The minimum amount for ZAR payouts is $2
@@ -68,9 +69,10 @@ curl --request POST \
 ```
 
 Sample response:
+
 ```json
 {
-  "status": "success",
+  "status": "ok",
   "data": {
     "id": "d1614a76-9c7f-4111-98a7-43199f307e5b",
     "exchangeRate": 1874805.7499999998,
@@ -113,6 +115,7 @@ You'll receive two webhook events:
 2. `payment.sent` - When the money is sent to the recipient's bank account
 
 ### payment.received Event
+
 ```json
 {
   "event": "payment.received",
@@ -144,6 +147,7 @@ You'll receive two webhook events:
 ```
 
 ### payment.sent Event
+
 ```json
 {
   "event": "payment.sent",
@@ -197,33 +201,36 @@ curl --location 'https://staging.api.mavapay.co/api/v1/price?currency=ZAR'
 ```
 
 Sample response:
+
 ```json
 {
-    "status": "ok",
-    "data": {
-        "currency": "ZAR",
-        "timestamp": 1738258609,
-        "btcPriceInUnitCurrency": 1874805.7499999998,
-        "unitPricePerSat": {
-            "amount": 0.01874805,
-            "currencyUnit": "ZARSAT"
-        },
-        "unitPricePerUsd": {
-            "amount": 18.4977,
-            "currencyUnit": "ZARUSD"
-        }
+  "status": "ok",
+  "data": {
+    "currency": "ZAR",
+    "timestamp": 1738258609,
+    "btcPriceInUnitCurrency": 1874805.7499999998,
+    "unitPricePerSat": {
+      "amount": 0.01874805,
+      "currencyUnit": "ZARSAT"
+    },
+    "unitPricePerUsd": {
+      "amount": 18.4977,
+      "currencyUnit": "ZARUSD"
     }
+  }
 }
 ```
 
 ## Testing
 
 Use our staging environment for testing:
+
 ```bash
 https://staging.api.mavapay.co/api/v1
 ```
 
 Test bank account details:
+
 - Account Number: `1352900000`
 - Bank: CAPITEC BANK
 - Account Holder: Ricki Tester
@@ -233,6 +240,7 @@ Test bank account details:
 ## Support
 
 If you need help with integration:
+
 - Email: info@mavapay.co
 - Documentation: https://docs.mavapay.co
-- API Reference: https://docs.mavapay.co/api-reference 
+- API Reference: https://docs.mavapay.co/api-reference

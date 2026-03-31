@@ -1,5 +1,5 @@
 ---
-title: 'Nigerian Naira (NGN) Payouts'
+title: "Nigerian Naira (NGN) Payouts"
 # description: 'Learn how to integrate Mavapay payouts for Nigerian Naira (NGN)'
 ---
 
@@ -42,6 +42,7 @@ curl --location 'https://staging.api.mavapay.co/api/v1/bank/bankcode?country=NG'
 ```
 
 Sample response:
+
 ```json
 {
   "status": "ok",
@@ -66,6 +67,7 @@ curl --request GET \
 ```
 
 Sample response:
+
 ```json
 {
   "status": "ok",
@@ -83,6 +85,7 @@ Sample response:
 ## Creating a Quote
 
 **Important Notes:**
+
 - All amounts are in Kobo (1 NGN = 100 Kobo)
 - Minimum payout amount is 2000 NGN
 - To send 3000 NGN, use amount = 300000 Kobo
@@ -109,9 +112,10 @@ curl --request POST \
 ```
 
 Sample response:
+
 ```json
 {
-  "status": "success",
+  "status": "ok",
   "data": {
     "id": "d1614a76-9c7f-4111-98a7-43199f307e5b",
     "exchangeRate": 5000000.23,
@@ -154,6 +158,7 @@ You'll receive two webhook events:
 2. `payment.sent` - When the money is sent to the recipient's bank account
 
 ### payment.received Event
+
 ```json
 {
   "event": "payment.received",
@@ -186,6 +191,7 @@ You'll receive two webhook events:
 ```
 
 ### payment.sent Event
+
 ```json
 {
   "event": "payment.sent",
@@ -240,33 +246,36 @@ curl --location 'https://staging.api.mavapay.co/api/v1/price?currency=NGN'
 ```
 
 Sample response:
+
 ```json
 {
-    "status": "ok",
-    "data": {
-        "currency": "NGN",
-        "timestamp": 1738258609,
-        "btcPriceInUnitCurrency": 167792701.75015488,
-        "unitPricePerSat": {
-            "amount": 1.6779270175015488,
-            "currencyUnit": "NGNSAT"
-        },
-        "unitPricePerUsd": {
-            "amount": 1596.29641,
-            "currencyUnit": "NGNUSD"
-        }
+  "status": "ok",
+  "data": {
+    "currency": "NGN",
+    "timestamp": 1738258609,
+    "btcPriceInUnitCurrency": 167792701.75015488,
+    "unitPricePerSat": {
+      "amount": 1.6779270175015488,
+      "currencyUnit": "NGNSAT"
+    },
+    "unitPricePerUsd": {
+      "amount": 1596.29641,
+      "currencyUnit": "NGNUSD"
     }
+  }
 }
 ```
 
 ## Testing
 
 Use our staging environment for testing:
+
 ```bash
 https://staging.api.mavapay.co/api/v1
 ```
 
 Test bank account details:
+
 - Account Number: `0149200000`
 - Bank: GTBANK PLC
 - Bank Code: `000013`
@@ -276,6 +285,7 @@ Test bank account details:
 ## Support
 
 If you need help with integration:
+
 - Email: info@mavapay.co
 - Documentation: https://docs.mavapay.co
-- API Reference: https://docs.mavapay.co/api-reference 
+- API Reference: https://docs.mavapay.co/api-reference
