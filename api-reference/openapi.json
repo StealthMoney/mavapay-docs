@@ -451,6 +451,7 @@
                     "targetCurrency": "BTCSAT",
                     "paymentMethod": "BANKTRANSFER",
                     "paymentCurrency": "NGNKOBO",
+                    "customerReference": "order-1234567890",
                     "autopayout": false
                   }
                 },
@@ -463,6 +464,7 @@
                     "targetCurrency": "BTCSAT",
                     "paymentMethod": "BANKTRANSFER",
                     "paymentCurrency": "BTCSAT",
+                    "customerReference": "order-1234567890",
                     "autopayout": false
                   }
                 },
@@ -475,6 +477,7 @@
                     "targetCurrency": "BTCSAT",
                     "paymentMethod": "BANKTRANSFER",
                     "paymentCurrency": "BTCSAT",
+                    "customerReference": "order-1234567890",
                     "autopayout": true,
                     "beneficiary": {
                       "lnInvoice": "lnbc2082380n1p5fhytmpp5ujnmhfhle6qpc22x0ghyh0w0geufk2qscpuegr0wu4yrpscexv8qdq8g36kuuccqzzsxqzfvsp5ely8sp5cgatch8e02uujamy39rwmjdd5pgmakptsq74u6redpnzq9qxpqysgq2lry5dgzu2g04s74tpvctwe37rkprs3k579jw6yt7ncrsg62p29yalw8gf5fawfvpydqv4jjve0nsysfhsxa35dtwug9e6gzxkq0h5gp636wc3"
@@ -491,6 +494,7 @@
                     "paymentMethod": "LIGHTNING",
                     "paymentCurrency": "NGNKOBO",
                     "autopayout": true,
+                    "customerReference": "order-1234567890",
                     "beneficiary": {
                       "bankAccountName": "olaolu olajide",
                       "bankCode": "000013",
@@ -1750,47 +1754,6 @@
         }
       }
     },
-    "/user/apikey": {
-      "get": {
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": ["User"],
-        "operationId": "getUserApiKey",
-        "summary": "Get user API key",
-        "description": "Returns the user's API key. This generates a new API key even if the user already has one",
-        "responses": {
-          "200": {
-            "description": "API key response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "format": "string",
-                      "example": "ok"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "apiKey": {
-                          "type": "string",
-                          "example": "addedednefendfdcd"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/paymentlink": {
       "post": {
         "security": [
@@ -2347,13 +2310,13 @@
           "sourceCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTCSAT", "NGNKOBO", "KESCENT", "ZARCENT"],
+            "enum": ["BTCSAT", "NGNKOBO"],
             "description": "The source currency for the quote"
           },
           "targetCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGNKOBO", "KESCENT", "ZARCENT"],
+            "enum": ["NGNKOBO", "KESCENT", "ZARCENT", "GHSPESEWA"],
             "description": "The target currency for the quote"
           },
           "transactionFeesInSourceCurrency": {
@@ -2406,6 +2369,12 @@
             "format": "string",
             "example": "189727ef2e0f35921af7858b96e27cbad960b0ec2bb2a4ab73b6a231f9ce8727",
             "description": "The payment hash for the lightning invoice attached to the quote"
+          },
+          "customerReference": {
+            "type": "string",
+            "format": "string",
+            "example": "order-1234567890",
+            "description": "Your unique identifier for the quote"
           },
           "totalAmountInSourceCurrency": {
             "type": "number",
@@ -2481,14 +2450,14 @@
           "sourceCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTCSAT", "NGNKOBO", "KESCENT", "ZARCENT"],
+            "enum": ["BTCSAT", "NGNKOBO"],
             "default": "BTCSAT",
             "description": "The source currency for the quote"
           },
           "targetCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGNKOBO", "KESCENT", "ZARCENT", "BTCSAT"],
+            "enum": ["NGNKOBO", "KESCENT", "ZARCENT", "GHSPESEWA", "BTCSAT"],
             "default": "NGNKOBO",
             "description": "The local currency to convert the source currency to"
           },
@@ -2502,8 +2471,14 @@
           "paymentCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGNKOBO", "BTCSAT", "KESCENT", "ZARCENT"],
+            "enum": ["NGNKOBO", "BTCSAT", "KESCENT", "ZARCENT", "GHSPESEWA"],
             "description": "Currency the amount is denominated in. Must be either sourceCurrency or targetCurrency. Determines what the 'amount' field represents. Example: if buying BTC with NGN and paymentCurrency is 'NGNKOBO', amount is in Naira; if 'BTCSAT', amount is in Bitcoin."
+          },
+          "customerReference": {
+            "type": "string",
+            "format": "string",
+            "example": "order-1234567890",
+            "description": "Your unique identifier for the quote"
           },
           "autopayout": {
             "type": "boolean",
@@ -2552,7 +2527,7 @@
                 "properties": {
                   "identifierType": {
                     "type": "string",
-                    "enum": ["paytophone", "paytobill"],
+                    "enum": ["paytophone", "paytobill", "paytotill"],
                     "example": "paytophone",
                     "description": "The type of identifier to use for the beneficiary"
                   },
@@ -2573,6 +2548,44 @@
                         "type": "string",
                         "example": "vlad",
                         "description": "The account number of the beneficiary if the identifierType is paytobill"
+                      },
+                      "tillNumber": {
+                        "type": "string",
+                        "example": "796980711",
+                        "description": "The till number of the beneficiary if the identifierType is paytotill"
+                      },
+                      "accountName": {
+                        "type": "string",
+                        "example": "John Doe",
+                        "description": "The account name of the beneficiary if the identifierType is paytobill or paytotill"
+                      }
+                    }
+                  }
+                },
+                "required": ["identifierType", "identifiers"]
+              },
+              {
+                "title": "GHS Beneficiary",
+                "type": "object",
+                "properties": {
+                  "identifierType": {
+                    "type": "string",
+                    "enum": ["MTN"],
+                    "example": "MTN",
+                    "description": "The type of mobile network to use for the beneficiary"
+                  },
+                  "identifiers": {
+                    "type": "object",
+                    "properties": {
+                      "phoneNumber": {
+                        "type": "string",
+                        "example": "+233796980788",
+                        "description": "The phone number of the beneficiary if the identifierType is MTN"
+                      },
+                      "accountName": {
+                        "type": "string",
+                        "example": "Mensah Kwame",
+                        "description": "The account name of the beneficiary if the identifierType is MTN"
                       }
                     }
                   }
@@ -2651,7 +2664,7 @@
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "KES", "BTC", "ZAR"]
+            "enum": ["NGN", "KES", "BTC", "ZAR", "GHS"]
           },
           "balance": {
             "type": "number",
@@ -2703,7 +2716,7 @@
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "KES", "BTC", "ZAR"],
+            "enum": ["NGN", "KES", "BTC", "ZAR", "GHS"],
             "description": "The currency of the transaction"
           },
           "type": {

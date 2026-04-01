@@ -1,38 +1,30 @@
 ---
 title: 'Authentication'
-description: 'All API endpoints are authenticated using Bearer tokens or API keys.'
+description: 'All API endpoints are authenticated using API keys.'
 ---
 
 ### Authentication Methods
-There are two ways to authenticate with our API: Bearer tokens and API keys. You can find the authentication method for each endpoint in the [OpenAPI specification file](https://github.com/stealthmoney/mavapay-docs/blob/main/api-reference/openapi.json).
-When building client applications, you can use the Bearer token or public API key to authenticate requests. For server-to-server communication, you can use just your API keys.
+All API requests are authenticated with an API key. You can find authentication requirements for each endpoint in the [OpenAPI specification file](https://github.com/stealthmoney/mavapay-docs/blob/main/api-reference/openapi.json).
 
 <Warning>
   Do not expose your API keys in public repositories. Use environment variables or a secure method to store and use your API keys.
 </Warning>
 
-Generally, we provide both a public key and a secret key. The public key is used to identify your account, while the secret key is used to authenticate requests. You should keep your secret key secure and never expose it in public repositories.
+We provision use RBAC for authentication. You can assign different roles to your API keys to control their access to the API. Roles can be `READ` or `WRITE`. You should keep your API key secure and never expose it in public repositories.
 
 ```json
 {
-  "public_key": "pk_test_sddkdkd",
-  "secret_key": "sk_test_sddkdkd"
+  "api_key": "aktestsddkdkd"
 }
 ```
-By default, public keys cannot cannot be used to modify your account or make payout transactions. They are used to identify your account and authenticate requests that initiates transactions to you e.g. collections. Secret keys, on the other hand, can be used to make transactions and modify your account like initiating payouts. Keep your secret key secure and never expose it in public repositories.
-If you suspect that your secret key has been compromised, you can regenerate it from the [dashboard](https://app.mavapay.co/settings).
+If you suspect that your API key has been compromised, deactivate the key and regenerate a new one immediately from the [dashboard](https://mavapay.co/api-keys).
 
 ### Authorization Headers
   
-  When making requests to our API, you need to include your API key or Bearer token in the `Authorization` or `x-api-key` header. The format of the `Authorization` header is as follows:
+  When making requests to our API, include your API key in the `x-api-key` header:
   
   <ResponseField>
     <CodeGroup>
-  ```json Bearer Token
-  {
-    "Authorization": "Bearer <YOUR_BEARER_TOKEN>"
-  }
-  ```
   ```json API Key
   {
     "x-api-key": "<YOUR_API_KEY>"
@@ -41,4 +33,4 @@ If you suspect that your secret key has been compromised, you can regenerate it 
     </CodeGroup>
   </ResponseField>
 
-  API request made without a valid API key or Bearer token will return a `401: Unauthorized` status code.
+  API requests made without a valid API key will return a `401: Unauthorized` status code.

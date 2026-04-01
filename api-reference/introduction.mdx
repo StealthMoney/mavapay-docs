@@ -5,7 +5,7 @@ description: "Learn how to integrate our APIs into your application."
 
 <Note>
   Before you start, you need to create a [free Mavapay
-  account](/api-reference/endpoint/auth/signup) and get your test API keys to
+  account](/authentication) and get your test API keys to
   start building with the Mavapay API. All monies transacted in the sandbox
   environment are not real and are for testing purposes only.
 </Note>
@@ -78,11 +78,41 @@ Mavapay makes use of the [ISO 4217](https://www.iso.org/iso-4217-currency-codes.
 <ResponseField name="Fiat">
 
 <CodeGroup>
-  ```json NGN "currency code": "NGN", "currency name": "Nigerian Naira",
-  "symbol": "₦", "base unit": "kobo", ``` ```json KES "currency code": "KES",
-  "currency name": "Kenyan Shilling", "symbol": "KSh", "base unit": "cent", ```
-  ```json ZAR "currency code": "ZAR", "currency name": "South African Rand",
-  "symbol": "R", "base unit": "cent", ```
+```json NGN
+{
+  "currency code": "NGN",
+  "currency name": "Nigerian Naira",
+  "symbol": "NGN",
+  "base unit": "kobo"
+}
+```
+
+```json KES
+{
+  "currency code": "KES",
+  "currency name": "Kenyan Shilling",
+  "symbol": "KES",
+  "base unit": "cent"
+}
+```
+
+```json ZAR
+{
+  "currency code": "ZAR",
+  "currency name": "South African Rand",
+  "symbol": "R",
+  "base unit": "cent"
+}
+```
+
+```json GHS
+{
+  "currency code": "GHS",
+  "currency name": "Ghanaian Cedi",
+  "symbol": "₵",
+  "base unit": "pesewa"
+}
+```
 </CodeGroup>
 
 </ResponseField>
@@ -90,8 +120,14 @@ Mavapay makes use of the [ISO 4217](https://www.iso.org/iso-4217-currency-codes.
 <ResponseField name="Cryptocurrency">
 
 <CodeGroup>
-  ```json BTC "currency": "BTC", "currency name": "Bitcoin", "symbol": "B",
-  "base unit": "satoshis" ```
+```json BTC
+{
+  "currency": "BTC",
+  "currency name": "Bitcoin",
+  "symbol": "B",
+  "base unit": "satoshis"
+}
+```
 </CodeGroup>
 
 </ResponseField>
