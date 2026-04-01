@@ -41,7 +41,7 @@ Triggered when Bitcoin payment is received via Lightning Network.
       "id": "698daefd-1dd8-4420-9c0a-5d78080d7c27",
       "orderId": "58772-8830",
       "paymentMethod": "BANKTRANSFER",
-      "externalRef": null,
+      "customerReference": "order-1234567890",
       "customerInternalFee": 0,
       "estimatedRoutingFee": 0,
       "onChainAddress": null,
@@ -88,9 +88,8 @@ Triggered when Bitcoin is sent on-chain to a beneficiary address.
       "id": "b6d82314-0148-413e-bfad-ccd74a45969e",
       "orderId": "44092-3881",
       "paymentMethod": "BANKTRANSFER",
-      "externalRef": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
+      "customerReference": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
       "customerInternalFee": 0,
-      "estimatedRoutingFee": 172,
       "lnInvoice": null,
       "lnAddress": null,
       "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5",
@@ -148,9 +147,8 @@ Triggered when a Payment Link transaction is fully settled (after block confirma
         "id": "b6d82314-0148-413e-bfad-ccd74a45969e",
         "orderId": "44092-3881",
         "paymentMethod": "BANKTRANSFER",
-        "externalRef": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
+        "customerReference": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
         "customerInternalFee": 0,
-        "estimatedRoutingFee": 172,
         "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5",
         "lnInvoice": null,
         "lnAddress": null,
@@ -204,6 +202,7 @@ Triggered when NGN payment is received in your Mavapay account.
       "bankAccountName": "OLADEJI OLAOLU",
       "bankAccountNumber": "0123456789",
       "customerInternalFee": 0,
+      "customerReference": "order-1234567890",
       "createdAt": "2025-02-03T14:18:20.737Z",
       "updatedAt": "2025-02-03T14:18:22.777Z"
     }
@@ -249,7 +248,7 @@ Triggered when ZAR payment is sent to a beneficiary.
       "updatedAt": "2025-01-30T15:23:09.768Z",
       "zarTransactionMetadata": {
           "id": "7801c544-2f05-4914-91e1-d157848ac569",
-          "merchantId": "f77986d6-75df-4979-85a9-8acedcfca392",
+          "customerReference": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
           "orderId": "47581-9962",
           "merchantName": "Ricki Allardice",
           "bankName": "CAPITEC BANK",
@@ -301,12 +300,12 @@ Triggered when KES payment is sent via M-Pesa.
       "updatedAt": "2025-01-30T15:23:09.768Z",
       "kesTransactionMetadata": {
           "id": "7801c544-2f05-4914-91e1-d157848ac569",
-          "transactionId": "14cfbe34-91b3-45ef-b1b0-bc7d55df7f0f",
-          "paymentId": "f77986d6-75df-4979-85a9-8acedcfca392",
+          "customerReference": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
           "customerInternalFee": 0,
           "identifierType": "paytophone",
           "identifiers": {
-            "phoneNumber": "+254796980711"
+            "phoneNumber": "+254796980711",
+            "accountName": "Nambanja David"
           },
           "createdAt": "2025-01-30T15:23:06.099Z",
           "updatedAt": "2025-01-30T15:23:09.772Z"

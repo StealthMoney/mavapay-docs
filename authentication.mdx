@@ -1,0 +1,48 @@
+---
+title: 'Authentication'
+description: 'Set up your account and start building with the Mavapay API.'
+---
+### Step 1: Create an account
+
+Create a [free Mavapay account](https://mavapay.co). By default, you should use the test environment until you are done with the integration and are ready to go live.
+
+### Step 2: Complete compliance (Production)
+After creating your account on `https://mavapay.co`, complete the compliance section before API key generation is enabled.
+
+![Compliance form](/images/Compliance-form.png)
+
+### Step 3: Generate your API key
+Once your compliance submission is approved, go to the API Keys section and generate your API key.
+
+![API key generation](/images/API-key-generate.png)
+
+These keys are a 32 character string. You will need them to authenticate your requests to the Mavapay API.
+Here's a sample of what your API keys will look like:
+
+```json
+{
+  "apiKey": "e2a81dcbcc459e3c96c15fe88db653051949058d908"
+}
+```
+
+### Step 4: Start building
+You can now start building with the Mavapay API.
+In the staging environment, you would be able to:
+
+1. Collect payments using mocked card data
+2. Make transfers to dummy accounts (bank accounts and mobile money wallets).
+3. Build with our wallets (using mock data).
+4. Configure your integration to handle different scenarios like failed payments, successful payments, etc.
+5. Complete KYC verification and go live with your integration.
+
+<Note>
+  On sandbox (`https://staging.mavapay.co`), compliance approval is instant for testing, so you do not need to fill the compliance form before generating test API keys.
+</Note>
+
+{/* <Card
+  title="Mavapay API Endpoints Schema"
+  icon="leaf"
+  href="https://github.com/stealthmoney/mavapay-docs/blob/main/api-reference/openapi.json"
+>
+  View our OpenAPI specification file
+</Card> */}
