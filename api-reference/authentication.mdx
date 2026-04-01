@@ -10,7 +10,7 @@ All API requests are authenticated with an API key. You can find authentication 
   Do not expose your API keys in public repositories. Use environment variables or a secure method to store and use your API keys.
 </Warning>
 
-We provision a single API key per credential. You should keep your API key secure and never expose it in public repositories.
+We provision use RBAC for authentication. You can assign different roles to your API keys to control their access to the API. Roles can be `READ` or `WRITE`. You should keep your API key secure and never expose it in public repositories.
 
 ```json
 {
