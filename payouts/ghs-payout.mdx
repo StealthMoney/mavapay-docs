@@ -1,0 +1,86 @@
+---
+title: "Ghanaian Cedi (GHS) Payouts"
+description: "Learn how to integrate Mavapay payouts for Ghanaian Cedi (GHS) with MTN Mobile Money"
+---
+
+# Ghanaian Cedi (GHS) Payouts
+
+This guide explains how to integrate Mavapay payouts for recipients in Ghana. At the moment, GHS payouts support **MTN Mobile Money only**.
+
+## Overview
+
+The GHS payout flow is similar to KES pay-to-phone:
+
+1. Create a quote with GHS payout details and MTN beneficiary information
+2. Pay the generated lightning invoice
+3. Receive webhook notifications for payout status
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+1. Created a Mavapay account
+2. Obtained your API key
+3. Set up your webhook endpoint
+4. Verified your business account
+
+## Authentication
+
+All API requests must include your API key in the header:
+
+```bash
+X-API-KEY: your_api_key_here
+```
+
+## MTN Mobile Money Quote Request
+
+Use the `quote` endpoint with `identifierType` set to `MTN`:
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/quote \
+  --header 'content-type: application/json' \
+  --header 'x-api-key: api-key' \
+  --data '
+{
+    "amount": "1000",
+    "sourceCurrency": "BTCSAT",
+    "targetCurrency": "GHSPESEWA",
+    "paymentMethod": "LIGHTNING",
+    "paymentCurrency": "GHSPESEWA",
+    "autopayout": true,
+    "customerInternalFee": "0",
+    "skipVirtualAccount": false,
+    "beneficiary": {
+        "identifierType": "MTN",
+        "identifiers": {
+            "phoneNumber": "+233999992800",
+            "accountName": "Mensah"
+        }
+    }
+}'
+```
+
+## Field Notes
+
+- `targetCurrency` and `paymentCurrency` should be `GHSPESEWA`
+- `identifierType` must be `MTN` for GHS payouts
+- `phoneNumber` should be in international format (for example, `+233...`)
+- Set `autopayout` to `true` to trigger payout immediately after invoice settlement
+
+## Webhook Events
+
+For GHS payouts, you will receive:
+
+1. `payment.received` - When we receive the lightning payment
+2. `payment.sent` - When funds are successfully sent to the MTN beneficiary
+
+For full event payload examples, see [webhook examples](/webhooks/webhook-examples).
+
+## Support
+
+If you need help with integration:
+
+- Email: info@mavapay.co
+- Documentation: https://docs.mavapay.co
+- API Reference: https://docs.mavapay.co/api-reference

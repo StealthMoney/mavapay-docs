@@ -1,0 +1,174 @@
+---
+title: 'NGN to GHS'
+description: 'Complete guide to sending Nigerian Naira to Ghanaian Cedi mobile money accounts using the Mavapay API'
+---
+
+## Overview
+
+Mavapay allows you to send Nigerian Naira (NGN) to Ghanaian Cedi (GHS) beneficiaries through MTN Mobile Money. This guide walks you through creating a quote, funding it, and tracking payout completion.
+
+<Note>
+  GHS payouts currently support `MTN` beneficiaries only.
+</Note>
+
+## Integration Flow
+
+### Step 1: Create a Quote
+
+Create a quote to lock in the rate and generate a virtual NGN account to fund the transfer.
+
+#### Understanding Payment Currency
+
+The `paymentCurrency` parameter determines what your `amount` means:
+
+- **`paymentCurrency: "NGNKOBO"`** -> amount is in NGN Kobo (you specify how much Naira to send)
+- **`paymentCurrency: "GHSPESEWA"`** -> amount is in GHS Pesewa (you specify how much recipient should receive)
+
+#### Option A: Send a Specific NGN Amount
+
+When you want to send exactly NGN 10,000:
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/quote \
+  --header 'content-type: application/json' \
+  --header 'x-api-key: <your-api-key>' \
+  --data '{
+    "amount": "1000000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "GHSPESEWA",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "NGNKOBO",
+    "autopayout": true,
+    "customerInternalFee": "0",
+    "skipVirtualAccount": false,
+    "beneficiary": {
+      "identifierType": "MTN",
+      "identifiers": {
+        "phoneNumber": "+233999992800",
+        "accountName": "Mensah"
+      }
+    }
+  }'
+```
+
+#### Option B: Recipient Gets a Specific GHS Amount
+
+When the recipient should receive exactly GHS 10.00:
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/quote \
+  --header 'content-type: application/json' \
+  --header 'x-api-key: <your-api-key>' \
+  --data '{
+    "amount": "1000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "GHSPESEWA",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "GHSPESEWA",
+    "autopayout": true,
+    "customerInternalFee": "0",
+    "skipVirtualAccount": false,
+    "beneficiary": {
+      "identifierType": "MTN",
+      "identifiers": {
+        "phoneNumber": "+233999992800",
+        "accountName": "Mensah"
+      }
+    }
+  }'
+```
+
+### Step 2: Review Quote Response
+
+A successful response returns the quote details and a virtual NGN account to fund:
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "18e2c0f8-a81e-46e1-ad9d-83381b79b62b",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "GHSPESEWA",
+    "amountInSourceCurrency": 1000000,
+    "amountInTargetCurrency": 1000,
+    "totalAmountInSourceCurrency": 1000000,
+    "hash": "69c3dbce8c054100124b86d1",
+    "expiry": "2026-03-25T13:07:50.483Z",
+    "ngnBankAccountNumber": "6167623224",
+    "ngnAccountName": "Mava Digital Solutions Limited",
+    "bankName": "wema",
+    "orderId": "38601-7270",
+    ...other fields...
+  }
+}
+```
+
+### Step 3: Fund the Virtual NGN Account
+
+Transfer the exact `totalAmountInSourceCurrency` (in Kobo) to the `ngnBankAccountNumber` before quote expiry.
+
+<Warning>
+  Send the exact amount on the quote. Underpayments and overpayments may delay processing.
+</Warning>
+
+### Step 4: Track Payout Status
+
+You'll receive webhook updates as the payment progresses:
+
+1. `payment.received` - NGN funding is confirmed
+2. `payment.sent` - GHS payout is sent to the MTN beneficiary
+
+You can also query by transaction hash:
+
+```bash
+curl --location 'https://api.mavapay.co/api/v1/transaction?hash=<transaction-hash>' \
+  --header 'x-api-key: <your-api-key>'
+```
+
+## Beneficiary Format (GHS MTN)
+
+Use the following beneficiary structure for NGN to GHS:
+
+```json
+{
+  "beneficiary": {
+    "identifierType": "MTN",
+    "identifiers": {
+      "phoneNumber": "+233999992800",
+      "accountName": "Mensah"
+    }
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `identifierType` | string | Yes | Must be `MTN` |
+| `identifiers.phoneNumber` | string | Yes | Beneficiary MTN number in international format (`+233...`) |
+| `identifiers.accountName` | string | Yes | Beneficiary account name |
+
+## Important Considerations
+
+### Currency Denominations
+
+All amounts are in the lowest denomination:
+
+- **NGNKOBO**: 100 Kobo = NGN 1
+- **GHSPESEWA**: 100 Pesewa = GHS 1
+
+### Quote Expiration
+
+Quotes expire quickly. Always display expiry time and prompt users to fund immediately.
+
+### Autopayout
+
+Set `autopayout: true` to process payout automatically after funding confirmation.
+
+## Related Resources
+
+- [GHS Payout Guide](/payouts/ghs-payout)
+- [Create Quote API](/api-reference/endpoint/quote/get-quote)
+- [Beneficiary Formats](/guides/beneficiary-formats)
+- [Webhook Examples](/webhooks/webhook-examples)
