@@ -326,6 +326,56 @@ Triggered when KES payment is sent via M-Pesa.
   KES amounts are in cents. Divide by 100 to get the amount in Shillings.
 </Note>
 
+## Ghanaian Cedi (GHS) Webhooks
+
+### payment.sent (Withdrawal)
+
+Triggered when GHS payment is sent via MTN Mobile Money.
+
+```json
+{
+  "event": "payment.sent",
+  "data": {
+      "id": "14cfbe34-91b3-45ef-b1b0-bc7d55df7f0f",
+      "walletId": "99a8272d-c8d7-436b-952b-a13ef816df9c",
+      "ref": "d386f2c1260d53ad60bead81e1c99",
+      "hash": "08f7198fd7dd73c087b4754a20d6f63f5b87bb8fcdc10e4d5cacd27650fce2ba",
+      "amount": 5000,
+      "fees": 0,
+      "currency": "GHS",
+      "type": "WITHDRAWAL",
+      "status": "SUCCESS",
+      "autopayout": true,
+      "createdAt": "2025-01-30T15:23:06.097Z",
+      "updatedAt": "2025-01-30T15:23:09.768Z",
+      "ghsTransactionMetadata": {
+          "id": "7801c544-2f05-4914-91e1-d157848ac569",
+          "customerReference": "7e8cdec9-77c8-4bda-bf9f-2e96777b2c69",
+          "customerInternalFee": 0,
+          "identifierType": "MTN",
+          "identifiers": {
+            "phoneNumber": "+233999992800",
+            "accountName": "Mensah"
+          },
+          "createdAt": "2025-01-30T15:23:06.099Z",
+          "updatedAt": "2025-01-30T15:23:09.772Z"
+      }
+  }
+}
+```
+
+### Key Fields
+
+| Field | Description |
+|-------|-------------|
+| `amount` | Amount in pesewa (1 GHS = 100 pesewa) |
+| `ghsTransactionMetadata.identifierType` | Mobile money network identifier (`MTN`) |
+| `ghsTransactionMetadata.identifiers` | Beneficiary payout details |
+
+<Note>
+  GHS amounts are in pesewa. Divide by 100 to get the amount in Cedis.
+</Note>
+
 ## Transaction Status Values
 
 | Status | Description |
