@@ -27,7 +27,8 @@
               "payouts/introduction",
               "payouts/ngn-payout",
               "payouts/zar-payout",
-              "payouts/kes-payout"
+              "payouts/kes-payout",
+              "payouts/ghs-payout"
             ]
           },
           {
@@ -48,7 +49,8 @@
               "guides/buying-bitcoin-onchain",
               "guides/internal-currency-swap",
               "guides/ngn-withdrawal",
-              "guides/ngn-zar"
+              "guides/ngn-zar",
+              "guides/ngn-ghs"
             ]
           }
         ]
