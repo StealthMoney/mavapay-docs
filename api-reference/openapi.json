@@ -2298,8 +2298,8 @@
           "exchangeRate": {
             "type": "number",
             "format": "number",
-            "example": 5000000.23,
-            "description": "The exchange rate of source currency to target currency for the quote. e.g 1 BTC = 5000000.23 NGN"
+            "example": 103830225.71866913,
+            "description": "The exchange rate is the rate of 1 BTC to the targetCurrency. So if you generated a quote for NGN->BTC (targetCurrency is BTC), the rate will be 1 because the exchange rate of 1 BTC to BTC is 1. If it's a quote of BTC->NGN (targetCurrency is NGN), the rate will likely be 103830225.71866913 i.e., 1 BTC to NGN"
           },
           "usdToTargetCurrencyRate": {
             "type": "number",
