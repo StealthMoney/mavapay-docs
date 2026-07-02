@@ -2483,8 +2483,8 @@
           "autopayout": {
             "type": "boolean",
             "format": "boolean",
-            "example": true,
-            "default": true
+            "example": false,
+            "default": false
           },
           "beneficiary": {
             "type": "object",
