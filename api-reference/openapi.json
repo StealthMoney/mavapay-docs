@@ -2539,6 +2539,12 @@
                         "example": "+254796980788",
                         "description": "The phone number of the beneficiary if the identifierType is paytophone"
                       },
+                      "network": {
+                        "type": "string",
+                        "enum": ["mpesa", "airtel"],
+                        "example": "mpesa",
+                        "description": "The target mobile money network. Required when identifierType is paytophone."
+                      },
                       "paybillNumber": {
                         "type": "string",
                         "example": "4141031",

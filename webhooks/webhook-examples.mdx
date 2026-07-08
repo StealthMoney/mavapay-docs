@@ -280,7 +280,7 @@ Triggered when ZAR payment is sent to a beneficiary.
 
 ### payment.sent (Withdrawal)
 
-Triggered when KES payment is sent via M-Pesa.
+Triggered when KES payment is sent via mobile money (M-Pesa or Airtel) or M-Pesa paybill/till.
 
 ```json
 {
@@ -305,7 +305,8 @@ Triggered when KES payment is sent via M-Pesa.
           "identifierType": "paytophone",
           "identifiers": {
             "phoneNumber": "+254796980711",
-            "accountName": "Nambanja David"
+            "accountName": "Nambanja David",
+            "network": "mpesa"
           },
           "createdAt": "2025-01-30T15:23:06.099Z",
           "updatedAt": "2025-01-30T15:23:09.772Z"
@@ -319,8 +320,8 @@ Triggered when KES payment is sent via M-Pesa.
 | Field | Description |
 |-------|-------------|
 | `amount` | Amount in cents (1 KES = 100 cents) |
-| `kesTransactionMetadata.identifierType` | M-Pesa payment type (paytophone, paytobill, paytotill) |
-| `kesTransactionMetadata.identifiers` | M-Pesa payment details (varies by type) |
+| `kesTransactionMetadata.identifierType` | Payment type (paytophone, paytobill, paytotill) |
+| `kesTransactionMetadata.identifiers` | Payment details (varies by type; paytophone includes `network`: `"mpesa"` or `"airtel"`) |
 
 <Note>
   KES amounts are in cents. Divide by 100 to get the amount in Shillings.

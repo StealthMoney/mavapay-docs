@@ -118,11 +118,11 @@ For South African Rand payouts, provide the beneficiary name and bank details.
 
 ## Kenyan Shilling (KES)
 
-Kenyan payouts are processed through M-Pesa. There are three supported M-Pesa payment methods:
+Kenyan payouts support mobile money (M-Pesa and Airtel) and M-Pesa paybill/till payments. There are three supported payment methods:
 
 ### Pay to Phone (Mobile Money)
 
-Send money directly to a mobile phone number.
+Send money directly to a mobile phone number on M-Pesa or Airtel Mobile Money.
 
 ```json
 {
@@ -130,7 +130,8 @@ Send money directly to a mobile phone number.
     "identifierType": "paytophone",
     "identifiers": {
       "phoneNumber": "+254796980711",
-      "accountName": "John Doe"
+      "accountName": "John Doe",
+      "network": "mpesa"
     }
   }
 }
@@ -142,7 +143,12 @@ Send money directly to a mobile phone number.
 |-------|------|----------|-------------|
 | `identifierType` | string | Yes | Must be `"paytophone"` |
 | `identifiers.phoneNumber` | string | Yes | Kenyan phone number in international format (+254...) |
-| `identifiers.accountName` | string | Yes | Name associated with the M-Pesa account |
+| `identifiers.accountName` | string | Yes | Name associated with the mobile money account |
+| `identifiers.network` | string | Yes | Target telecom network: `"mpesa"` or `"airtel"` |
+
+<Warning>
+  Starting **July 12, 2026**, the `network` field is **required** for all pay-to-phone KES quotes.
+</Warning>
 
 ### Pay to Bill (Business Payments)
 
@@ -324,7 +330,8 @@ curl --location 'https://api.mavapay.co/api/v1/quote/validate-kes-identifier' \
     "identifierType": "paytophone",
     "identifiers": {
       "phoneNumber": "+254796980711",
-      "accountName": "John Doe"
+      "accountName": "John Doe",
+      "network": "mpesa"
     }
   }
 }
@@ -403,7 +410,7 @@ Before creating a quote, you can validate beneficiary details:
 - **NGN**: Use the [Name Enquiry endpoint](/api-reference/endpoint/bank-info/name-enquiry) to validate account details
 - **ZAR**: Validation not currently available
 - **KES**: 
-  - For Pay to Phone: Ensure phone numbers are in correct format (+254...)
+  - For Pay to Phone: Ensure phone numbers are in correct format (+254...) and include the required `network` field (`"mpesa"` or `"airtel"`)
   - For Pay to Bill and Pay to Till: Use the [KES Identifier Validation endpoint](#kes-identifier-validation) to validate business names (production only)
 - **BTC**: Ensure Lightning invoice is valid and not expired
 

@@ -133,7 +133,8 @@ curl -X POST https://staging.api.mavapay.co/api/v1/simulation/pay-in \
 curl -X POST https://staging.api.mavapay.co/api/v1/quote \
   -H "Content-Type: application/json" \
   -H "X-API-KEY: your_staging_api_key" \
-  -d '{
+  -d 
+  '{
     "amount": "604300",
     "sourceCurrency": "NGNKOBO",
     "targetCurrency": "KESCENT",
@@ -143,7 +144,9 @@ curl -X POST https://staging.api.mavapay.co/api/v1/quote \
     "beneficiary": {
       "identifierType": "paytophone",
       "identifiers": {
-        "phoneNumber": "+254796980711"
+        "phoneNumber": "+254796980711",
+        "accountName": "John Doe",
+        "network": "mpesa"
       }
     }
   }'
