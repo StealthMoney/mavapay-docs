@@ -5,18 +5,18 @@ description: "Learn how to integrate Mavapay payouts for Kenyan Shilling (KES)"
 
 # Kenyan Shilling (KES) Payouts
 
-This guide explains how to integrate Mavapay's payout functionality for sending money to Kenyan recipients through various M-Pesa payment modes.
+This guide explains how to integrate Mavapay's payout functionality for sending money to Kenyan recipients through mobile money and M-Pesa payment modes.
 
 ## Overview
 
 The KES payout process involves the following steps:
 
-1. Choose the appropriate M-Pesa payment mode
+1. Choose the appropriate payment mode (mobile money or M-Pesa paybill/till)
 2. Create a quote with the required beneficiary details
 3. Pay the generated lightning invoice
 4. Receive webhook notifications for payment status
 
-**Note**: All KES payments are processed through M-Pesa, Kenya's leading mobile money service.
+**Note**: KES pay-to-phone payouts support **M-Pesa** and **Airtel Mobile Money**. Pay to Bill and Pay to Till are processed through M-Pesa.
 
 ## Prerequisites
 
@@ -40,16 +40,21 @@ X-API-KEY: your_api_key_here
 - All amounts are in cents (1 KES = 100 cents)
 - The minimum amount for KES payouts is $2
 - Phone numbers must be in international format (e.g., +254...)
+- Pay-to-phone quotes require a `network` field: `"mpesa"` or `"airtel"`
 - Account numbers for paybill payments can be text (usually business name or identifier)
-- All payments are processed through M-Pesa's payment infrastructure
+- Pay to Bill and Pay to Till are processed through M-Pesa's payment infrastructure
 
 ## Payment Modes
 
-All KES payments are processed through M-Pesa using one of the following modes:
+KES payouts support the following modes:
 
-### 1. Pay to Phone Number (M-Pesa Mobile Money)
+### 1. Pay to Phone (Mobile Money)
 
-Send money directly to a recipient's M-Pesa account:
+Send money directly to a recipient's M-Pesa or Airtel Mobile Money account. You must specify the target network in `beneficiary.identifiers.network`.
+
+<Warning>
+  Starting **July 12, 2026**, the `network` field is **required** for all pay-to-phone KES quotes. Requests missing this field will return a validation error.
+</Warning>
 
 ```bash
 curl --request POST \
@@ -66,7 +71,9 @@ curl --request POST \
   "beneficiary": {
     "identifierType": "paytophone",
     "identifiers": {
-      "phoneNumber": "+254796980788"
+      "phoneNumber": "+254796980788",
+      "accountName": "John Doe",
+      "network": "mpesa"
     }
   }
 }'
@@ -178,7 +185,7 @@ You'll receive two webhook events:
     "amount": 500000,
     "currency": "KES",
     "status": "SUCCESS",
-    "metadata": {
+    "kesTransactionMetadata": {
       "hash": "189727ef2e0f35921af7858b96e27cbad960b0ec2bb2a4ab73b6a231f9ce8727",
       "reference": "MP123456789"
     }
@@ -196,9 +203,10 @@ You'll receive two webhook events:
     "amount": 500000,
     "currency": "KES",
     "status": "SUCCESS",
-    "metadata": {
+    "kesTransactionMetadata": {
       "identifierType": "paytophone",
       "phoneNumber": "+254796980788",
+      "network": "mpesa",
       "reference": "MP123456789"
     }
   }
