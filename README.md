@@ -19,7 +19,7 @@ npm i -g mint
 Run the following command at the root of your documentation (where mint.json is)
 
 ```bash
-mintlify dev
+mint dev
 ```
 
 ### Publishing Changes
@@ -28,5 +28,5 @@ Install our Github App to auto propagate changes from your repo to your deployme
 
 #### Troubleshooting
 
-- Mintlify dev isn't running - Run `mintlify install` it'll re-install dependencies.
+- Mintlify dev isn't running - Run `mint install` it'll re-install dependencies.
 - Page loads as a 404 - Make sure you are running in a folder with `mint.json`
