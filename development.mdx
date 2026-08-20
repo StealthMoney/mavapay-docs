@@ -56,6 +56,14 @@ Test different scenarios with:
 - Various response states (success/failure)
 - Different currencies (NGN, KES, ZAR)
 
+#### Stablecoins (USDT)
+Test USDT deposits and withdrawals on staging:
+- Generate deposit addresses on supported networks (`trc20`, `erc20`, `plasma`, `solana`, `polygon`)
+- Withdraw USDT from your test wallet to an external address
+- Receive the same `payment.received` and `payment.sent` webhooks as production
+
+See the [stablecoins guide](/stablecoins/introduction) for the full deposit and withdraw flow.
+
 #### Mobile Money
 Test mobile money features using:
 - Test phone numbers

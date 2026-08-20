@@ -712,7 +712,7 @@
             "description": "The currency to get the details for (optional)",
             "schema": {
               "type": "string",
-              "enum": ["NGN", "KES", "BTC", "USD"]
+              "enum": ["NGN", "KES", "BTC", "USD", "USDT"]
             },
             "required": false
           }
@@ -1006,6 +1006,316 @@
                       "$ref": "#/components/schemas/Transaction"
                     }
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/withdraw/stablecoin": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Withdraw"],
+        "operationId": "withdrawStablecoin",
+        "summary": "Withdraw stablecoin",
+        "description": "Withdraw USDT from your Mavapay stablecoin wallet to an external address. The amount is specified in USDT cents (2 decimal places). For example, `100` = 1 USDT.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["amount", "network", "currency", "address"],
+                "properties": {
+                  "amount": {
+                    "type": "string",
+                    "description": "The amount to withdraw in USDT cents (2 decimal places). For example, `100` = 1 USDT, `500` = 5 USDT.",
+                    "example": "500000"
+                  },
+                  "network": {
+                    "type": "string",
+                    "description": "The blockchain network to withdraw on. Use lowercase values in the request.",
+                    "enum": ["trc20", "erc20", "plasma", "solana", "polygon"],
+                    "example": "trc20"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "The stablecoin to withdraw. Currently only USDT is supported.",
+                    "enum": ["USDT"],
+                    "example": "USDT"
+                  },
+                  "address": {
+                    "type": "string",
+                    "description": "The destination wallet address on the selected network. Must be a valid address for that chain (e.g. a Tron address for `trc20`, an Ethereum address for `erc20`).",
+                    "example": "TLt6fwdcdD18S36L9oiikn4Z8hebgwbzwS"
+                  },
+                  "customerReference": {
+                    "type": "string",
+                    "description": "Optional identifier you supply to correlate this withdrawal in webhooks (`stablecoinTransactionMetadata.customerReference`).",
+                    "example": "customer-provided-reference"
+                  }
+                }
+              },
+              "examples": {
+                "withdrawTrc20": {
+                  "summary": "Withdraw USDT on Tron (TRC20)",
+                  "value": {
+                    "amount": "500000",
+                    "network": "trc20",
+                    "currency": "USDT",
+                    "address": "TLt6fwdcdD18S36L9oiikn4Z8hebgwbzwS"
+                  }
+                },
+                "withdrawErc20": {
+                  "summary": "Withdraw USDT on Ethereum (ERC20)",
+                  "value": {
+                    "amount": "500000",
+                    "network": "erc20",
+                    "currency": "USDT",
+                    "address": "0x220303f911dbC38F09d13f8cC3ba8700f0Ca8C99",
+                    "customerReference": "customer-provided-reference"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Withdraw response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Transaction"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/stablecoin/generate-address": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Collection"],
+        "operationId": "generateStablecoinAddress",
+        "summary": "Generate a stablecoin deposit address",
+        "description": "Generate a unique USDT deposit address on a supported network. Send this address to customers so they can deposit USDT into your Mavapay stablecoin wallet. You can generate multiple addresses per network and use `label` to identify them.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["currency", "network"],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "description": "A human-readable identifier for this address. Returned as `reference` on the address object.",
+                    "example": "test 1"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "The stablecoin to collect. Currently only USDT is supported.",
+                    "enum": ["USDT"],
+                    "example": "USDT"
+                  },
+                  "network": {
+                    "type": "string",
+                    "description": "The blockchain network to generate the address on. Use lowercase values in the request.",
+                    "enum": ["trc20", "erc20", "plasma", "solana", "polygon"],
+                    "example": "erc20"
+                  }
+                }
+              },
+              "examples": {
+                "generateErc20": {
+                  "summary": "Generate an Ethereum (ERC20) deposit address",
+                  "value": {
+                    "label": "test 1",
+                    "currency": "USDT",
+                    "network": "erc20"
+                  }
+                },
+                "generateTrc20": {
+                  "summary": "Generate a Tron (TRC20) deposit address",
+                  "value": {
+                    "label": "tron deposits",
+                    "currency": "USDT",
+                    "network": "trc20"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Address generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Address generated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/StablecoinDepositAddress"
+                    }
+                  }
+                },
+                "example": {
+                  "status": "ok",
+                  "message": "Address generated successfully",
+                  "data": {
+                    "id": "bdf9bbba-f562-4b10-abfb-b180404415b7",
+                    "address": "0x220303f911dbC38F09d13f8cC3ba8700f0Ca8C99",
+                    "currency": "USDT",
+                    "network": "ERC20",
+                    "memo": null,
+                    "reference": "Theo test 1",
+                    "minAmount": "5",
+                    "maxAmount": "0",
+                    "walletId": "69a7129f-0a0a-484d-968f-2601bce85149",
+                    "updatedAt": "2026-08-20T10:09:46.288Z",
+                    "createdAt": "2026-08-20T10:09:46.288Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/stablecoin/addresses": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Collection"],
+        "operationId": "listStablecoinAddresses",
+        "summary": "List stablecoin deposit addresses",
+        "description": "Retrieve all previously generated USDT deposit addresses for your account. Filter by currency using the `currency` query parameter.",
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "Filter addresses by stablecoin. Currently only USDT is supported.",
+            "schema": {
+              "type": "string",
+              "enum": ["USDT"]
+            },
+            "required": false,
+            "example": "USDT"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deposit addresses retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Deposit addresses retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StablecoinDepositAddress"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "ok",
+                  "message": "Deposit addresses retrieved successfully",
+                  "data": [
+                    {
+                      "id": "41abd3c5-4fcd-4e8a-8c74-5702bb758f80",
+                      "walletId": "69a7129f-0a0a-484d-968f-2601bce85149",
+                      "address": "0xAdEd4E29eB636A5c6500c881812701eB0a7043A0",
+                      "network": "ERC20",
+                      "currency": "USDT",
+                      "memo": null,
+                      "reference": "Ry test 1",
+                      "minAmount": "5",
+                      "maxAmount": "0",
+                      "createdAt": "2026-06-09T09:24:38.785Z",
+                      "updatedAt": "2026-06-09T09:24:38.785Z"
+                    }
+                  ]
                 }
               }
             }
@@ -1328,7 +1638,7 @@
             "description": "The currency of the transaction",
             "schema": {
               "type": "string",
-              "enum": ["NGN", "KES", "ZAR"]
+              "enum": ["NGN", "KES", "ZAR", "USDT"]
             },
             "required": false
           },
@@ -2670,13 +2980,76 @@
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "KES", "BTC", "ZAR", "GHS"]
+            "enum": ["NGN", "KES", "BTC", "ZAR", "GHS", "USDT"]
           },
           "balance": {
             "type": "number",
             "format": "number",
             "example": 1000,
             "description": "The balance of the wallet in its lowest denomination"
+          }
+        }
+      },
+      "StablecoinDepositAddress": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "bdf9bbba-f562-4b10-abfb-b180404415b7",
+            "description": "The unique identifier for the deposit address"
+          },
+          "walletId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "69a7129f-0a0a-484d-968f-2601bce85149",
+            "description": "The USDT wallet this address deposits into"
+          },
+          "address": {
+            "type": "string",
+            "example": "0x220303f911dbC38F09d13f8cC3ba8700f0Ca8C99",
+            "description": "The on-chain address customers should send USDT to"
+          },
+          "currency": {
+            "type": "string",
+            "enum": ["USDT"],
+            "example": "USDT"
+          },
+          "network": {
+            "type": "string",
+            "description": "The blockchain network. Responses typically return this in uppercase (e.g. `ERC20`).",
+            "example": "ERC20"
+          },
+          "memo": {
+            "type": "string",
+            "nullable": true,
+            "description": "Destination memo/tag if required by the network. `null` when not applicable.",
+            "example": null
+          },
+          "reference": {
+            "type": "string",
+            "description": "The label supplied when the address was generated",
+            "example": "Theo test 1"
+          },
+          "minAmount": {
+            "type": "string",
+            "description": "Minimum deposit amount in USDT. Deposits below this amount may not be credited. For example, `5` means 5 USDT.",
+            "example": "5"
+          },
+          "maxAmount": {
+            "type": "string",
+            "description": "Maximum deposit amount in USDT. `0` means there is no maximum.",
+            "example": "0"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-08-20T10:09:46.288Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-08-20T10:09:46.288Z"
           }
         }
       },
@@ -2722,7 +3095,7 @@
           "currency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGN", "KES", "BTC", "ZAR", "GHS"],
+            "enum": ["NGN", "KES", "BTC", "ZAR", "GHS", "USDT"],
             "description": "The currency of the transaction"
           },
           "type": {
@@ -2937,7 +3310,7 @@
                   "currency": {
                     "type": "string",
                     "format": "string",
-                    "enum": ["NGN", "KES", "BTC", "USD"]
+                    "enum": ["NGN", "KES", "BTC", "USD", "USDT"]
                   },
                   "balance": {
                     "type": "number",
@@ -3592,7 +3965,7 @@
           },
           "currency": {
             "type": "string",
-            "enum": ["NGN", "KES", "BTC", "ZAR"]
+            "enum": ["NGN", "KES", "BTC", "ZAR", "USDT"]
           },
           "type": {
             "type": "string",
@@ -3821,6 +4194,14 @@
     {
       "name": "Payment Link",
       "description": "Payment Link endpoints for creating and managing hosted payment pages"
+    },
+    {
+      "name": "Collection",
+      "description": "Stablecoin collection endpoints for generating and listing USDT deposit addresses"
+    },
+    {
+      "name": "Withdraw",
+      "description": "Withdraw funds from Mavapay wallets to external accounts or addresses"
     }
   ]
 }

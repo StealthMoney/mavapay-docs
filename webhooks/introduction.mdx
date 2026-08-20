@@ -51,10 +51,10 @@ const response = await fetch('https://api.mavapay.co/api/v1/webhook', {
 
 ## Event Types
 
-Mavapay currently supports two types of webhook events:
+Mavapay currently supports the following webhook events:
 
-1. `payment.received` - Triggered when a payment is received
-2. `payment.sent` - Triggered when a payment is sent
+1. `payment.received` - Triggered when a payment is received (including USDT deposits). Status may be `SUCCESS` or `FAILED`.
+2. `payment.sent` - Triggered when a payment is sent (including USDT withdrawals). USDT withdrawals fire once as `PENDING` (`hash` is `null`) and again as `SUCCESS` when complete.
 
 ### Event Payloads
 

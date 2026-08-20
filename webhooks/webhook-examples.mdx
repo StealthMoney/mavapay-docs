@@ -114,6 +114,162 @@ Triggered when Bitcoin is sent on-chain to a beneficiary address.
   On-chain withdrawals remain in `PENDING` status until there are **3 block confirmations**, after which the status changes to `SUCCESS`.
 </Note>
 
+## USDT Webhooks
+
+USDT deposits and withdrawals use the same `payment.received` and `payment.sent` events as other currencies. Metadata is on `stablecoinTransactionMetadata`. The transaction `currency` is `"USDT"`.
+
+<Note>
+  Amounts are in USDT cents (2 decimal places). Divide by `100` to get USDT. For example, `1000` = 10 USDT, `300` = 3 USDT.
+</Note>
+
+### payment.received (Deposit)
+
+Fired after the on-chain deposit has been processed by Mavapay core.
+
+- `status: "SUCCESS"` — the funds are available in your USDT wallet
+- `status: "FAILED"` — the deposit was not credited. This can happen if the sending address is blacklisted, or in rare undocumented cases
+
+```json
+{
+  "event": "payment.received",
+  "data": {
+    "id": "ae30046c-27d5-4d12-b4b1-83782c934fc9",
+    "walletId": "206132f7-ed30-43fa-8f5a-e436aaf948cc",
+    "ref": "019ff3a2-4468-7cc2-a1e2-1c2b49fae1c4",
+    "hash": "7b69613664e79423c4b5f1e3dcb23",
+    "amount": 1000,
+    "fees": 0,
+    "currency": "USDT",
+    "type": "DEPOSIT",
+    "status": "SUCCESS",
+    "autopayout": false,
+    "createdAt": "2026-08-13T12:13:53.509Z",
+    "updatedAt": "2026-08-13T12:15:35.646Z",
+    "stablecoinTransactionMetadata": {
+      "id": "f25622be-8f64-4d0e-85a2-57443c9cbbc8",
+      "orderId": null,
+      "beneficiaryId": null,
+      "address": "0xC3a0dA7aB9e033801aE2531757526A156601b8C9",
+      "network": "erc20",
+      "currency": "USDT",
+      "memo": null,
+      "reference": "019ff3a2-4468-7cc2-a1e2-1c2b49fae1c4",
+      "customerReference": null,
+      "customerInternalFee": 0,
+      "createdAt": "2026-08-13T12:13:53.525Z",
+      "updatedAt": "2026-08-13T12:13:53.525Z"
+    }
+  }
+}
+```
+
+### Key Fields
+
+| Field | Description |
+|-------|-------------|
+| `amount` | Amount in USDT cents (`1000` = 10 USDT) |
+| `status` | `SUCCESS` if credited, `FAILED` if the deposit could not be credited |
+| `hash` | Set once the deposit has been processed |
+| `stablecoinTransactionMetadata.network` | Network the deposit arrived on (`erc20`, `trc20`, `plasma`, `solana`, `polygon`) |
+| `stablecoinTransactionMetadata.address` | The collection address that received the funds |
+| `stablecoinTransactionMetadata.reference` | Identifier for this deposit address |
+
+<Warning>
+  A `FAILED` deposit means the on-chain transfer was not credited to your wallet. Handle `FAILED` the same way you handle `SUCCESS`: acknowledge the webhook and update the customer. Do not retry crediting the funds yourself.
+</Warning>
+
+### payment.sent (Withdrawal initiated)
+
+Fired when you call [Withdraw stablecoin](/api-reference/endpoint/withdraw/withdraw-stablecoin). The transfer is not on-chain yet: `status` is `PENDING` and `hash` is `null`.
+
+```json
+{
+  "event": "payment.sent",
+  "data": {
+    "id": "01146747-640a-46c6-8023-c2d20f734ea3",
+    "walletId": "206132f7-ed30-43fa-8f5a-e436aaf948cc",
+    "ref": "a77d683ed70fca06a82969ec58c1a",
+    "hash": null,
+    "amount": 300,
+    "fees": 40,
+    "currency": "USDT",
+    "type": "WITHDRAWAL",
+    "status": "PENDING",
+    "autopayout": false,
+    "createdAt": "2026-08-13T12:38:08.958Z",
+    "updatedAt": "2026-08-13T12:38:08.958Z",
+    "stablecoinTransactionMetadata": {
+      "id": "609f20bb-5005-491d-9e8c-1b3454271d96",
+      "orderId": null,
+      "beneficiaryId": null,
+      "address": "0xC0508cBB551e0d7aB31D1b341591197c93e92B1F",
+      "network": "erc20",
+      "currency": "USDT",
+      "memo": null,
+      "reference": "a77d683ed70fca06a82969ec58c1a",
+      "customerReference": "customer-provided-reference",
+      "customerInternalFee": 0,
+      "createdAt": "2026-08-13T12:38:08.979Z",
+      "updatedAt": "2026-08-13T12:38:08.979Z"
+    }
+  }
+}
+```
+
+### payment.sent (Withdrawal completed)
+
+Fired when the withdrawal is completed. `status` is `SUCCESS` and `hash` is now set. The transaction `id` is the same as the pending webhook.
+
+```json
+{
+  "event": "payment.sent",
+  "data": {
+    "id": "01146747-640a-46c6-8023-c2d20f734ea3",
+    "walletId": "206132f7-ed30-43fa-8f5a-e436aaf948cc",
+    "ref": "a77d683ed70fca06a82969ec58c1a",
+    "hash": "c56dc34e8aedfd4ce737ba6092fed",
+    "amount": 300,
+    "fees": 40,
+    "currency": "USDT",
+    "type": "WITHDRAWAL",
+    "status": "SUCCESS",
+    "autopayout": false,
+    "createdAt": "2026-08-13T12:38:08.958Z",
+    "updatedAt": "2026-08-13T12:38:09.045Z",
+    "stablecoinTransactionMetadata": {
+      "id": "609f20bb-5005-491d-9e8c-1b3454271d96",
+      "orderId": null,
+      "beneficiaryId": null,
+      "address": "0xC0508cBB551e0d7aB31D1b341591197c93e92B1F",
+      "network": "erc20",
+      "currency": "USDT",
+      "memo": null,
+      "reference": "a77d683ed70fca06a82969ec58c1a",
+      "customerReference": "customer-provided-reference",
+      "customerInternalFee": 0,
+      "createdAt": "2026-08-13T12:38:08.979Z",
+      "updatedAt": "2026-08-13T12:38:08.979Z"
+    }
+  }
+}
+```
+
+### Withdrawal Fields
+
+| Field | Description |
+|-------|-------------|
+| `amount` | Amount in USDT cents (`300` = 3 USDT) |
+| `fees` | Withdrawal fee in USDT cents (`40` = 0.40 USDT) |
+| `hash` | `null` while `PENDING`; set when the withdrawal completes |
+| `status` | `PENDING` on initiate, `SUCCESS` when complete |
+| `stablecoinTransactionMetadata.address` | Destination address |
+| `stablecoinTransactionMetadata.network` | Network used for the withdrawal |
+| `stablecoinTransactionMetadata.customerReference` | Your `customerReference` from the withdraw request |
+
+<Note>
+  Treat the pending and completed `payment.sent` events as the same withdrawal (`data.id` does not change). Use idempotency so you do not double-process the completed event.
+</Note>
+
 ## Payment Link Webhooks
 
 ### payment_link.settled

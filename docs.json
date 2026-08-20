@@ -32,6 +32,12 @@
             ]
           },
           {
+            "group": "Stablecoins",
+            "pages": [
+              "stablecoins/introduction"
+            ]
+          },
+          {
             "group": "Webhooks",
             "pages": [
               "webhooks/introduction",
@@ -119,10 +125,18 @@
                 ]
               },
               {
+                "group": "Collection",
+                "pages": [
+                  "api-reference/endpoint/collection/generate-stablecoin-address",
+                  "api-reference/endpoint/collection/get-stablecoin-addresses"
+                ]
+              },
+              {
                 "group": "Withdraw",
                 "pages": [
                   "api-reference/endpoint/withdraw/withdraw-fiat",
-                  "api-reference/endpoint/withdraw/withdraw-btc"
+                  "api-reference/endpoint/withdraw/withdraw-btc",
+                  "api-reference/endpoint/withdraw/withdraw-stablecoin"
                 ]
               },
               {
