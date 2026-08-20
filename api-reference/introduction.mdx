@@ -71,7 +71,7 @@ The response body will contain the data you requested or an error message if the
 
 Mavapay makes use of the [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) format for currency codes. When sending currency codes in requests, please use the appropriate ISO 4217 code for the currency you are working with.
 
-> When sending amounts, please ensure that the amount is in the smallest unit of the currency. For example, if you are sending 100 NGN, you should send `10000` as the amount `(100 * 100)`.
+> When sending amounts, please ensure that the amount is in the smallest unit of the currency. For example, if you are sending 100 NGN, you should send `10000` as the amount `(100 * 100)`. For USDT, amounts are in cents (2 decimal places), so 1 USDT is `100`.
 >
 > Here are the list of currencies our API supports (we're constantly adding more currencies):
 
@@ -117,7 +117,7 @@ Mavapay makes use of the [ISO 4217](https://www.iso.org/iso-4217-currency-codes.
 
 </ResponseField>
 
-<ResponseField name="Cryptocurrency">
+<ResponseField name="Cryptocurrency and stablecoins">
 
 <CodeGroup>
 ```json BTC
@@ -126,6 +126,15 @@ Mavapay makes use of the [ISO 4217](https://www.iso.org/iso-4217-currency-codes.
   "currency name": "Bitcoin",
   "symbol": "B",
   "base unit": "satoshis"
+}
+```
+
+```json USDT
+{
+  "currency": "USDT",
+  "currency name": "Tether USD",
+  "symbol": "USDT",
+  "base unit": "cent (1 USDT = 100 cents)"
 }
 ```
 </CodeGroup>

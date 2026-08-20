@@ -1,0 +1,226 @@
+---
+title: 'Stablecoins'
+description: 'Deposit and withdraw USDT using your Mavapay stablecoin wallet'
+---
+
+Mavapay provides a USDT wallet that you can use to collect stablecoin deposits from customers and send USDT to external addresses.
+
+## Overview
+
+USDT balances live in your Mavapay **USDT wallet**, separate from your BTC and fiat wallets. You can:
+
+1. [Generate a deposit address](/api-reference/endpoint/collection/generate-stablecoin-address) on a supported network
+2. Share that address with your customer
+3. Receive a `payment.received` webhook when the deposit is credited (or `FAILED` if it cannot be credited)
+4. [Withdraw USDT](/api-reference/endpoint/withdraw/withdraw-stablecoin) to any address on a supported network
+
+Check your USDT balance with the [Get wallets](/api-reference/endpoint/wallet/get-wallets) endpoint (`currency=USDT`).
+
+## Supported Networks
+
+| Network | Request value | Address format |
+|---------|---------------|----------------|
+| Tron (TRC20) | `trc20` | Tron address (`T...`) |
+| Ethereum (ERC20) | `erc20` | Ethereum address (`0x...`) |
+| Plasma | `plasma` | Plasma address |
+| Solana | `solana` | Solana address |
+| Polygon | `polygon` | Polygon / EVM address (`0x...`) |
+
+Use **lowercase** network values in requests (`erc20`, `trc20`). Address objects may return the network in uppercase (`ERC20`); webhook metadata uses lowercase (`erc20`).
+
+<Warning>
+  Send USDT only on the network the address was generated for. USDT sent on the wrong chain cannot be recovered.
+</Warning>
+
+## Amounts
+
+USDT amounts in API requests, wallet balances, and webhooks are in **cents** (2 decimal places). 1 USDT = 100 cents:
+
+| Amount | USDT |
+|--------|------|
+| `100` | 1 USDT |
+| `500` | 5 USDT |
+| `1000` | 10 USDT |
+| `500000` | 5,000 USDT |
+
+Deposit address `minAmount` and `maxAmount` are returned in **USDT**, not cents. For example, `"minAmount": "5"` means deposits below 5 USDT may not be credited. `"maxAmount": "0"` means there is no maximum.
+
+## Deposit USDT
+
+### 1. Generate a deposit address
+
+Call [Generate a stablecoin deposit address](/api-reference/endpoint/collection/generate-stablecoin-address) with a `label` so you can identify the address later. You can create multiple addresses per network.
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/collections/stablecoin/generate-address \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "label": "test 1",
+    "currency": "USDT",
+    "network": "erc20"
+  }'
+```
+
+Sample response:
+
+```json
+{
+  "status": "ok",
+  "message": "Address generated successfully",
+  "data": {
+    "id": "bdf9bbba-f562-4b10-abfb-b180404415b7",
+    "address": "0x220303f911dbC38F09d13f8cC3ba8700f0Ca8C99",
+    "currency": "USDT",
+    "network": "ERC20",
+    "memo": null,
+    "reference": "test 1",
+    "minAmount": "5",
+    "maxAmount": "0",
+    "walletId": "69a7129f-0a0a-484d-968f-2601bce85149",
+    "updatedAt": "2026-08-20T10:09:46.288Z",
+    "createdAt": "2026-08-20T10:09:46.288Z"
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `address` | Share this with the customer. They must send USDT on the matching network. |
+| `memo` | Include this with the transfer when it is not `null`. Most supported networks do not require a memo. |
+| `reference` | The `label` you supplied when generating the address. |
+| `minAmount` | Minimum deposit in USDT. |
+| `walletId` | The USDT wallet that will be credited. |
+
+### 2. List existing addresses
+
+Retrieve previously generated addresses with [List stablecoin deposit addresses](/api-reference/endpoint/collection/get-stablecoin-addresses):
+
+```bash
+curl --request GET \
+  --url 'https://api.mavapay.co/api/v1/collections/stablecoin/addresses?currency=USDT' \
+  --header 'x-api-key: YOUR_API_KEY'
+```
+
+Sample response:
+
+```json
+{
+  "status": "ok",
+  "message": "Deposit addresses retrieved successfully",
+  "data": [
+    {
+      "id": "41abd3c5-4fcd-4e8a-8c74-5702bb758f80",
+      "walletId": "69a7129f-0a0a-484d-968f-2601bce85149",
+      "address": "0xAdEd4E29eB636A5c6500c881812701eB0a7043A0",
+      "network": "ERC20",
+      "currency": "USDT",
+      "memo": null,
+      "reference": "test 1",
+      "minAmount": "5",
+      "maxAmount": "0",
+      "createdAt": "2026-06-09T09:24:38.785Z",
+      "updatedAt": "2026-06-09T09:24:38.785Z"
+    }
+  ]
+}
+```
+
+### 3. Wait for the deposit webhook
+
+After the transfer confirms on-chain, Mavapay core credits your USDT wallet and sends a `payment.received` webhook with `currency: "USDT"` and `type: "DEPOSIT"`.
+
+- `status: "SUCCESS"` — the deposit is available in your USDT wallet
+- `status: "FAILED"` — the deposit was not credited. This can happen if the sending address is blacklisted, or in rare undocumented cases
+
+Use the transaction `id` for idempotency. Match the deposit to a customer with `stablecoinTransactionMetadata.address` or `reference`.
+
+See [USDT webhook examples](/webhooks/webhook-examples#usdt-webhooks).
+
+## Withdraw USDT
+
+Withdraw from your USDT wallet to any address on a supported network.
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/withdraw/stablecoin \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "amount": "500000",
+    "network": "trc20",
+    "currency": "USDT",
+    "address": "TLt6fwdcdD18S36L9oiikn4Z8hebgwbzwS",
+    "customerReference": "customer-provided-reference"
+  }'
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `amount` | Yes | Amount in USDT cents (2 decimal places). `"500000"` = 5,000 USDT |
+| `network` | Yes | `trc20`, `erc20`, `plasma`, `solana`, or `polygon` |
+| `currency` | Yes | Must be `USDT` |
+| `address` | Yes | Destination address on the selected network |
+| `customerReference` | No | Your identifier for this withdrawal. Returned on webhooks as `stablecoinTransactionMetadata.customerReference` |
+
+<Warning>
+  The destination `address` must be valid for the `network` you pass. A Tron address will fail on `erc20`, and an Ethereum address will fail on `trc20`.
+</Warning>
+
+You receive two `payment.sent` webhooks for a withdrawal:
+
+1. **Initiated** — `status: "PENDING"` and `hash` is `null`
+2. **Completed** — `status: "SUCCESS"` and `hash` is populated
+
+See [USDT webhook examples](/webhooks/webhook-examples#usdt-webhooks).
+
+## Webhooks
+
+| Event | When |
+|-------|------|
+| `payment.received` | Deposit processed by Mavapay core. `SUCCESS` if credited; `FAILED` if it cannot be credited (for example a blacklisted sending address) |
+| `payment.sent` | Withdrawal initiated (`PENDING`, `hash` is `null`) and again when it completes (`SUCCESS`, `hash` is set) |
+
+Register your webhook endpoint before going live. See [Webhook integration](/webhooks/introduction) and [USDT webhook examples](/webhooks/webhook-examples#usdt-webhooks).
+
+## Testing
+
+Use the staging environment while you integrate:
+
+```bash
+https://staging.api.mavapay.co/api/v1
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Generate deposit address"
+    icon="wallet"
+    href="/api-reference/endpoint/collection/generate-stablecoin-address"
+  >
+    Create a USDT address on a supported network
+  </Card>
+  <Card
+    title="Withdraw USDT"
+    icon="arrow-up-from-bracket"
+    href="/api-reference/endpoint/withdraw/withdraw-stablecoin"
+  >
+    Send USDT from your Mavapay wallet
+  </Card>
+  <Card
+    title="Get wallets"
+    icon="vault"
+    href="/api-reference/endpoint/wallet/get-wallets"
+  >
+    Check your USDT wallet balance
+  </Card>
+  <Card
+    title="Webhook examples"
+    icon="webhook"
+    href="/webhooks/webhook-examples"
+  >
+    Handle deposit and withdrawal events
+  </Card>
+</CardGroup>
