@@ -1,0 +1,89 @@
+---
+title: 'Prefunded Quote (Internal Wallet)'
+description: 'Create a quote funded from your internal wallet and accept it for payout'
+---
+
+# Prefunded Quote (Internal Wallet)
+
+A prefunded quote extends the standard [quote](/api-reference/endpoint/quote/get-quote) flow: instead of sending funds to a bank account or paying a Lightning invoice, the source amount is deducted directly from your internal wallet.
+
+## Create Quote
+
+`POST {{url}}/quote`
+
+```json
+{
+    "amount": "1000",
+    "sourceCurrency": "USDTCENT",
+    "targetCurrency": "NGNKOBO",
+    "paymentMethod": "ONCHAIN",
+    "paymentCurrency": "USDTCENT",
+    "sourceWallet": "USDT",
+    "autopayout": true,
+    "beneficiary": {
+        "bankAccountNumber": "7012345678",
+        "bankAccountName": "Example Customer",
+        "bankCode": "100004",
+        "bankName": "OPAY"
+    }
+}
+```
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "b01af569-7ad3-4803-ad3c-4aa368ee98bf",
+    "exchangeRate": 109495302.39059484,
+    "usdToTargetCurrencyRate": 1374.033506,
+    "sourceCurrency": "USDTCENT",
+    "targetCurrency": "NGNKOBO",
+    "transactionFeesInSourceCurrency": 8,
+    "transactionFeesInTargetCurrency": 10305,
+    "amountInSourceCurrency": 1000,
+    "amountInTargetCurrency": 1363041,
+    "paymentMethod": "ONCHAIN",
+    "expiry": "2026-08-27T11:16:41.564Z",
+    "isValid": true,
+    "invoice": "",
+    "hash": "",
+    "totalAmountInSourceCurrency": 1000,
+    "customerInternalFee": 0,
+    "invoiceRequired": false,
+    "onchainAddress": "MPY_USDTCENT_1787828801564",
+    "network": "trc20",
+    "memo": "MAVAPAY_INTERNAL",
+    "orderId": "260827-GDTV6-28K3N"
+  }
+}
+```
+
+## Accept Quote (Pay with Internal Wallet)
+
+To pay with your internal wallet, call the accept endpoint with the quote `id` in the path.
+
+`POST {{url}}/wallet/payout/:id/accept`
+
+```json
+{
+    "sourceWallet": "USDT"
+}
+```
+
+**200 Response:**
+
+```json
+{
+    "status": "ok",
+    "message": "quote is being processed"
+}
+```
+
+**400 Response:**
+
+```json
+{
+  "status": "error",
+  "message": "Error processing internal transfer: Insufficient balance in USDT wallet"
+}
+```

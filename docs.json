@@ -48,6 +48,7 @@
             "group": "Guides",
             "pages": [
               "guides/quote-examples",
+              "guides/prefunded-internal-wallet",
               "guides/beneficiary-formats",
               "guides/name-enquiry-guide",
               "guides/simulation",
