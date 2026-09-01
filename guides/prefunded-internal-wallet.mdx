@@ -42,12 +42,9 @@ curl --location 'https://api.mavapay.co/api/v1/quote' \
 
 ### **Step 2: The Quote Response**
 
-Mavapay returns a quote object. Key fields to note:
+Mavapay returns a quote object. Key field to note:
 
 - **`id`** — Use this when accepting the quote from your wallet.
-- **`onchainAddress`** — The internal address to route the transaction.
-- **`network`** — The network used (e.g. `trc20`).
-- **`memo`** — Set to `MAVAPAY_INTERNAL` for internal wallet transactions.
 
 > **Note:** Quotes are typically valid for **5–10 minutes**. You must accept before the `expiry` timestamp.
 
@@ -82,7 +79,7 @@ Mavapay returns a quote object. Key fields to note:
 
 ### **Step 3: Accept and Settle from Wallet**
 
-To finalize the payout, call the [accept endpoint](/api-reference/endpoint/wallet/accept-quote). This will immediately deduct the `amountInSourceCurrency` (plus fees) from your internal wallet and process the payout to the beneficiary.
+To finalize the payout, call the [accept endpoint](/api-reference/endpoint/wallet/accept-quote). This will immediately deduct the `totalAmountInSourceCurrency` from your internal wallet and process the payout to the beneficiary.
 
 * **Endpoint:** `POST .../wallet/payout/{quoteId}/accept`
 * **Payload:** The `sourceWallet` value must match the one used in the original quote.
