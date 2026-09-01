@@ -1,18 +1,29 @@
 ---
-title: 'Prefunded Quote (Internal Wallet)'
-description: 'Create a quote funded from your internal wallet and accept it for payout'
+title: "Prefunded Quote (Internal Wallet)"
+description: "Learn how to create a quote funded from your internal wallet and accept it for payout"
 ---
 
-# Prefunded Quote (Internal Wallet)
+This guide covers how to create a [prefunded quote](/api-reference/endpoint/quote/get-quote) and settle it using your internal wallet balance. A prefunded quote is identical to a standard quote — the only difference is the `sourceWallet` field, which tells Mavapay to deduct the source amount directly from your internal wallet instead of expecting an external bank transfer or Lightning payment.
 
-A prefunded quote extends the standard [quote](/api-reference/endpoint/quote/get-quote) flow: instead of sending funds to a bank account or paying a Lightning invoice, the source amount is deducted directly from your internal wallet.
+---
 
-## Create Quote
+## **Prefunded Quote Flow**
 
-`POST {{url}}/quote`
+Performing a prefunded payout is a two-step process: **Requesting a Quote** and **Accepting the Quote from your Wallet**.
 
-```json
-{
+### **Step 1: Create a Prefunded Quote**
+
+The [quote endpoint](/api-reference/endpoint/quote/get-quote) calculates the exchange rate and fees. The request is the same as a standard quote, with one addition: the `sourceWallet` field.
+
+<Note>
+  **The `sourceWallet` field** is the only difference between a prefunded quote and a regular quote. It specifies which internal wallet to debit for the source amount. The value must correspond to the `sourceCurrency` in the quote body (e.g. `USDTCENT` → `USDT`, `BTCSAT` → `BTC`, `NGNKOBO` → `NGN`).
+</Note>
+
+```bash
+curl --location 'https://api.mavapay.co/api/v1/quote' \
+--header 'Content-Type: application/json' \
+--header 'x-api-key: YOUR_API_KEY' \
+--data '{
     "amount": "1000",
     "sourceCurrency": "USDTCENT",
     "targetCurrency": "NGNKOBO",
@@ -26,8 +37,19 @@ A prefunded quote extends the standard [quote](/api-reference/endpoint/quote/get
         "bankCode": "100004",
         "bankName": "OPAY"
     }
-}
+}'
 ```
+
+### **Step 2: The Quote Response**
+
+Mavapay returns a quote object. Key fields to note:
+
+- **`id`** — Use this when accepting the quote from your wallet.
+- **`onchainAddress`** — The internal address to route the transaction.
+- **`network`** — The network used (e.g. `trc20`).
+- **`memo`** — Set to `MAVAPAY_INTERNAL` for internal wallet transactions.
+
+> **Note:** Quotes are typically valid for **5–10 minutes**. You must accept before the `expiry` timestamp.
 
 ```json
 {
@@ -58,16 +80,20 @@ A prefunded quote extends the standard [quote](/api-reference/endpoint/quote/get
 }
 ```
 
-## Accept Quote (Pay with Internal Wallet)
+### **Step 3: Accept and Settle from Wallet**
 
-To pay with your internal wallet, call the accept endpoint with the quote `id` in the path.
+To finalize the payout, call the [accept endpoint](/api-reference/endpoint/wallet/accept-quote). This will immediately deduct the `amountInSourceCurrency` (plus fees) from your internal wallet and process the payout to the beneficiary.
 
-`POST {{url}}/wallet/payout/:id/accept`
+* **Endpoint:** `POST .../wallet/payout/{quoteId}/accept`
+* **Payload:** The `sourceWallet` value must match the one used in the original quote.
 
-```json
-{
+```bash
+curl --location 'https://api.mavapay.co/api/v1/wallet/payout/b01af569-7ad3-4803-ad3c-4aa368ee98bf/accept' \
+--header 'Content-Type: application/json' \
+--header 'x-api-key: YOUR_API_KEY' \
+--data '{
     "sourceWallet": "USDT"
-}
+}'
 ```
 
 **200 Response:**
@@ -79,11 +105,26 @@ To pay with your internal wallet, call the accept endpoint with the quote `id` i
 }
 ```
 
-**400 Response:**
+**400 Response (Insufficient Balance):**
 
 ```json
 {
-  "status": "error",
-  "message": "Error processing internal transfer: Insufficient balance in USDT wallet"
+    "status": "error",
+    "message": "Error processing internal transfer: Insufficient balance in USDT wallet"
 }
 ```
+
+---
+
+## **Key Considerations**
+
+* **Sufficient Balance:** Ensure your internal wallet has enough funds to cover the `totalAmountInSourceCurrency` (which includes fees).
+* **Rate Volatility:** Because exchange rates change rapidly, the quote `id` is short-lived. If it expires, you must generate a new quote.
+* **Denominations:** All amounts are in the lowest denomination (cents for USDTCENT, kobo for NGNKOBO, satoshis for BTCSAT).
+
+## **Related Resources**
+
+- [Create Quote API](/api-reference/endpoint/quote/get-quote) — Full quote endpoint reference
+- [Accept Quote API](/api-reference/endpoint/wallet/accept-quote) — Wallet accept endpoint reference
+- [Beneficiary Formats](/guides/beneficiary-formats) — Required beneficiary formats for each currency
+- [Internal Currency Swap](/guides/internal-currency-swap) — Similar flow for swapping between internal wallets
