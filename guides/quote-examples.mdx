@@ -14,9 +14,13 @@ Mavapay supports the following currency conversions:
 - BTCSAT => NGNKOBO (Bitcoin to Nigerian Naira)
 - BTCSAT => ZARCENT (Bitcoin to South African Rand)
 - BTCSAT => KESCENT (Bitcoin to Kenyan Shilling)
+- BTCSAT => USDTCENT (Bitcoin to USDT — [crypto swap](/swaps/introduction), 60 second quote)
 - NGNKOBO => BTCSAT (Nigerian Naira to Bitcoin)
+- NGNKOBO => USDTCENT (Nigerian Naira to USDT)
 - NGNKOBO => ZARCENT (Nigerian Naira to South African Rand)
 - NGNKOBO => KESCENT (Nigerian Naira to Kenyan Shilling)
+- USDTCENT => BTCSAT (USDT to Bitcoin — [crypto swap](/swaps/introduction), 60 second quote)
+- USDTCENT => NGNKOBO (USDT to Nigerian Naira payout)
 
 **Get Price endpoint possible values:** `NGN`, `KES`, `ZAR`
 
@@ -318,6 +322,215 @@ Mavapay supports the following currency conversions:
 }
 ```
 
+## Bitcoin to USDT (BTCSAT => USDTCENT)
+
+Quote expires in **60 seconds**. Autopayout to an external USDT address is not supported. See [Crypto Swaps](/swaps/introduction).
+
+### Pay a Lightning invoice
+
+Omit `sourceWallet`. Pay the `invoice` in the response within 60 seconds. USDT is credited to your internal wallet.
+
+```json
+{
+  "amount": "1000",
+  "sourceCurrency": "BTCSAT",
+  "targetCurrency": "USDTCENT",
+  "paymentMethod": "LIGHTNING",
+  "paymentCurrency": "USDTCENT",
+  "autopayout": false
+}
+```
+
+The response `invoice` is a Lightning invoice (`lnbc...`). `amountInSourceCurrency` is the satoshi amount to pay. `amountInTargetCurrency` is the USDT credited, in cents.
+
+### Debit your BTC wallet
+
+Pass `sourceWallet: "BTC"` and accept the quote. Do not pay the internal `MAVAPAY_INTERNAL` invoice.
+
+### Request
+
+```json
+{
+  "amount": "1000",
+  "sourceCurrency": "BTCSAT",
+  "targetCurrency": "USDTCENT",
+  "paymentMethod": "LIGHTNING",
+  "paymentCurrency": "USDTCENT",
+  "autopayout": false,
+  "sourceWallet": "BTC",
+  "customerReference": "swap 1"
+}
+```
+
+### Response
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "a98d4e1d-9239-49e4-b4a2-67bd20f335e0",
+    "exchangeRate": 82082.54529,
+    "usdToTargetCurrencyRate": 1,
+    "sourceCurrency": "BTCSAT",
+    "targetCurrency": "USDTCENT",
+    "transactionFeesInSourceCurrency": 60,
+    "transactionFeesInTargetCurrency": 5,
+    "amountInSourceCurrency": 12300,
+    "amountInTargetCurrency": 1000,
+    "paymentMethod": "LIGHTNING",
+    "expiry": "2026-10-15T23:25:44.501Z",
+    "isValid": true,
+    "invoice": "MAVAPAY_INTERNAL:a98d4e1d-9239-49e4-b4a2-67bd20f335e0",
+    "hash": "a98d4e1d-9239-49e4-b4a2-67bd20f335e0",
+    "totalAmountInSourceCurrency": 12300,
+    "customerInternalFee": 0,
+    "customerReference": "swap 1",
+    "invoiceRequired": false,
+    "estimatedRoutingFee": 0,
+    "orderId": "261015-VPSVK-VEAY4"
+  }
+}
+```
+
+Accept with `"sourceWallet": "BTC"`. `1000` USDTCENT = 10 USDT. `12300` source = satoshis debited.
+
+## USDT to Bitcoin (USDTCENT => BTCSAT)
+
+Internal wallet swap. Quote expires in **60 seconds**. See [Crypto Swaps](/swaps/introduction).
+
+### Request
+
+```json
+{
+  "amount": "1000",
+  "sourceCurrency": "USDTCENT",
+  "targetCurrency": "BTCSAT",
+  "paymentMethod": "ONCHAIN",
+  "paymentCurrency": "USDTCENT",
+  "autopayout": false,
+  "sourceWallet": "USDT",
+  "customerReference": "swap 2"
+}
+```
+
+### Response
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "4a4467fd-c39d-46b0-bd90-23af5aca90bd",
+    "exchangeRate": 1,
+    "usdToTargetCurrencyRate": 0.00001216556302755137,
+    "sourceCurrency": "USDTCENT",
+    "targetCurrency": "BTCSAT",
+    "transactionFeesInSourceCurrency": 5,
+    "transactionFeesInTargetCurrency": 61,
+    "amountInSourceCurrency": 1000,
+    "amountInTargetCurrency": 12105,
+    "paymentMethod": "ONCHAIN",
+    "expiry": "2026-10-16T02:03:13.014Z",
+    "isValid": true,
+    "invoice": "",
+    "hash": "",
+    "totalAmountInSourceCurrency": 1000,
+    "customerInternalFee": 0,
+    "customerReference": "swap 2",
+    "invoiceRequired": false,
+    "onchainAddress": "MPY_USDTCENT_1792116133014",
+    "network": "trc20",
+    "memo": "MAVAPAY_INTERNAL",
+    "estimatedRoutingFee": 0,
+    "orderId": "261016-MBVJ7-1EG3F"
+  }
+}
+```
+
+Accept with `"sourceWallet": "USDT"`. Do not send funds to `onchainAddress`.
+
+## Nigerian Naira to USDT (NGNKOBO => USDTCENT)
+
+Buy USDT with NGN. Quote is valid for **10 minutes**. See [Buy USDT with NGN](/stablecoins/buy-usdt).
+
+### Request
+
+```json
+{
+  "amount": "10000",
+  "sourceCurrency": "NGNKOBO",
+  "targetCurrency": "USDTCENT",
+  "paymentMethod": "BANKTRANSFER",
+  "paymentCurrency": "USDTCENT",
+  "autopayout": true,
+  "customerReference": "onchain ngn 1",
+  "beneficiary": {
+    "address": "TR7NHqjeKQxGTCi8q8ZY4pL8ktSzgjLj6t",
+    "network": "trc20"
+  }
+}
+```
+
+### Response
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "c4b76db5-c9f8-452d-b40b-4c1a065190bf",
+    "exchangeRate": 82002.94497,
+    "usdToTargetCurrencyRate": 1,
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "USDTCENT",
+    "transactionFeesInSourceCurrency": 68525,
+    "transactionFeesInTargetCurrency": 50,
+    "amountInSourceCurrency": 13910500,
+    "amountInTargetCurrency": 10000,
+    "paymentMethod": "BANKTRANSFER",
+    "expiry": "2026-10-16T02:16:58.104Z",
+    "isValid": true,
+    "invoice": "",
+    "hash": "6ad186c27e7528e98f260f99",
+    "totalAmountInSourceCurrency": 13910500,
+    "customerInternalFee": 0,
+    "customerReference": "onchain ngn 1",
+    "invoiceRequired": false,
+    "bankName": "WEMA BANK",
+    "ngnBankAccountNumber": "7824121093780538",
+    "ngnAccountName": "Mava Digital Solutions Limited",
+    "ngnBankCode": "000027",
+    "estimatedRoutingFee": 100,
+    "orderId": "261016-JXEMY-DB30Y"
+  }
+}
+```
+
+Pay `totalAmountInSourceCurrency` in kobo to the virtual account. `10000` USDTCENT = 100 USDT.
+
+## USDT to Nigerian Naira (USDTCENT => NGNKOBO)
+
+Fiat payout sourced from your USDT wallet. Pass `sourceWallet: "USDT"` and `settlementCurrency: "USDT"`, then accept the quote. See [Prefunded Quote](/guides/prefunded-internal-wallet).
+
+### Request
+
+```json
+{
+  "amount": "1000",
+  "sourceCurrency": "USDTCENT",
+  "targetCurrency": "NGNKOBO",
+  "paymentMethod": "ONCHAIN",
+  "paymentCurrency": "USDTCENT",
+  "sourceWallet": "USDT",
+  "settlementCurrency": "USDT",
+  "autopayout": true,
+  "beneficiary": {
+    "bankAccountNumber": "7012345678",
+    "bankAccountName": "Example Customer",
+    "bankCode": "100004",
+    "bankName": "OPAY"
+  }
+}
+```
+
 ## Understanding Quote Fields
 
 | Field | Description |
@@ -336,7 +549,7 @@ Mavapay supports the following currency conversions:
 | `expiry` | Quote expiration timestamp |
 
 <Tip>
-  All amounts are in the lowest denomination of the currency (kobo for NGN, cents for KES/ZAR, satoshis for BTC).
+  All amounts are in the lowest denomination of the currency (kobo for NGN, cents for KES/ZAR/USDT, satoshis for BTC). Crypto swap quotes expire in 60 seconds. NGN → USDT quotes expire in 10 minutes.
 </Tip>
 
 ## Next Steps

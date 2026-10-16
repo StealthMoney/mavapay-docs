@@ -17,8 +17,10 @@ Mavapay allows you to send money to bank accounts and mobile money accounts in s
 The payout process generally involves:
 
 1. Creating a quote for the amount you want to pay out
-2. Paying the generated lightning invoice
+2. Paying the generated lightning invoice **or** settling from an internal wallet
 3. Receiving webhook notifications for payment status
+
+You can fund a fiat payout from **Bitcoin (Lightning)**, **USDT**, or an internal **NGN** wallet. To pay from USDT, set `sourceCurrency` to `USDTCENT`, `sourceWallet` to `USDT`, and `settlementCurrency` to `USDT`, then [accept the quote](/api-reference/endpoint/wallet/accept-quote). See [Prefunded Quote](/guides/prefunded-internal-wallet).
 
 ## Currency-Specific Requirements
 

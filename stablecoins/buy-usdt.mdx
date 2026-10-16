@@ -1,0 +1,160 @@
+---
+title: 'Buy USDT with NGN'
+description: 'Buy USDT using Nigerian Naira — to an external address or your internal wallet'
+---
+
+Buy USDT with Naira. You can send the USDT to an external address, or credit your internal USDT wallet.
+
+NGN → USDT quotes are valid for **10 minutes**.
+
+## Choose how you pay and where USDT goes
+
+| You want to… | Set these fields |
+|---|---|
+| Customer pays from an external NGN bank account | Omit `sourceWallet`. Pay the virtual account on the quote. |
+| Pay from your internal NGN wallet | `"sourceWallet": "NGN"` and `"skipVirtualAccount": true`, then [accept the quote](/api-reference/endpoint/wallet/accept-quote) |
+| Send USDT to an external address | `"autopayout": true` and a `beneficiary` with `address` + `network` |
+| Credit your internal USDT wallet | `"autopayout": false` (no beneficiary) |
+
+`paymentCurrency` controls what `amount` means. With `"paymentCurrency": "USDTCENT"`, `"10000"` is **100 USDT**.
+
+## Pay from an external bank account
+
+USDT is sent to the beneficiary address after the NGN transfer is received.
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/quote \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "amount": "10000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "USDTCENT",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "USDTCENT",
+    "autopayout": true,
+    "customerReference": "onchain ngn 1",
+    "beneficiary": {
+      "address": "TR7NHqjeKQxGTCi8q8ZY4pL8ktSzgjLj6t",
+      "network": "trc20"
+    }
+  }'
+```
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "c4b76db5-c9f8-452d-b40b-4c1a065190bf",
+    "exchangeRate": 82002.94497,
+    "usdToTargetCurrencyRate": 1,
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "USDTCENT",
+    "transactionFeesInSourceCurrency": 68525,
+    "transactionFeesInTargetCurrency": 50,
+    "amountInSourceCurrency": 13910500,
+    "amountInTargetCurrency": 10000,
+    "paymentMethod": "BANKTRANSFER",
+    "expiry": "2026-10-16T02:16:58.104Z",
+    "isValid": true,
+    "invoice": "",
+    "hash": "6ad186c27e7528e98f260f99",
+    "totalAmountInSourceCurrency": 13910500,
+    "customerInternalFee": 0,
+    "customerReference": "onchain ngn 1",
+    "invoiceRequired": false,
+    "bankName": "WEMA BANK",
+    "ngnBankAccountNumber": "7824121093780538",
+    "ngnAccountName": "Mava Digital Solutions Limited",
+    "ngnBankCode": "000027",
+    "estimatedRoutingFee": 100,
+    "orderId": "261016-JXEMY-DB30Y"
+  }
+}
+```
+
+Pay **exactly** `totalAmountInSourceCurrency` (kobo) to the virtual account:
+
+| Field | Use |
+|-------|-----|
+| `ngnBankAccountNumber` | Account number to pay |
+| `ngnAccountName` | Account name |
+| `bankName` | Bank |
+| `totalAmountInSourceCurrency` | Amount in kobo (`13910500` = ₦139,105.00) |
+| `expiry` | Quote is valid for 10 minutes |
+
+When payment is received you get `payment.received`, then `payment.sent` when USDT is sent to the beneficiary.
+
+## Pay from your internal NGN wallet
+
+If your NGN wallet has enough balance, skip the virtual account and accept the quote.
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/quote \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "amount": "10000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "USDTCENT",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "USDTCENT",
+    "autopayout": true,
+    "sourceWallet": "NGN",
+    "skipVirtualAccount": true,
+    "customerReference": "internal ngn usdt",
+    "beneficiary": {
+      "address": "TR7NHqjeKQxGTCi8q8ZY4pL8ktSzgjLj6t",
+      "network": "trc20"
+    }
+  }'
+```
+
+Then accept with `sourceWallet: "NGN"`:
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/wallet/payout/c4b76db5-c9f8-452d-b40b-4c1a065190bf/accept \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "sourceWallet": "NGN"
+  }'
+```
+
+Your NGN wallet is debited immediately. No bank transfer is required.
+
+## Credit your internal USDT wallet
+
+Set `autopayout` to `false` and omit `beneficiary`. USDT is credited to your Mavapay USDT wallet instead of an external address.
+
+```json
+{
+  "amount": "10000",
+  "sourceCurrency": "NGNKOBO",
+  "targetCurrency": "USDTCENT",
+  "paymentMethod": "BANKTRANSFER",
+  "paymentCurrency": "USDTCENT",
+  "autopayout": false,
+  "customerReference": "usdt to wallet"
+}
+```
+
+Pay the virtual account (external NGN) or pass `sourceWallet: "NGN"` + `skipVirtualAccount: true` and accept (internal NGN).
+
+## Beneficiary
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `address` | Yes, when `autopayout` is `true` | Destination USDT address |
+| `network` | Yes, when `autopayout` is `true` | `trc20`, `erc20`, `plasma`, `solana`, or `polygon` |
+
+The address must match the network. See [USDT networks](/stablecoins/introduction#supported-networks).
+
+## Related
+
+- [USDT wallet](/stablecoins/introduction) — deposit and withdraw
+- [Crypto swaps](/swaps/introduction) — BTC ↔ USDT
+- [Accept quote](/api-reference/endpoint/wallet/accept-quote)

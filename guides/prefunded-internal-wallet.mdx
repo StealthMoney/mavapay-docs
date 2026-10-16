@@ -16,7 +16,11 @@ Performing a prefunded payout is a two-step process: **Requesting a Quote** and 
 The [quote endpoint](/api-reference/endpoint/quote/get-quote) calculates the exchange rate and fees. The request is the same as a standard quote, with one addition: the `sourceWallet` field.
 
 <Note>
-  **The `sourceWallet` field** is the only difference between a prefunded quote and a regular quote. It specifies which internal wallet to debit for the source amount. The value must correspond to the `sourceCurrency` in the quote body (e.g. `USDTCENT` → `USDT`, `BTCSAT` → `BTC`, `NGNKOBO` → `NGN`).
+  **`sourceWallet`** tells Mavapay which internal wallet to debit. It must match `sourceCurrency` (`USDTCENT` → `USDT`, `BTCSAT` → `BTC`, `NGNKOBO` → `NGN`).
+</Note>
+
+<Note>
+  To settle from your USDT wallet, also pass `"settlementCurrency": "USDT"`. For USDT-sourced fiat payouts use `sourceCurrency: "USDTCENT"`, `sourceWallet: "USDT"`, and `settlementCurrency: "USDT"`.
 </Note>
 
 ```bash
@@ -30,6 +34,7 @@ curl --location 'https://api.mavapay.co/api/v1/quote' \
     "paymentMethod": "ONCHAIN",
     "paymentCurrency": "USDTCENT",
     "sourceWallet": "USDT",
+    "settlementCurrency": "USDT",
     "autopayout": true,
     "beneficiary": {
         "bankAccountNumber": "7012345678",
@@ -46,7 +51,7 @@ Mavapay returns a quote object. Key field to note:
 
 - **`id`** — Use this when accepting the quote from your wallet.
 
-> **Note:** Quotes are typically valid for **5–10 minutes**. You must accept before the `expiry` timestamp.
+> **Note:** Crypto swap quotes (BTC ↔ USDT) expire in **60 seconds**. Other quotes are typically valid for **5–10 minutes**. You must accept before the `expiry` timestamp.
 
 ```json
 {
@@ -124,4 +129,5 @@ curl --location 'https://api.mavapay.co/api/v1/wallet/payout/b01af569-7ad3-4803-
 - [Create Quote API](/api-reference/endpoint/quote/get-quote) — Full quote endpoint reference
 - [Accept Quote API](/api-reference/endpoint/wallet/accept-quote) — Wallet accept endpoint reference
 - [Beneficiary Formats](/guides/beneficiary-formats) — Required beneficiary formats for each currency
-- [Internal Currency Swap](/guides/internal-currency-swap) — Similar flow for swapping between internal wallets
+- [Crypto Swaps](/swaps/introduction) — BTC ↔ USDT internal swaps (60 second quotes)
+- [Internal Currency Swap](/guides/internal-currency-swap) — NGN ↔ BTC internal swaps
