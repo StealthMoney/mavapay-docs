@@ -13,6 +13,9 @@ USDT balances live in your Mavapay **USDT wallet**, separate from your BTC and f
 2. Share that address with your customer
 3. Receive a `payment.received` webhook when the deposit is credited (or `FAILED` if it cannot be credited)
 4. [Withdraw USDT](/api-reference/endpoint/withdraw/withdraw-stablecoin) to any address on a supported network
+5. [Buy USDT with NGN](/stablecoins/buy-usdt)
+6. [Swap BTC ↔ USDT](/swaps/introduction) in your internal wallets
+7. Use USDT as the source for [fiat payouts](/guides/prefunded-internal-wallet) (`sourceCurrency: USDTCENT`, `settlementCurrency: USDT`)
 
 Check your USDT balance with the [Get wallets](/api-reference/endpoint/wallet/get-wallets) endpoint (`currency=USDT`).
 
@@ -222,5 +225,19 @@ https://staging.api.mavapay.co/api/v1
     href="/webhooks/webhook-examples"
   >
     Handle deposit and withdrawal events
+  </Card>
+  <Card
+    title="Buy USDT with NGN"
+    icon="naira-sign"
+    href="/stablecoins/buy-usdt"
+  >
+    Buy USDT with Naira
+  </Card>
+  <Card
+    title="Crypto Swaps"
+    icon="arrows-rotate"
+    href="/swaps/introduction"
+  >
+    Swap BTC and USDT (60 second quotes)
   </Card>
 </CardGroup>

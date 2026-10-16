@@ -62,6 +62,45 @@ For on-chain Bitcoin payouts to a standard Bitcoin address:
   On-chain transactions have a minimum amount of **6000 SATs** and require a minimum of 3 blockchain confirmations. For faster, lower-fee payments, consider using Lightning.
 </Warning>
 
+## USDT
+
+For buying USDT with autopayout to an external address, pass the destination address and network.
+
+```json
+{
+  "beneficiary": {
+    "address": "TR7NHqjeKQxGTCi8q8ZY4pL8ktSzgjLj6t",
+    "network": "trc20"
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `address` | string | Yes | Destination USDT address |
+| `network` | string | Yes | `trc20`, `erc20`, `plasma`, `solana`, or `polygon` |
+
+<Warning>
+  The address must be valid for the network. Crypto swaps cannot autopayout to an external USDT address — swap into your internal wallet, then [withdraw](/api-reference/endpoint/withdraw/withdraw-stablecoin).
+</Warning>
+
+### Example: Buy USDT with NGN
+
+```json
+{
+  "amount": "10000",
+  "sourceCurrency": "NGNKOBO",
+  "targetCurrency": "USDTCENT",
+  "paymentMethod": "BANKTRANSFER",
+  "paymentCurrency": "USDTCENT",
+  "autopayout": true,
+  "beneficiary": {
+    "address": "TR7NHqjeKQxGTCi8q8ZY4pL8ktSzgjLj6t",
+    "network": "trc20"
+  }
+}
+```
+
 ## Nigerian Naira (NGN)
 
 For Nigerian Naira payouts, provide complete bank account details.
@@ -413,6 +452,7 @@ Before creating a quote, you can validate beneficiary details:
   - For Pay to Phone: Ensure phone numbers are in correct format (+254...) and include the required `network` field (`"mpesa"` or `"airtel"`)
   - For Pay to Bill and Pay to Till: Use the [KES Identifier Validation endpoint](#kes-identifier-validation) to validate business names (production only)
 - **BTC**: Ensure Lightning invoice is valid and not expired
+- **USDT**: Address must match `network`. Autopayout on BTC ↔ USDT swaps is not supported
 
 ## Next Steps
 

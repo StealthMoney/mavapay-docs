@@ -34,7 +34,14 @@
           {
             "group": "Stablecoins",
             "pages": [
-              "stablecoins/introduction"
+              "stablecoins/introduction",
+              "stablecoins/buy-usdt"
+            ]
+          },
+          {
+            "group": "Crypto Swaps",
+            "pages": [
+              "swaps/introduction"
             ]
           },
           {

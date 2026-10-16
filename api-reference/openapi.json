@@ -502,6 +502,83 @@
                       "bankAccountNumber": "0087241555"
                     }
                   }
+                },
+                "btcToUsdtLightning": {
+                  "summary": "Swap BTC to USDT (Lightning invoice)",
+                  "description": "BTC to USDT swap paid with a Lightning invoice. The invoice in the response must be paid within 60 seconds. USDT is credited to your internal wallet. Autopayout to an external address is not supported.",
+                  "value": {
+                    "amount": "1000",
+                    "sourceCurrency": "BTCSAT",
+                    "targetCurrency": "USDTCENT",
+                    "paymentMethod": "LIGHTNING",
+                    "paymentCurrency": "USDTCENT",
+                    "autopayout": false
+                  }
+                },
+                "btcToUsdtSwap": {
+                  "summary": "Swap BTC to USDT (debit BTC wallet)",
+                  "description": "Internal swap from your BTC wallet to your USDT wallet. Autopayout to an external USDT address is not supported. Quote expires in 60 seconds. Accept with sourceWallet BTC.",
+                  "value": {
+                    "amount": "1000",
+                    "sourceCurrency": "BTCSAT",
+                    "targetCurrency": "USDTCENT",
+                    "paymentMethod": "LIGHTNING",
+                    "paymentCurrency": "USDTCENT",
+                    "autopayout": false,
+                    "sourceWallet": "BTC",
+                    "customerReference": "swap 1"
+                  }
+                },
+                "usdtToBtcSwap": {
+                  "summary": "Swap USDT to BTC (internal wallet)",
+                  "description": "Internal swap from your USDT wallet to your BTC wallet. Quote expires in 60 seconds. Accept with sourceWallet USDT.",
+                  "value": {
+                    "amount": "1000",
+                    "sourceCurrency": "USDTCENT",
+                    "targetCurrency": "BTCSAT",
+                    "paymentMethod": "ONCHAIN",
+                    "paymentCurrency": "USDTCENT",
+                    "autopayout": false,
+                    "sourceWallet": "USDT",
+                    "customerReference": "swap 2"
+                  }
+                },
+                "buyUsdtWithNgn": {
+                  "summary": "Buy USDT with NGN (external address)",
+                  "description": "Buy USDT with Naira and send it to an external address. Quote is valid for 10 minutes. Pay the virtual NGN account, or pass sourceWallet NGN and skipVirtualAccount true to debit your internal NGN wallet.",
+                  "value": {
+                    "amount": "10000",
+                    "sourceCurrency": "NGNKOBO",
+                    "targetCurrency": "USDTCENT",
+                    "paymentMethod": "BANKTRANSFER",
+                    "paymentCurrency": "USDTCENT",
+                    "autopayout": true,
+                    "customerReference": "onchain ngn 1",
+                    "beneficiary": {
+                      "address": "TR7NHqjeKQxGTCi8q8ZY4pL8ktSzgjLj6t",
+                      "network": "trc20"
+                    }
+                  }
+                },
+                "usdtToNgnPayout": {
+                  "summary": "NGN payout sourced from USDT",
+                  "description": "Fiat payout using USDT as the source currency, settled from your internal USDT wallet.",
+                  "value": {
+                    "amount": "1000",
+                    "sourceCurrency": "USDTCENT",
+                    "targetCurrency": "NGNKOBO",
+                    "paymentMethod": "ONCHAIN",
+                    "paymentCurrency": "USDTCENT",
+                    "sourceWallet": "USDT",
+                    "settlementCurrency": "USDT",
+                    "autopayout": true,
+                    "beneficiary": {
+                      "bankAccountNumber": "7012345678",
+                      "bankAccountName": "Example Customer",
+                      "bankCode": "100004",
+                      "bankName": "OPAY"
+                    }
+                  }
                 }
               }
             }
@@ -766,8 +843,8 @@
         ],
         "tags": ["Wallet"],
         "operationId": "acceptQuote",
-        "summary": "Accept Swap Quote",
-        "description": "Accept a quote to perform an internal currency swap",
+        "summary": "Accept quote",
+        "description": "Accept a quote and debit the specified internal wallet. Used for crypto swaps (BTC ↔ USDT), prefunded payouts, and quotes paid from an internal balance. `sourceWallet` must match the wallet on the quote (`BTC`, `USDT`, or `NGN`). Swap quotes expire in 60 seconds.",
         "parameters": [
           {
             "name": "quoteId",
@@ -788,8 +865,9 @@
                 "properties": {
                   "sourceWallet": {
                     "type": "string",
-                    "description": "The source wallet currency (e.g., 'NGN')",
-                    "example": "NGN"
+                    "description": "The internal wallet to debit. Must match `sourceWallet` on the quote.",
+                    "enum": ["BTC", "USDT", "NGN"],
+                    "example": "USDT"
                   }
                 },
                 "required": ["sourceWallet"]
@@ -2620,13 +2698,13 @@
           "sourceCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTCSAT", "NGNKOBO"],
+            "enum": ["BTCSAT", "NGNKOBO", "USDTCENT"],
             "description": "The source currency for the quote"
           },
           "targetCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGNKOBO", "KESCENT", "ZARCENT", "GHSPESEWA"],
+            "enum": ["NGNKOBO", "KESCENT", "ZARCENT", "GHSPESEWA", "BTCSAT", "USDTCENT"],
             "description": "The target currency for the quote"
           },
           "transactionFeesInSourceCurrency": {
@@ -2656,7 +2734,23 @@
           "paymentMethod": {
             "type": "string",
             "format": "string",
-            "enum": ["LIGHTNING"]
+            "enum": ["LIGHTNING", "BANKTRANSFER", "ONCHAIN"]
+          },
+          "invoiceRequired": {
+            "type": "boolean",
+            "description": "Whether you must pay an invoice to settle this quote. `false` for internal swaps and wallet-settled quotes — accept the quote instead."
+          },
+          "onchainAddress": {
+            "type": "string",
+            "description": "Placeholder on-chain address for internal USDT settlement. Do not send funds to this address when memo is `MAVAPAY_INTERNAL`."
+          },
+          "network": {
+            "type": "string",
+            "description": "Network associated with an internal or on-chain quote (e.g. `trc20`)"
+          },
+          "memo": {
+            "type": "string",
+            "description": "`MAVAPAY_INTERNAL` for wallet-settled quotes. Do not treat this as a deposit memo."
           },
           "expiry": {
             "type": "string",
@@ -2755,34 +2849,49 @@
             "type": "number",
             "format": "number",
             "example": 1000,
-            "description": "The amount in the target currency in its lowest denomination. e.g '500000' for 5000.00 NGN"
+            "description": "The amount in `paymentCurrency`, in that currency's lowest denomination. For `USDTCENT`, `100` = 1 USDT. For `NGNKOBO`, `10000` = 100 NGN."
           },
           "sourceCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTCSAT", "NGNKOBO"],
+            "enum": ["BTCSAT", "NGNKOBO", "USDTCENT"],
             "default": "BTCSAT",
             "description": "The source currency for the quote"
           },
           "targetCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGNKOBO", "KESCENT", "ZARCENT", "GHSPESEWA", "BTCSAT"],
+            "enum": ["NGNKOBO", "KESCENT", "ZARCENT", "GHSPESEWA", "BTCSAT", "USDTCENT"],
             "default": "NGNKOBO",
-            "description": "The local currency to convert the source currency to"
+            "description": "The currency to convert the source currency to"
           },
           "paymentMethod": {
             "type": "string",
             "format": "string",
-            "enum": ["LIGHTNING", "BANKTRANSFER"],
+            "enum": ["LIGHTNING", "BANKTRANSFER", "ONCHAIN"],
             "default": "LIGHTNING",
-            "description": "The payment method for the quote"
+            "description": "The payment method for the quote. Use `LIGHTNING` for BTC-sourced swaps, `ONCHAIN` for USDT-sourced quotes, `BANKTRANSFER` for NGN."
           },
           "paymentCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["NGNKOBO", "BTCSAT", "KESCENT", "ZARCENT", "GHSPESEWA"],
-            "description": "Currency the amount is denominated in. Must be either sourceCurrency or targetCurrency. Determines what the 'amount' field represents. Example: if buying BTC with NGN and paymentCurrency is 'NGNKOBO', amount is in Naira; if 'BTCSAT', amount is in Bitcoin."
+            "enum": ["NGNKOBO", "BTCSAT", "KESCENT", "ZARCENT", "GHSPESEWA", "USDTCENT"],
+            "description": "Currency the amount is denominated in. Must be either sourceCurrency or targetCurrency. If `USDTCENT`, amount is in USDT cents (100 = 1 USDT)."
+          },
+          "sourceWallet": {
+            "type": "string",
+            "enum": ["BTC", "USDT", "NGN"],
+            "description": "Internal wallet to debit. Required for crypto swaps and prefunded quotes. Map: `BTCSAT` → `BTC`, `USDTCENT` → `USDT`, `NGNKOBO` → `NGN`."
+          },
+          "settlementCurrency": {
+            "type": "string",
+            "enum": ["USDT"],
+            "description": "Set to `USDT` to settle the quote from your internal USDT wallet balance."
+          },
+          "skipVirtualAccount": {
+            "type": "boolean",
+            "description": "When `true` with `sourceWallet: NGN`, do not generate a virtual NGN account. Accept the quote to debit your internal NGN wallet instead.",
+            "default": false
           },
           "customerReference": {
             "type": "string",
@@ -2950,6 +3059,24 @@
                     "description": "Bitcoin on-chain address for payout (alternative to lnInvoice)"
                   }
                 }
+              },
+              {
+                "title": "USDT Beneficiary",
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "example": "TR7NHqjeKQxGTCi8q8ZY4pL8ktSzgjLj6t",
+                    "description": "Destination USDT address. Required when buying USDT with autopayout true."
+                  },
+                  "network": {
+                    "type": "string",
+                    "enum": ["trc20", "erc20", "plasma", "solana", "polygon"],
+                    "example": "trc20",
+                    "description": "Network for the destination address"
+                  }
+                },
+                "required": ["address", "network"]
               }
             ]
           }

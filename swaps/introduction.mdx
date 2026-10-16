@@ -1,0 +1,257 @@
+---
+title: 'Crypto Swaps'
+description: 'Swap BTC and USDT between your internal Mavapay wallets'
+---
+
+Swap BTC into your **USDT wallet**, or USDT into your **BTC wallet**. USDT from a swap is always credited to the internal wallet.
+
+<Warning>
+  **Autopayout to an external USDT address is not supported.** Swap into your internal USDT wallet first, then [withdraw USDT](/api-reference/endpoint/withdraw/withdraw-stablecoin) to an external address.
+</Warning>
+
+<Warning>
+  Swap quotes expire in **60 seconds**. Pay the Lightning invoice or accept the quote before `expiry`, or create a new one.
+</Warning>
+
+## How a swap works
+
+USDT always lands in your **internal USDT wallet**. There are two ways to pay for a BTC → USDT swap:
+
+| | Pay Lightning invoice | Debit BTC wallet | USDT → BTC |
+|---|---|---|---|
+| `sourceCurrency` | `BTCSAT` | `BTCSAT` | `USDTCENT` |
+| `targetCurrency` | `USDTCENT` | `USDTCENT` | `BTCSAT` |
+| `sourceWallet` | omit | `BTC` | `USDT` |
+| How you pay | Pay `invoice` within 60 seconds | [Accept](/api-reference/endpoint/wallet/accept-quote) with `sourceWallet: BTC` | Accept with `sourceWallet: USDT` |
+| `paymentMethod` | `LIGHTNING` | `LIGHTNING` | `ONCHAIN` |
+| `autopayout` | `false` | `false` | `false` |
+
+`paymentCurrency` controls what `amount` means. If `paymentCurrency` is `USDTCENT`, `amount` is in USDT cents (`1000` = 10 USDT).
+
+## BTC → USDT
+
+USDT is credited to your internal wallet. Autopayout to an external address is not supported.
+
+`amount` is in **USDT cents** because `paymentCurrency` is `USDTCENT`.
+
+### Pay a Lightning invoice
+
+Omit `sourceWallet`. The response includes a Lightning invoice. Pay that invoice within **60 seconds**. Mavapay credits your internal USDT wallet when the payment is received.
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/quote \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "amount": "1000",
+    "sourceCurrency": "BTCSAT",
+    "targetCurrency": "USDTCENT",
+    "paymentMethod": "LIGHTNING",
+    "paymentCurrency": "USDTCENT",
+    "autopayout": false
+  }'
+```
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "ccb5d95c-89fc-4bbd-bb74-74ee25b3e0ad",
+    "exchangeRate": 82064.24361,
+    "usdToTargetCurrencyRate": 1,
+    "sourceCurrency": "BTCSAT",
+    "targetCurrency": "USDTCENT",
+    "transactionFeesInSourceCurrency": 60,
+    "transactionFeesInTargetCurrency": 5,
+    "amountInSourceCurrency": 12300,
+    "amountInTargetCurrency": 1000,
+    "paymentMethod": "LIGHTNING",
+    "expiry": "2026-10-16T02:27:20.000Z",
+    "isValid": true,
+    "invoice": "lnbc123u1p4drz6vpp5wljqk2gsk8nlxy4dm3ladlln02g97ydpnfzzd6pptz028fkrxnxqdz9296k7ar98gsxxcmzx4jrjdtr95urjenr956xycny943xyde595mnget9xg6kyvm9xpskgcqzzsxqzpusp5725cdj4zwgu48ezzajhlta30pgymz7achczfkqalpuezkrxt982s9qxpqysgqk6d7frtf0rx4q4ncd8tswc2zezwcfpc376w3ff2vt0qasku9767rxgw07m5faqw8pp8ffavnzxd536hmv2manrwc0w7hv6hajrxr5mgpkcg2he",
+    "hash": "77e40b2910b1e7f312addc7fd6fff37a905f11a19a4426e821589ea3a6c334cc",
+    "totalAmountInSourceCurrency": 12300,
+    "customerInternalFee": 0,
+    "invoiceRequired": false,
+    "estimatedRoutingFee": 0,
+    "orderId": "261016-497R0-AXJ4V"
+  }
+}
+```
+
+| Field | Meaning |
+|-------|---------|
+| `invoice` | Lightning invoice to pay. Pay the full amount before `expiry` (60 seconds). |
+| `amountInSourceCurrency` | Invoice amount in satoshis (`12300` sats) |
+| `amountInTargetCurrency` | USDT credited to your wallet, in cents (`1000` = 10 USDT) |
+| `expiry` | Invoice and quote expire 60 seconds after creation |
+
+Do not call the accept endpoint for this path. Paying the invoice completes the swap.
+
+### Debit your BTC wallet
+
+Pass `sourceWallet: "BTC"`. The response invoice is an internal reference (`MAVAPAY_INTERNAL:...`). Do not pay it. [Accept the quote](#accept-the-swap) to debit your BTC wallet.
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/quote \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "amount": "1000",
+    "sourceCurrency": "BTCSAT",
+    "targetCurrency": "USDTCENT",
+    "paymentMethod": "LIGHTNING",
+    "paymentCurrency": "USDTCENT",
+    "autopayout": false,
+    "sourceWallet": "BTC",
+    "customerReference": "swap 1"
+  }'
+```
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "a98d4e1d-9239-49e4-b4a2-67bd20f335e0",
+    "exchangeRate": 82082.54529,
+    "usdToTargetCurrencyRate": 1,
+    "sourceCurrency": "BTCSAT",
+    "targetCurrency": "USDTCENT",
+    "transactionFeesInSourceCurrency": 60,
+    "transactionFeesInTargetCurrency": 5,
+    "amountInSourceCurrency": 12300,
+    "amountInTargetCurrency": 1000,
+    "paymentMethod": "LIGHTNING",
+    "expiry": "2026-10-15T23:25:44.501Z",
+    "isValid": true,
+    "invoice": "MAVAPAY_INTERNAL:a98d4e1d-9239-49e4-b4a2-67bd20f335e0",
+    "hash": "a98d4e1d-9239-49e4-b4a2-67bd20f335e0",
+    "totalAmountInSourceCurrency": 12300,
+    "customerInternalFee": 0,
+    "customerReference": "swap 1",
+    "invoiceRequired": false,
+    "estimatedRoutingFee": 0,
+    "orderId": "261015-VPSVK-VEAY4"
+  }
+}
+```
+
+| Field | Meaning |
+|-------|---------|
+| `id` | Quote ID. Pass this to accept. |
+| `invoice` | Internal reference (`MAVAPAY_INTERNAL:...`). Do not pay it. |
+| `amountInSourceCurrency` | BTC to debit, in satoshis (`12300` sats) |
+| `amountInTargetCurrency` | USDT to credit, in cents (`1000` = 10 USDT) |
+| `expiry` | 60 seconds from creation |
+
+## USDT → BTC
+
+Debits your USDT wallet and credits your internal BTC wallet.
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/quote \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "amount": "1000",
+    "sourceCurrency": "USDTCENT",
+    "targetCurrency": "BTCSAT",
+    "paymentMethod": "ONCHAIN",
+    "paymentCurrency": "USDTCENT",
+    "autopayout": false,
+    "sourceWallet": "USDT",
+    "customerReference": "swap 2"
+  }'
+```
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "4a4467fd-c39d-46b0-bd90-23af5aca90bd",
+    "exchangeRate": 1,
+    "usdToTargetCurrencyRate": 0.00001216556302755137,
+    "sourceCurrency": "USDTCENT",
+    "targetCurrency": "BTCSAT",
+    "transactionFeesInSourceCurrency": 5,
+    "transactionFeesInTargetCurrency": 61,
+    "amountInSourceCurrency": 1000,
+    "amountInTargetCurrency": 12105,
+    "paymentMethod": "ONCHAIN",
+    "expiry": "2026-10-16T02:03:13.014Z",
+    "isValid": true,
+    "invoice": "",
+    "hash": "",
+    "totalAmountInSourceCurrency": 1000,
+    "customerInternalFee": 0,
+    "customerReference": "swap 2",
+    "invoiceRequired": false,
+    "onchainAddress": "MPY_USDTCENT_1792116133014",
+    "network": "trc20",
+    "memo": "MAVAPAY_INTERNAL",
+    "estimatedRoutingFee": 0,
+    "orderId": "261016-MBVJ7-1EG3F"
+  }
+}
+```
+
+`onchainAddress` and `memo` are internal placeholders (`MAVAPAY_INTERNAL`). Do not send funds to them. Accept the quote to complete the swap.
+
+## Accept the swap
+
+Use this only when the quote includes `sourceWallet`. If you requested a Lightning invoice (no `sourceWallet`), pay `invoice` instead.
+
+Call [Accept Quote](/api-reference/endpoint/wallet/accept-quote) with the quote `id` and the wallet to debit. This must match `sourceWallet` on the quote.
+
+**BTC → USDT** — debit BTC:
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/wallet/payout/a98d4e1d-9239-49e4-b4a2-67bd20f335e0/accept \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "sourceWallet": "BTC"
+  }'
+```
+
+**USDT → BTC** — debit USDT:
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/wallet/payout/4a4467fd-c39d-46b0-bd90-23af5aca90bd/accept \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "sourceWallet": "USDT"
+  }'
+```
+
+The wallet must cover `totalAmountInSourceCurrency` (includes fees). If the quote has expired, create a new one.
+
+## After a BTC → USDT swap
+
+USDT lands in your internal wallet. To send it on-chain:
+
+1. Confirm the USDT balance with [Get wallets](/api-reference/endpoint/wallet/get-wallets) (`currency=USDT`)
+2. [Withdraw](/api-reference/endpoint/withdraw/withdraw-stablecoin) to an external address
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="USDT wallet" icon="coins" href="/stablecoins/introduction">
+    Deposit and withdraw USDT
+  </Card>
+  <Card title="Buy USDT with NGN" icon="naira-sign" href="/stablecoins/buy-usdt">
+    Buy USDT using Naira
+  </Card>
+  <Card title="Accept quote" icon="check" href="/api-reference/endpoint/wallet/accept-quote">
+    Debit a wallet and complete a quote
+  </Card>
+  <Card title="Prefunded payouts" icon="wallet" href="/guides/prefunded-internal-wallet">
+    Pay fiat payouts from your USDT wallet
+  </Card>
+</CardGroup>
