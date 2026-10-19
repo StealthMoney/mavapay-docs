@@ -1,0 +1,33 @@
+---
+title: 'Introduction'
+description: 'Collect NGN and KES from customers and settle to USDT, BTC, or another currency'
+---
+
+# Collections
+
+Collections are payments **from** your customer into Mavapay. Payouts are payments **out** to a beneficiary. A collection can credit an internal wallet or settle straight to a beneficiary.
+
+We currently support collections in:
+
+1. [Nigerian Naira (NGN)](/collections/ngn-collection)
+2. [Kenyan Shilling (KES)](/collections/kes-collection)
+
+## How the customer pays
+
+### Nigerian Naira (NGN)
+- Customer pays a virtual bank account, or you debit your internal NGN wallet
+- Quote is valid for **10 minutes**
+- [View NGN Collections](/collections/ngn-collection)
+
+### Kenyan Shilling (KES)
+- Customer approves an STK prompt on M-Pesa or Airtel Money
+- The prompt expires in **20 seconds**
+- [View KES Collections](/collections/kes-collection)
+
+## Where funds can go
+
+Both currencies can credit an internal USDT or BTC wallet, send to an external USDT or BTC address, or settle instantly to another supported payout currency. See the currency page for the exact `targetCurrency` and beneficiary.
+
+## Webhooks
+
+After the customer pays, Mavapay sends `payment.received`. When funds are sent to a beneficiary, Mavapay also sends `payment.sent`. See [webhook examples](/webhooks/webhook-examples).

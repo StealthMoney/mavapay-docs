@@ -1,0 +1,270 @@
+---
+title: 'Kenyan Shilling (KES) Collections'
+description: 'Collect KES with M-Pesa or Airtel Money and settle to USDT, BTC, or another currency'
+---
+
+Customers pay with **M-Pesa** or **Airtel Money**. Mavapay sends an STK prompt to their phone. They authorize with their mobile-money PIN. The payout or wallet credit then completes on its own.
+
+<Warning>
+  `paymentSource.phoneNumber` must be the **paying customer's** phone number, in international format (`+254...`). The STK prompt is sent to that number.
+</Warning>
+
+## What happens
+
+1. Create a quote with `paymentMethod: "MOBILEMONEY"` and `paymentSource.phoneNumber`.
+2. The API returns the quote immediately.
+3. Within a few seconds, an STK prompt is sent to that phone.
+4. The customer enters their M-Pesa or Airtel Money PIN.
+5. The prompt expires in **20 seconds**. If they miss it, create a new quote.
+6. After they authorize, do nothing else. Mavapay processes the payment and sends a webhook.
+
+No invoice to pay and no accept call.
+
+## Where the funds go
+
+| Destination | `targetCurrency` | `autopayout` | `beneficiary` |
+|---|---|---|---|
+| Internal USDT wallet | `USDTCENT` | `false` | omit |
+| Internal BTC wallet | `BTCSAT` | `false` | omit |
+| External USDT address | `USDTCENT` | `true` | USDT `address` + `network` |
+| External BTC | `BTCSAT` | `true` | Lightning invoice, Lightning address, or on-chain address |
+| NGN bank account | `NGNKOBO` | `true` | NGN bank beneficiary |
+| ZAR bank account | `ZARCENT` | `true` | ZAR bank beneficiary |
+| GHS mobile money | `GHSPESEWA` | `true` | GHS MTN beneficiary |
+
+`paymentCurrency` is what `amount` means. It must be `sourceCurrency` or `targetCurrency`.
+
+- `USDTCENT` — USDT cents (`1000` = 10 USDT)
+- `BTCSAT` — satoshis
+- `KESCENT` — Kenyan shilling cents (`100` = 1 KES)
+
+Buying BTC uses the same request as buying USDT. Change `targetCurrency` and, when the amount is in BTC, `paymentCurrency`.
+
+## Buy USDT into the internal wallet
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/quote \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "amount": "1000",
+    "sourceCurrency": "KESCENT",
+    "targetCurrency": "USDTCENT",
+    "paymentMethod": "MOBILEMONEY",
+    "paymentCurrency": "USDTCENT",
+    "autopayout": false,
+    "paymentSource": {
+      "phoneNumber": "+254796980788"
+    }
+  }'
+```
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "b19bb917-daae-4aa9-9e17-c97e5eeb1357",
+    "exchangeRate": 81934.67331,
+    "usdToTargetCurrencyRate": 1,
+    "sourceCurrency": "KESCENT",
+    "targetCurrency": "USDTCENT",
+    "transactionFeesInSourceCurrency": 666,
+    "transactionFeesInTargetCurrency": 5,
+    "amountInSourceCurrency": 133800,
+    "amountInTargetCurrency": 1000,
+    "paymentMethod": "MOBILEMONEY",
+    "expiry": "2026-10-19T18:28:28.011Z",
+    "isValid": true,
+    "invoice": "",
+    "hash": "",
+    "totalAmountInSourceCurrency": 133800,
+    "customerInternalFee": 0,
+    "invoiceRequired": false,
+    "estimatedRoutingFee": 0,
+    "orderId": "261019-3DEXK-EJH9H"
+  }
+}
+```
+
+| Field | Meaning |
+|-------|---------|
+| `amount` / `amountInTargetCurrency` | USDT the wallet receives, in cents (`1000` = 10 USDT) |
+| `amountInSourceCurrency` | KES the customer is charged, in cents (`133800` = KES 1,338.00) |
+| `paymentSource.phoneNumber` | Number that receives the STK prompt |
+
+Tell the customer to approve the prompt. If it expires, create the quote again.
+
+## Buy BTC into the internal wallet
+
+Same request. Set the target to Bitcoin. Here `paymentCurrency` is `BTCSAT`, so `amount` is satoshis.
+
+```json
+{
+  "amount": "10000",
+  "sourceCurrency": "KESCENT",
+  "targetCurrency": "BTCSAT",
+  "paymentMethod": "MOBILEMONEY",
+  "paymentCurrency": "BTCSAT",
+  "autopayout": false,
+  "paymentSource": {
+    "phoneNumber": "+254796980788"
+  }
+}
+```
+
+To charge a fixed shilling amount instead, set `paymentCurrency` to `KESCENT` and pass `amount` in cents.
+
+## Buy BTC to an external address
+
+Set `autopayout` to `true` and `targetCurrency` to `BTCSAT`. The customer must provide **one** of `lnInvoice`, `lnAddress`, or `onChainAddress`.
+
+| Field | Use |
+|-------|-----|
+| `lnInvoice` | Lightning invoice |
+| `lnAddress` | Lightning address (`user@wallet.com`) |
+| `onChainAddress` | Bitcoin on-chain address |
+
+**Lightning invoice**
+
+```json
+{
+  "amount": "10000",
+  "sourceCurrency": "KESCENT",
+  "targetCurrency": "BTCSAT",
+  "paymentMethod": "MOBILEMONEY",
+  "paymentCurrency": "BTCSAT",
+  "autopayout": true,
+  "paymentSource": {
+    "phoneNumber": "+254796980788"
+  },
+  "beneficiary": {
+    "lnInvoice": "lntbs20u1p5dmy87pp5l2pm..."
+  }
+}
+```
+
+**Lightning address**
+
+```json
+"beneficiary": {
+  "lnAddress": "user@wallet.com"
+}
+```
+
+**On-chain address**
+
+```json
+"beneficiary": {
+  "onChainAddress": "bc1q8yz7u50r4nne2q8wkuc4kyxx0s76fxsjlac5fxd8h7tzkh4rs82qnweuv5"
+}
+```
+
+On-chain payouts have a minimum of **6000 sats**. The Lightning invoice must still be valid when the customer authorizes the STK prompt.
+
+## Send USDT to an external address
+
+Set `autopayout` to `true` and pass a USDT beneficiary. See [beneficiary formats](/guides/beneficiary-formats#usdt).
+
+```json
+{
+  "amount": "1000",
+  "sourceCurrency": "KESCENT",
+  "targetCurrency": "USDTCENT",
+  "paymentMethod": "MOBILEMONEY",
+  "paymentCurrency": "USDTCENT",
+  "autopayout": true,
+  "paymentSource": {
+    "phoneNumber": "+254796980788"
+  },
+  "beneficiary": {
+    "address": "TR7NHqjeKQxGTCi8q8ZY4pL8ktSzgjLj6t",
+    "network": "trc20"
+  }
+}
+```
+
+## Instant cross-border payouts
+
+The same KES payment can settle straight to another currency. Pass `autopayout: true` and the beneficiary for that currency. Settlement starts once the customer authorizes the STK prompt.
+
+**NGN bank account**
+
+```json
+{
+  "amount": "1000000",
+  "sourceCurrency": "KESCENT",
+  "targetCurrency": "NGNKOBO",
+  "paymentMethod": "MOBILEMONEY",
+  "paymentCurrency": "NGNKOBO",
+  "autopayout": true,
+  "paymentSource": {
+    "phoneNumber": "+254796980788"
+  },
+  "beneficiary": {
+    "bankAccountName": "JOHN DOE",
+    "bankCode": "000013",
+    "bankName": "GTBANK PLC",
+    "bankAccountNumber": "0123456789"
+  }
+}
+```
+
+**ZAR bank account**
+
+Amounts are in cents (`100` = 1 ZAR).
+
+```json
+{
+  "amount": "50000",
+  "sourceCurrency": "KESCENT",
+  "targetCurrency": "ZARCENT",
+  "paymentMethod": "MOBILEMONEY",
+  "paymentCurrency": "ZARCENT",
+  "autopayout": true,
+  "paymentSource": {
+    "phoneNumber": "+254796980788"
+  },
+  "beneficiary": {
+    "name": "Ricki Allardice",
+    "bankName": "CAPITEC BANK",
+    "bankAccountNumber": "1352906218"
+  }
+}
+```
+
+**GHS (MTN)**
+
+```json
+{
+  "amount": "1000",
+  "sourceCurrency": "KESCENT",
+  "targetCurrency": "GHSPESEWA",
+  "paymentMethod": "MOBILEMONEY",
+  "paymentCurrency": "GHSPESEWA",
+  "autopayout": true,
+  "paymentSource": {
+    "phoneNumber": "+254796980788"
+  },
+  "beneficiary": {
+    "identifierType": "MTN",
+    "identifiers": {
+      "phoneNumber": "+233999992800",
+      "accountName": "Mensah"
+    }
+  }
+}
+```
+
+Supported beneficiary formats: [NGN](/guides/beneficiary-formats#nigerian-naira-ngn), [ZAR](/guides/beneficiary-formats#south-african-rand-zar), [GHS](/payouts/ghs-payout), [BTC](/guides/beneficiary-formats#bitcoin-btc), [USDT](/guides/beneficiary-formats#usdt).
+
+## Webhooks
+
+After the customer authorizes, Mavapay sends the usual payment webhooks. You do not confirm the STK prompt yourself.
+
+| Event | When |
+|-------|------|
+| `payment.received` | The mobile-money payment is received |
+| `payment.sent` | Funds are credited or sent to the beneficiary (`autopayout: true`) |
+
+See [webhook examples](/webhooks/webhook-examples).

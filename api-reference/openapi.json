@@ -560,6 +560,21 @@
                     }
                   }
                 },
+                "buyUsdtWithKes": {
+                  "summary": "Buy USDT with KES mobile money",
+                  "description": "KES onramp via M-Pesa or Airtel. An STK prompt is sent to paymentSource.phoneNumber and expires in 20 seconds. autopayout false credits the internal USDT wallet. Set targetCurrency to BTCSAT to buy Bitcoin instead.",
+                  "value": {
+                    "amount": "1000",
+                    "sourceCurrency": "KESCENT",
+                    "targetCurrency": "USDTCENT",
+                    "paymentMethod": "MOBILEMONEY",
+                    "paymentCurrency": "USDTCENT",
+                    "autopayout": false,
+                    "paymentSource": {
+                      "phoneNumber": "+254796980788"
+                    }
+                  }
+                },
                 "usdtToNgnPayout": {
                   "summary": "NGN payout sourced from USDT",
                   "description": "Fiat payout using USDT as the source currency, settled from your internal USDT wallet.",
@@ -2698,7 +2713,7 @@
           "sourceCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTCSAT", "NGNKOBO", "USDTCENT"],
+            "enum": ["BTCSAT", "NGNKOBO", "USDTCENT", "KESCENT"],
             "description": "The source currency for the quote"
           },
           "targetCurrency": {
@@ -2734,7 +2749,7 @@
           "paymentMethod": {
             "type": "string",
             "format": "string",
-            "enum": ["LIGHTNING", "BANKTRANSFER", "ONCHAIN"]
+            "enum": ["LIGHTNING", "BANKTRANSFER", "ONCHAIN", "MOBILEMONEY"]
           },
           "invoiceRequired": {
             "type": "boolean",
@@ -2854,7 +2869,7 @@
           "sourceCurrency": {
             "type": "string",
             "format": "string",
-            "enum": ["BTCSAT", "NGNKOBO", "USDTCENT"],
+            "enum": ["BTCSAT", "NGNKOBO", "USDTCENT", "KESCENT"],
             "default": "BTCSAT",
             "description": "The source currency for the quote"
           },
@@ -2868,9 +2883,21 @@
           "paymentMethod": {
             "type": "string",
             "format": "string",
-            "enum": ["LIGHTNING", "BANKTRANSFER", "ONCHAIN"],
+            "enum": ["LIGHTNING", "BANKTRANSFER", "ONCHAIN", "MOBILEMONEY"],
             "default": "LIGHTNING",
-            "description": "The payment method for the quote. Use `LIGHTNING` for BTC-sourced swaps, `ONCHAIN` for USDT-sourced quotes, `BANKTRANSFER` for NGN."
+            "description": "The payment method for the quote. Use `LIGHTNING` for BTC-sourced swaps, `ONCHAIN` for USDT-sourced quotes, `BANKTRANSFER` for NGN collections, `MOBILEMONEY` for KES M-Pesa and Airtel collections."
+          },
+          "paymentSource": {
+            "type": "object",
+            "description": "Who is paying. Required when paymentMethod is MOBILEMONEY. phoneNumber must be the paying customer's number. Mavapay sends the STK prompt to this number.",
+            "required": ["phoneNumber"],
+            "properties": {
+              "phoneNumber": {
+                "type": "string",
+                "example": "+254796980788",
+                "description": "Paying customer's M-Pesa or Airtel Money number, in international format."
+              }
+            }
           },
           "paymentCurrency": {
             "type": "string",

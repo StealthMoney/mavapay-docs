@@ -1,0 +1,156 @@
+---
+title: 'Nigerian Naira (NGN) Collections'
+description: 'Collect Naira by bank transfer and settle to USDT, BTC, or another currency'
+---
+
+Customers pay **Nigerian Naira** by bank transfer. The quote returns a virtual account. They pay that account. Mavapay then credits a wallet or sends the payout.
+
+NGN collection quotes are valid for **10 minutes**.
+
+You can also pay from your **internal NGN wallet** when the balance covers the quote. Pass `sourceWallet: "NGN"` and `skipVirtualAccount: true`, then [accept the quote](/api-reference/endpoint/wallet/accept-quote).
+
+## Where the funds go
+
+| Destination | `targetCurrency` | `autopayout` | `beneficiary` |
+|---|---|---|---|
+| Internal USDT wallet | `USDTCENT` | `false` | omit |
+| External USDT address | `USDTCENT` | `true` | USDT `address` + `network` |
+| Internal BTC wallet | `BTCSAT` | `false` | omit |
+| External BTC | `BTCSAT` | `true` | Lightning invoice, Lightning address, or on-chain address |
+| ZAR bank account | `ZARCENT` | `true` | ZAR bank beneficiary |
+| GHS mobile money | `GHSPESEWA` | `true` | GHS MTN beneficiary |
+| KES mobile money | `KESCENT` | `true` | KES beneficiary |
+
+`paymentCurrency` is what `amount` means. It must be `sourceCurrency` or `targetCurrency`.
+
+- `NGNKOBO` — kobo (`100` = 1 NGN)
+- `USDTCENT` — USDT cents (`10000` = 100 USDT)
+- `BTCSAT` — satoshis
+
+`paymentMethod` is `BANKTRANSFER`.
+
+## Buy USDT and send it to an address
+
+The customer pays the virtual account on the quote. USDT is sent to `beneficiary` after the transfer is received.
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/quote \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "amount": "10000",
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "USDTCENT",
+    "paymentMethod": "BANKTRANSFER",
+    "paymentCurrency": "USDTCENT",
+    "autopayout": true,
+    "customerReference": "onchain ngn 1",
+    "beneficiary": {
+      "address": "TR7NHqjeKQxGTCi8q8ZY4pL8ktSzgjLj6t",
+      "network": "trc20"
+    }
+  }'
+```
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "c4b76db5-c9f8-452d-b40b-4c1a065190bf",
+    "exchangeRate": 82002.94497,
+    "usdToTargetCurrencyRate": 1,
+    "sourceCurrency": "NGNKOBO",
+    "targetCurrency": "USDTCENT",
+    "transactionFeesInSourceCurrency": 68525,
+    "transactionFeesInTargetCurrency": 50,
+    "amountInSourceCurrency": 13910500,
+    "amountInTargetCurrency": 10000,
+    "paymentMethod": "BANKTRANSFER",
+    "expiry": "2026-10-16T02:16:58.104Z",
+    "isValid": true,
+    "invoice": "",
+    "hash": "6ad186c27e7528e98f260f99",
+    "totalAmountInSourceCurrency": 13910500,
+    "customerInternalFee": 0,
+    "customerReference": "onchain ngn 1",
+    "invoiceRequired": false,
+    "bankName": "WEMA BANK",
+    "ngnBankAccountNumber": "7824121093780538",
+    "ngnAccountName": "Mava Digital Solutions Limited",
+    "ngnBankCode": "000027",
+    "estimatedRoutingFee": 100,
+    "orderId": "261016-JXEMY-DB30Y"
+  }
+}
+```
+
+Pay **exactly** `totalAmountInSourceCurrency` in kobo (`13910500` = ₦139,105.00) to `ngnBankAccountNumber` before `expiry`.
+
+| Field | Use |
+|-------|-----|
+| `ngnBankAccountNumber` | Account number to pay |
+| `ngnAccountName` | Account name |
+| `bankName` | Bank |
+| `amountInTargetCurrency` | USDT sent, in cents (`10000` = 100 USDT) |
+
+To credit the internal USDT wallet instead, set `autopayout` to `false` and omit `beneficiary`.
+
+## Pay from the internal NGN wallet
+
+Skip the virtual account and debit the NGN wallet.
+
+```json
+{
+  "amount": "10000",
+  "sourceCurrency": "NGNKOBO",
+  "targetCurrency": "USDTCENT",
+  "paymentMethod": "BANKTRANSFER",
+  "paymentCurrency": "USDTCENT",
+  "autopayout": true,
+  "sourceWallet": "NGN",
+  "skipVirtualAccount": true,
+  "beneficiary": {
+    "address": "TR7NHqjeKQxGTCi8q8ZY4pL8ktSzgjLj6t",
+    "network": "trc20"
+  }
+}
+```
+
+```bash
+curl --request POST \
+  --url https://api.mavapay.co/api/v1/wallet/payout/QUOTE_ID/accept \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "sourceWallet": "NGN"
+  }'
+```
+
+## Buy BTC
+
+Use `targetCurrency: "BTCSAT"`. `paymentCurrency: "BTCSAT"` means `amount` is satoshis. `paymentCurrency: "NGNKOBO"` means `amount` is kobo.
+
+- Lightning delivery: [Buying Bitcoin (Lightning)](/guides/buying-bitcoin)
+- On-chain delivery: [Buying Bitcoin (On-Chain)](/guides/buying-bitcoin-onchain)
+
+`autopayout: false` credits your internal BTC wallet. `autopayout: true` requires a [Bitcoin beneficiary](/guides/beneficiary-formats#bitcoin-btc).
+
+## Other payout currencies
+
+The same NGN payment can settle to another currency. Pass `autopayout: true` and that currency's beneficiary.
+
+- [NGN to ZAR](/guides/ngn-zar)
+- [NGN to GHS](/guides/ngn-ghs)
+- [NGN to KES](/guides/quote-examples) — `targetCurrency: "KESCENT"`
+
+Beneficiary formats: [USDT](/guides/beneficiary-formats#usdt), [BTC](/guides/beneficiary-formats#bitcoin-btc), [ZAR](/guides/beneficiary-formats#south-african-rand-zar), [KES](/guides/beneficiary-formats#kenyan-shilling-kes), [GHS](/payouts/ghs-payout).
+
+## Webhooks
+
+| Event | When |
+|-------|------|
+| `payment.received` | The NGN transfer is received |
+| `payment.sent` | USDT, BTC, or the payout is sent (`autopayout: true`) |
+
+See [webhook examples](/webhooks/webhook-examples).
