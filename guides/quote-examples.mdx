@@ -15,12 +15,15 @@ Mavapay supports the following currency conversions:
 - BTCSAT => ZARCENT (Bitcoin to South African Rand)
 - BTCSAT => KESCENT (Bitcoin to Kenyan Shilling)
 - BTCSAT => USDTCENT (Bitcoin to USDT — [crypto swap](/swaps/introduction), 60 second quote)
-- NGNKOBO => BTCSAT (Nigerian Naira to Bitcoin)
-- NGNKOBO => USDTCENT (Nigerian Naira to USDT)
+- NGNKOBO => BTCSAT (Nigerian Naira to Bitcoin — [NGN Collections](/collections/ngn-collection))
+- NGNKOBO => USDTCENT (Nigerian Naira to USDT — [NGN Collections](/collections/ngn-collection))
 - NGNKOBO => ZARCENT (Nigerian Naira to South African Rand)
 - NGNKOBO => KESCENT (Nigerian Naira to Kenyan Shilling)
 - USDTCENT => BTCSAT (USDT to Bitcoin — [crypto swap](/swaps/introduction), 60 second quote)
 - USDTCENT => NGNKOBO (USDT to Nigerian Naira payout)
+- KESCENT => USDTCENT (Kenyan Shilling to USDT — [KES Collections](/collections/kes-collection))
+- KESCENT => BTCSAT (Kenyan Shilling to Bitcoin — [KES Collections](/collections/kes-collection))
+- KESCENT => NGNKOBO / ZARCENT / GHSPESEWA (KES mobile money to an instant payout — [KES Collections](/collections/kes-collection))
 
 **Get Price endpoint possible values:** `NGN`, `KES`, `ZAR`
 
@@ -450,7 +453,7 @@ Accept with `"sourceWallet": "USDT"`. Do not send funds to `onchainAddress`.
 
 ## Nigerian Naira to USDT (NGNKOBO => USDTCENT)
 
-Buy USDT with NGN. Quote is valid for **10 minutes**. See [Buy USDT with NGN](/stablecoins/buy-usdt).
+Buy USDT with NGN. Quote is valid for **10 minutes**. See [NGN Collections](/collections/ngn-collection).
 
 ### Request
 
@@ -530,6 +533,57 @@ Fiat payout sourced from your USDT wallet. Pass `sourceWallet: "USDT"` and `sett
   }
 }
 ```
+
+## Kenyan Shilling to USDT (KESCENT => USDTCENT)
+
+M-Pesa or Airtel STK collection. The prompt expires in **20 seconds**. See [KES Collections](/collections/kes-collection).
+
+### Request
+
+```json
+{
+  "amount": "1000",
+  "sourceCurrency": "KESCENT",
+  "targetCurrency": "USDTCENT",
+  "paymentMethod": "MOBILEMONEY",
+  "paymentCurrency": "USDTCENT",
+  "autopayout": false,
+  "paymentSource": {
+    "phoneNumber": "+254796980788"
+  }
+}
+```
+
+### Response
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "id": "b19bb917-daae-4aa9-9e17-c97e5eeb1357",
+    "exchangeRate": 81934.67331,
+    "usdToTargetCurrencyRate": 1,
+    "sourceCurrency": "KESCENT",
+    "targetCurrency": "USDTCENT",
+    "transactionFeesInSourceCurrency": 666,
+    "transactionFeesInTargetCurrency": 5,
+    "amountInSourceCurrency": 133800,
+    "amountInTargetCurrency": 1000,
+    "paymentMethod": "MOBILEMONEY",
+    "expiry": "2026-10-19T18:28:28.011Z",
+    "isValid": true,
+    "invoice": "",
+    "hash": "",
+    "totalAmountInSourceCurrency": 133800,
+    "customerInternalFee": 0,
+    "invoiceRequired": false,
+    "estimatedRoutingFee": 0,
+    "orderId": "261019-3DEXK-EJH9H"
+  }
+}
+```
+
+`1000` USDTCENT = 10 USDT. `133800` KES cents = KES 1,338.00. `paymentSource.phoneNumber` is the paying customer. Omit `beneficiary` to credit the internal USDT wallet. For BTC, set `targetCurrency` to `BTCSAT`.
 
 ## Understanding Quote Fields
 

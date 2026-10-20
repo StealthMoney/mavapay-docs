@@ -32,6 +32,14 @@
             ]
           },
           {
+            "group": "Collections",
+            "pages": [
+              "collections/introduction",
+              "collections/ngn-collection",
+              "collections/kes-collection"
+            ]
+          },
+          {
             "group": "Stablecoins",
             "pages": [
               "stablecoins/introduction",
