@@ -39,6 +39,45 @@ In the staging environment, you would be able to:
   On sandbox (`https://staging.mavapay.co`), compliance approval is instant for testing, so you do not need to fill the compliance form before generating test API keys.
 </Note>
 
+### IP whitelisting
+
+IP whitelisting limits which networks can call the API with your keys. When it is turned on, Mavapay accepts requests only from the IP addresses you save. Requests from any other address are rejected. The list applies to every API key on the account.
+
+Whitelisting is optional and off by default. You can turn it off again at any time. We recommend leaving it on in production so a leaked API key cannot be used from an unknown network.
+
+You manage it from the [dashboard](https://mavapay.co). The same steps apply on [sandbox](https://staging.mavapay.co). Two-factor authentication has to be set up before you can add addresses or change the setting.
+
+#### Set up two-factor authentication
+
+Open **Settings**, then **Preferences**. Under **Two-Factor Authentication**, choose how you want to receive codes:
+
+- **Authenticator app** for a time-based one-time password (TOTP)
+- **Email** for a code sent to your account email
+
+![Set up two-factor authentication from Settings, then Preferences](/images/setup-2fa.png)
+
+Until this is done, your saved IP list stays visible, but you cannot add or remove addresses or change enforcement.
+
+#### Add IP addresses
+
+Open **Settings**, then **IP whitelisting**, and select **Add IP address**. Enter the public IP of each server that calls the API. You can save more than one address.
+
+Both IPv4 and IPv6 are supported, for example `203.0.113.10` or `2001:db8::1`.
+
+Use the public address your server uses for outbound traffic. A private address such as `10.0.0.1` or `192.168.1.1` will not match requests that reach the API.
+
+#### Turn enforcement on or off
+
+After you have added at least one address, turn on **Enforce IP whitelisting**. Only the addresses in your list can call the API while the toggle is on.
+
+To stop restricting traffic, turn the toggle off. Your saved addresses stay in the list, so you can turn the feature back on later without entering them again.
+
+![Add IP addresses and turn enforcement on or off from Settings, then IP whitelisting](/images/ip-whitelisting.png)
+
+<Note>
+  Add the address you are connecting from before you enable enforcement. Otherwise calls from that server are rejected.
+</Note>
+
 {/* <Card
   title="Mavapay API Endpoints Schema"
   icon="leaf"
