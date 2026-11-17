@@ -34,3 +34,9 @@ If you suspect that your API key has been compromised, deactivate the key and re
   </ResponseField>
 
   API requests made without a valid API key will return a `401: Unauthorized` status code.
+
+### IP whitelisting
+
+You can limit API access to specific IPv4 and IPv6 addresses. When enforcement is on, requests from any other address are rejected. The list applies to every API key on the account.
+
+Whitelisting is optional and off by default. Turn it on from the dashboard after you set up two-factor authentication (email or an authenticator app). See [IP whitelisting](/authentication#ip-whitelisting) for the setup steps. You can turn it off again at any time.
